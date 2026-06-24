@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5AFC8B1D-EC0E-41CB-ABDB-933F01C4DDD1}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Apparel_Dynamic_1._0</RootNamespace>
+    <AssemblyName>Apparel_Dynamic_1.0</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Apparel_Dynamic_1._0.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="SAPBusinessOneSDK" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helper\FileDialogHelper.cs" />
+    <Compile Include="Helper\Global.cs" />
+    <Compile Include="Helper\GlobalFunction.cs" />
+    <Compile Include="Helper\NetworkShareHelper.cs" />
+    <Compile Include="Modules\SalesQuotation.cs" />
+    <Compile Include="Modules\StandardFormManipulation.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Master\RouteMaster.b1f.cs">
+      <DependentUpon>RouteMaster.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Master\SampleMaster.b1f.cs">
+      <DependentUpon>SampleMaster.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Master\SizeTypeMaster.b1f.cs">
+      <DependentUpon>SizeTypeMaster.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Master\StyleMaster.b1f.cs">
+      <DependentUpon>StyleMaster.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Brand.b1f.cs">
+      <DependentUpon>Brand.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Colour.b1f.cs">
+      <DependentUpon>Colour.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\ComponentStages.b1f.cs">
+      <DependentUpon>ComponentStages.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Department.b1f.cs">
+      <DependentUpon>Department.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Gender.b1f.cs">
+      <DependentUpon>Gender.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\LeadTime.b1f.cs">
+      <DependentUpon>LeadTime.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\OrderType.b1f.cs">
+      <DependentUpon>OrderType.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Position.b1f.cs">
+      <DependentUpon>Position.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\ProductGroup.b1f.cs">
+      <DependentUpon>ProductGroup.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\ProductLine.b1f.cs">
+      <DependentUpon>ProductLine.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\ProductType.b1f.cs">
+      <DependentUpon>ProductType.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\SampleStatus.b1f.cs">
+      <DependentUpon>SampleStatus.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\SampleType.b1f.cs">
+      <DependentUpon>SampleType.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\Size.b1f.cs">
+      <DependentUpon>Size.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\SubDivision.b1f.cs">
+      <DependentUpon>SubDivision.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Setup\UseType.b1f.cs">
+      <DependentUpon>UseType.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Transaction\CAD.b1f.cs">
+      <DependentUpon>CAD.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Transaction\OTT.b1f.cs">
+      <DependentUpon>OTT.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Transaction\SalesContract.b1f.cs">
+      <DependentUpon>SalesContract.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Transaction\SamplePreCosting.b1f.cs">
+      <DependentUpon>SamplePreCosting.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Version\SalesContractAmendLog.b1f.cs">
+      <DependentUpon>SalesContractAmendLog.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Version\SamplePreCostVersionLog.b1f.cs">
+      <DependentUpon>SamplePreCostVersionLog.b1f</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AddFiles\Database Design\" />
+    <Folder Include="AddFiles\Documents\" />
+    <Folder Include="AddFiles\Hana\" />
+    <Folder Include="AddFiles\Logo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Master\RouteMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Master\SampleMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Master\SizeTypeMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Master\StyleMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Brand.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Colour.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\ComponentStages.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Department.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Gender.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\LeadTime.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\OrderType.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Position.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\ProductGroup.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\ProductLine.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\ProductType.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\SampleStatus.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\SampleType.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\Size.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\SubDivision.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\UseType.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\CAD.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\OTT.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\SalesContract.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\SamplePreCosting.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Version\SalesContractAmendLog.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Version\SamplePreCostVersionLog.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

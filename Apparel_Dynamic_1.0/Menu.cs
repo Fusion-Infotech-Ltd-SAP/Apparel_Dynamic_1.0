@@ -550,17 +550,18 @@ namespace Apparel_Dynamic_1._0
                 }
                 //CPM Master
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_CPM")
-                {
-                    string formUID = "FIL_FRM_CPM";
-                    if (IsFormOpen(formUID))
-                    {
-                        Global.G_UI_Application.Forms.Item(formUID).Select();
-                        Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
-                        return;
-                    }
+                { 
                     try
                     {
+                        string formUID = "FIL_FRM_CPM";
+                        if (IsFormOpen(formUID))
+                        {
+                            Global.G_UI_Application.Forms.Item(formUID).Select();
+                            Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                                SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                            return;
+                        }
+
                         CPMMaster activeForm = new CPMMaster();
                         activeForm.Show();
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_CPM");

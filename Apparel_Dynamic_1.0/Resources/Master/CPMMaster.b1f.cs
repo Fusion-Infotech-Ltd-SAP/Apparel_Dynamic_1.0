@@ -18,31 +18,31 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         /// </summary>
         public override void OnInitializeComponent()
         {
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
-            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_1").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STBRNDCD").Specific));
+            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("STPDGPCD").Specific));
             this.StaticText2 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_2").Specific));
-            this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_3").Specific));
-            this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_4").Specific));
-            this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_5").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("Item_6").Specific));
-            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("Item_7").Specific));
-            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("Item_8").Specific));
-            this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("Item_9").Specific));
+            this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCNUM").Specific));
+            this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("STFRMDAT").Specific));
+            this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("STTODATE").Specific));
+            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETBRNDCD").Specific));
+            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("ETBRNDNM").Specific));
+            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
+            this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("ETPDGPCD").Specific));
             this.EditText4 = ((SAPbouiCOM.EditText)(this.GetItem("Item_10").Specific));
-            this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("Item_11").Specific));
+            this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("ETPDGPNM").Specific));
             this.EditText6 = ((SAPbouiCOM.EditText)(this.GetItem("Item_12").Specific));
-            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("Item_13").Specific));
-            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("Item_14").Specific));
-            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("Item_15").Specific));
-            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_16").Specific));
-            this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("Item_18").Specific));
-            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_19").Specific));
-            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_20").Specific));
-            this.Folder1 = ((SAPbouiCOM.Folder)(this.GetItem("Item_21").Specific));
-            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_22").Specific));
-            this.Button2 = ((SAPbouiCOM.Button)(this.GetItem("Item_23").Specific));
-            this.Button3 = ((SAPbouiCOM.Button)(this.GetItem("Item_24").Specific));
-            this.Matrix1 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_25").Specific));
+            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
+            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
+            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("ETFRMDAT").Specific));
+            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("ETTODATE").Specific));
+            this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("TABSAMRN").Specific));
+            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
+            this.Folder1 = ((SAPbouiCOM.Folder)(this.GetItem("TABCPM").Specific));
+            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSAMRN").Specific));
+            this.Button2 = ((SAPbouiCOM.Button)(this.GetItem("BTNWLN").Specific));
+            this.Button3 = ((SAPbouiCOM.Button)(this.GetItem("BTNLDCPM").Specific));
+            this.Matrix1 = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCPM").Specific));
             this.OnCustomInitialize();
 
         }

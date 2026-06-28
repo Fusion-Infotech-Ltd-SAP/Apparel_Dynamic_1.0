@@ -47,6 +47,7 @@ namespace Apparel_Dynamic_1._0
                 //Apparel ->  Master
                 CreateMainMenu("APP_MST", "APP_MST_ROUTNG", "Route Master", 1, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_SZTPMSTR", "Size Type Master", 2, 1, false);
+                CreateMainMenu("APP_MST", "APP_MST_CPM", "CPM Master", 3, 1, false);
 
 
                 //Apparel -> Transcation
@@ -247,7 +248,7 @@ namespace Apparel_Dynamic_1._0
                     ProductGroup activeForm = new ProductGroup();
                     activeForm.Show();
                 }
-                //FIL_FRM_BRNDMSTR
+                //Brand Master
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_BRAND")
                 {
                     string formUID = "FIL_FRM_BRNDMSTR";
@@ -370,6 +371,7 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
+                
                 //___________________________________________________________Master________________________________________________
                 //Sample Master
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_SAM_SM")
@@ -518,8 +520,7 @@ namespace Apparel_Dynamic_1._0
                     {
                         Application.SBO_Application.MessageBox("Error Found : " + e.Message);
                     }
-                }
-               
+                }       
                 //Sales Quotation
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_MRD_DRO")
                 {
@@ -546,6 +547,45 @@ namespace Apparel_Dynamic_1._0
                     {
                         Application.SBO_Application.MessageBox("Error while opening Sales Order Draft form: " + ex.Message);
                     }
+                }
+                //CPM Master
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_CPM")
+                { 
+                    try
+                    {
+                        string formUID = "FIL_FRM_CPM";
+                        if (IsFormOpen(formUID))
+                        {
+                            Global.G_UI_Application.Forms.Item(formUID).Select();
+                            Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                                SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                            return;
+                        }
+
+                        CPMMaster activeForm = new CPMMaster();
+                        activeForm.Show();
+                        SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_CPM");
+                        SAPbouiCOM.Matrix MTXSAMRN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                        MTXSAMRN.AutoResizeColumns();
+
+                        //Series Initialization
+                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                        {
+                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_CPM");  //Object Type
+                            string ocmbvalue = ocmb.Selected.Value;
+                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_CPM");
+                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Application.SBO_Application.MessageBox("Error Found : " + ex.Message);
+                    }
+
                 }
 
                 //___________________________________________________________Transaction________________________________________________

@@ -18,7 +18,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private SAPbouiCOM.EditText ETBRNDCD, ETBRNDNM, ETDOCTRY, ETPDGPCD, ETRTSGCD, ETPDGPNM, 
                     ETRTSGNM, ETDOCNUM, ETFRMDAT, ETTODATE;
 
-        
+
 
         private SAPbouiCOM.ComboBox CBSERIES;
 
@@ -74,13 +74,53 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeFormEvents()
         {
+            this.ActivateAfter += new ActivateAfterHandler(this.Form_ActivateAfter);
+
         }
 
-        
+
 
         private void OnCustomInitialize()
         {
 
+        }
+
+        private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode ==SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+            {
+                HideSampleRateColumns(oForm);
+            }
+        }
+
+        private void HideSampleRateColumns(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                oForm.Freeze(true);
+
+                SAPbouiCOM.Matrix oMatrix =
+                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    try
+                    {
+                        oMatrix.Columns.Item($"CLSAMR{i}").Visible = false;
+                    }
+                    catch
+                    {
+                        // Ignore if the column does not exist
+                    }
+                }
+
+                oMatrix.AutoResizeColumns();
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
         }
 
         private void ETRTSGCD_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)

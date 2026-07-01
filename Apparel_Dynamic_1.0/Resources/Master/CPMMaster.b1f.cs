@@ -33,14 +33,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeComponent()
         {
-            //     Static Text
+            //        Static Text
             this.STBRNDCD = ((SAPbouiCOM.StaticText)(this.GetItem("STBRNDCD").Specific));
             this.STPDGPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STPDGPCD").Specific));
             this.STRTSGCD = ((SAPbouiCOM.StaticText)(this.GetItem("STRTSGCD").Specific));
             this.STDOCNUM = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCNUM").Specific));
             this.STFRMDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STFRMDAT").Specific));
             this.STTODATE = ((SAPbouiCOM.StaticText)(this.GetItem("STTODATE").Specific));
-            //     Edit text
+            //        Edit text
             this.ETBRNDCD = ((SAPbouiCOM.EditText)(this.GetItem("ETBRNDCD").Specific));
             this.ETBRNDCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETBRNDCD_ChooseFromListBefore);
             this.ETBRNDCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETBRNDCD_ChooseFromListAfter);
@@ -57,17 +57,19 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETFRMDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETFRMDAT").Specific));
             this.ETTODATE = ((SAPbouiCOM.EditText)(this.GetItem("ETTODATE").Specific));
-            //     Combo box
+            //        Combo box
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //     tab
+            //        tab
             this.TABSAMRN = ((SAPbouiCOM.Folder)(this.GetItem("TABSAMRN").Specific));
             this.TABCPM = ((SAPbouiCOM.Folder)(this.GetItem("TABCPM").Specific));
-            //     Matrix
+            //        Matrix
             this.MTXSAMRN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSAMRN").Specific));
             this.MTXSAMRN.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXSAMRN_LostFocusAfter);
             this.MTXCPM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCPM").Specific));
-            //     Button
+            //        Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
+            this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNWLN = ((SAPbouiCOM.Button)(this.GetItem("BTNWLN").Specific));
             this.BTNWLN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNWLN_PressedAfter);
@@ -80,7 +82,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeFormEvents()
         {
-            this.ActivateAfter += new ActivateAfterHandler(this.Form_ActivateAfter);
+            this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
 
         }
 
@@ -91,6 +94,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         }
 
+
+
+        private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            throw new System.NotImplementedException();
+
+        }
+
         private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
@@ -98,6 +109,36 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 HideSampleRateColumns(oForm);
             }
+        }
+
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+            try
+            {
+                if (eventInfo.ItemUID != "MTXSAMRN" || eventInfo.Row <= 0)
+                    return;
+
+                oForm.EnableMenu("1293", true);
+            }
+            catch { }
+
+        }
+        private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            // Do not validate in OK mode
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                return;
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                ValidateForm(ref oForm, ref BubbleEvent);
+            }
+
         }
 
         private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -694,6 +735,85 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     SAPbouiCOM.BoMessageTime.bmt_Long,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+        }
+
+        //___________________________________________________________________________________________________________ 
+        // User Define Function
+
+        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            string brandCode = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_BRAND", 0).Trim();
+            string prdGrpCode = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_PRDGRP", 0).Trim();
+            string fromDateText = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_FROMDATE", 0).Trim();
+            string toDateText = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_TODATE", 0).Trim();
+
+            if (string.IsNullOrWhiteSpace(brandCode))
+            {
+                Global.GFunc.ShowError("Enter Brand Code");
+                oForm.ActiveItem = "ETBRNDCD";
+                return BubbleEvent = false;
+            }
+            if (string.IsNullOrWhiteSpace(prdGrpCode))
+            {
+                Global.GFunc.ShowError("Enter Product Group Master Code");
+                oForm.ActiveItem = "ETPDGPCD";
+                return BubbleEvent = false;
+            }
+            DateTime fromDate = DateTime.ParseExact(fromDateText, "yyyyMMdd", null);
+            DateTime toDate = DateTime.ParseExact(toDateText, "yyyyMMdd", null);
+
+            if (toDate < fromDate)
+            {
+                Global.GFunc.ShowError("To Date cannot be before From Date");
+                oForm.ActiveItem = "ETTODATE";
+                return BubbleEvent = false;
+            }
+
+            SAPbouiCOM.Matrix oMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+
+            for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+            {
+                string fromQtyText = GetMatrixStringValue(oMatrix, "CLFROM", i);
+                string toQtyText = GetMatrixStringValue(oMatrix, "CLTO", i);
+
+                // Skip only last auto-added empty row
+                //if (i == oMatrix.RowCount && string.IsNullOrWhiteSpace(maxQtyText))
+                //    continue;
+
+                double fromQty = GetMatrixDoubleValue(oMatrix, "CLFROM", i);
+                double toQty = GetMatrixDoubleValue(oMatrix, "CLTO", i);
+
+                if (string.IsNullOrWhiteSpace(fromQtyText) || fromQty <= 0)
+                {
+                    Global.GFunc.ShowError("From Quantity must have value in row " + i);
+                    oMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Click();
+                    return BubbleEvent = false;
+                }
+
+                if (string.IsNullOrWhiteSpace(toQtyText) || toQty <= 0)
+                {
+                    Global.GFunc.ShowError("To Quantity must have value in row " + i);
+                    oMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Click();
+                    return BubbleEvent = false;
+                }
+
+                if (toQty <= fromQty)
+                {
+                    Global.GFunc.ShowError("TO Quantity must be greater than From Quantity in row " + i);
+                    oMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Click();
+                    return BubbleEvent = false;
+                }
+            }
+
+            oMatrix.FlushToDataSource();
+
+            return BubbleEvent;
+        }
+
+        private string GetMatrixStringValue(SAPbouiCOM.Matrix oMatrix, string colUID, int row)
+        {
+            SAPbouiCOM.EditText txt = (SAPbouiCOM.EditText)oMatrix.Columns.Item(colUID).Cells.Item(row).Specific;
+            return txt.Value.Trim();
         }
 
         private void SetSAMMatrixEditableAfterLoad(SAPbouiCOM.Matrix oMatrix)

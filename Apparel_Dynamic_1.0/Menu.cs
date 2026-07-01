@@ -349,17 +349,28 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Matrix MTXLEDTM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
                         MTXLEDTM.AutoResizeColumns();
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
+                        SAPbouiCOM.DBDataSource oDBH =(SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
+
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_LEADTMST");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_LEADTMST");
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            SAPbouiCOM.ComboBox ocmb =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_LEADTMST");
 
-                            //LoadShippingModeComboInMatrix(oForm);
+                            //Null Check 
+                            if (ocmb.Selected == null || string.IsNullOrWhiteSpace(ocmb.Selected.Value))
+                            {
+                                Global.GFunc.ShowError("No valid document numbering series found for this fiscal year.");
+                                return;
+                            }
+
+                            string seriesValue = ocmb.Selected.Value.Trim();
+                            long docno = oForm.BusinessObject.GetNextSerialNumber(seriesValue, "FIL_D_LEADTMST");
+                            if (docno <= 0)
+                            {
+                                Global.GFunc.ShowError("Next document number not found for the selected series.");
+                                return;
+                            }
+                            oDBH.SetValue("DocNum", 0, docno.ToString());
                             LoadMatrixCombos(oForm);
                             EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
                         }

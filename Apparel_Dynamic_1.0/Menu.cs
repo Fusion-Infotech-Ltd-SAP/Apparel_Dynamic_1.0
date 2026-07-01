@@ -577,7 +577,6 @@ namespace Apparel_Dynamic_1._0
                             string ocmbvalue = ocmb.Selected.Value;
                             long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_CPM");
                             oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
-
                         }
 
                     }

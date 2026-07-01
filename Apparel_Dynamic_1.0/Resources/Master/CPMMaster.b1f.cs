@@ -98,7 +98,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
 
         }
 
@@ -759,6 +759,18 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 oForm.ActiveItem = "ETPDGPCD";
                 return BubbleEvent = false;
             }
+            if (string.IsNullOrWhiteSpace(fromDateText))
+            {
+                Global.GFunc.ShowError("Enter From Date ");
+                oForm.ActiveItem = "ETFRMDAT";
+                return BubbleEvent = false;
+            }
+            if (string.IsNullOrWhiteSpace(toDateText))
+            {
+                Global.GFunc.ShowError("Enter To Date");
+                oForm.ActiveItem = "ETTODATE";
+                return BubbleEvent = false;
+            }
             DateTime fromDate = DateTime.ParseExact(fromDateText, "yyyyMMdd", null);
             DateTime toDate = DateTime.ParseExact(toDateText, "yyyyMMdd", null);
 
@@ -786,21 +798,21 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (string.IsNullOrWhiteSpace(fromQtyText) || fromQty <= 0)
                 {
                     Global.GFunc.ShowError("From Quantity must have value in row " + i);
-                    oMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Click();
+                    oMatrix.Columns.Item("CLFROM").Cells.Item(i).Click();
                     return BubbleEvent = false;
                 }
 
                 if (string.IsNullOrWhiteSpace(toQtyText) || toQty <= 0)
                 {
                     Global.GFunc.ShowError("To Quantity must have value in row " + i);
-                    oMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Click();
+                    oMatrix.Columns.Item("CLTO").Cells.Item(i).Click();
                     return BubbleEvent = false;
                 }
 
                 if (toQty <= fromQty)
                 {
                     Global.GFunc.ShowError("TO Quantity must be greater than From Quantity in row " + i);
-                    oMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Click();
+                    oMatrix.Columns.Item("CLTO").Cells.Item(i).Click();
                     return BubbleEvent = false;
                 }
             }

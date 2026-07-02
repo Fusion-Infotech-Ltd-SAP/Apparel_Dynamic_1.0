@@ -14,9 +14,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         {
         }
 
-        private SAPbouiCOM.StaticText STBRNDCD, STPDGPCD, STDOCNUM, STRTSGCD, STFRMDAT, STTODATE;
+        private SAPbouiCOM.StaticText STBRNDCD, STPDGPCD, STDOCNUM, STRTSGCD, STFRMDAT, STTODATE, STDOCDAT;
 
-        private SAPbouiCOM.EditText ETBRNDCD, ETBRNDNM, ETDOCTRY, ETPDGPCD, ETRTSGCD, ETPDGPNM, 
+        private SAPbouiCOM.EditText ETBRNDCD, ETBRNDNM, ETDOCTRY, ETPDGPCD, ETRTSGCD, ETPDGPNM, ETDOCDAT,
                     ETRTSGNM, ETDOCNUM, ETFRMDAT, ETTODATE;
 
         private SAPbouiCOM.ComboBox CBSERIES;
@@ -33,14 +33,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeComponent()
         {
-            //        Static Text
+            //         Static Text
             this.STBRNDCD = ((SAPbouiCOM.StaticText)(this.GetItem("STBRNDCD").Specific));
             this.STPDGPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STPDGPCD").Specific));
             this.STRTSGCD = ((SAPbouiCOM.StaticText)(this.GetItem("STRTSGCD").Specific));
             this.STDOCNUM = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCNUM").Specific));
             this.STFRMDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STFRMDAT").Specific));
             this.STTODATE = ((SAPbouiCOM.StaticText)(this.GetItem("STTODATE").Specific));
-            //        Edit text
+            //         Edit text
             this.ETBRNDCD = ((SAPbouiCOM.EditText)(this.GetItem("ETBRNDCD").Specific));
             this.ETBRNDCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETBRNDCD_ChooseFromListBefore);
             this.ETBRNDCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETBRNDCD_ChooseFromListAfter);
@@ -57,16 +57,16 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETFRMDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETFRMDAT").Specific));
             this.ETTODATE = ((SAPbouiCOM.EditText)(this.GetItem("ETTODATE").Specific));
-            //        Combo box
+            //         Combo box
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //        tab
+            //         tab
             this.TABSAMRN = ((SAPbouiCOM.Folder)(this.GetItem("TABSAMRN").Specific));
             this.TABCPM = ((SAPbouiCOM.Folder)(this.GetItem("TABCPM").Specific));
-            //        Matrix
+            //         Matrix
             this.MTXSAMRN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSAMRN").Specific));
             this.MTXSAMRN.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXSAMRN_LostFocusAfter);
             this.MTXCPM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCPM").Specific));
-            //        Button
+            //         Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -76,6 +76,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.BTNLDCPM = ((SAPbouiCOM.Button)(this.GetItem("BTNLDCPM").Specific));
             this.BTNLDCPM.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.BTNLDCPM_PressedBefore);
             this.BTNLDCPM.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNLDCPM_PressedAfter);
+            this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
+            this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
             this.OnCustomInitialize();
 
         }
@@ -83,7 +85,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         public override void OnInitializeFormEvents()
         {
             this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
-            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.RightClickBefore += new SAPbouiCOM.Framework.FormBase.RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
 
         }
 
@@ -100,6 +103,37 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         {
            
 
+        }
+        private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+
+                SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                SAPbouiCOM.Matrix cpmMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+
+                // First hide all SAM columns in MTXCPM
+                HideSampleRateColumns(oForm);
+
+                // Then show columns based on loaded MTXSAMRN row count
+                ShowSampleRateColumns(oForm, samMatrix.VisualRowCount);
+                samMatrix.AutoResizeColumns();
+                cpmMatrix.AutoResizeColumns();
+                SetSAMMatrixEditableAfterLoad(samMatrix);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_DataLoadAfter Error: {ex.Message}");
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
+            }
         }
 
         private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
@@ -153,6 +187,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
 
         }
+
+
 
         private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
@@ -681,6 +717,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             string prdGrpCode = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_PRDGRP", 0).Trim();
             string fromDateText = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_FROMDATE", 0).Trim();
             string toDateText = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_TODATE", 0).Trim();
+            string docDate = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_DOCDATE", 0).Trim();
 
             if (string.IsNullOrWhiteSpace(brandCode))
             {
@@ -701,6 +738,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 return BubbleEvent = false;
             }
             if (string.IsNullOrWhiteSpace(toDateText))
+            {
+                Global.GFunc.ShowError("Enter  DpcDate");
+                oForm.ActiveItem = "ETDOCDAT";
+                return BubbleEvent = false;
+            }
+            if (string.IsNullOrWhiteSpace(docDate))
             {
                 Global.GFunc.ShowError("Enter To Date");
                 oForm.ActiveItem = "ETTODATE";
@@ -753,7 +796,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
 
             oMatrix.FlushToDataSource();
-
             return BubbleEvent;
         }
 
@@ -884,6 +926,5 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 Global.GFunc.SetNewLine(matrix, db, 1, "");
             }
         }
-
     }
 }

@@ -98,32 +98,45 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            //throw new System.NotImplementedException();
+           
 
         }
 
         private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            if (oForm.Mode ==SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+            try
             {
-                HideSampleRateColumns(oForm);
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                {
+                    HideSampleRateColumns(oForm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_ActivateAfter Error: {ex.Message}");
             }
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
         {
             BubbleEvent = true;
-            SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+
             try
             {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+
                 if (eventInfo.ItemUID != "MTXSAMRN" || eventInfo.Row <= 0)
                     return;
 
                 oForm.EnableMenu("1293", true);
             }
-            catch { }
-
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_RightClickBefore Error: {ex.Message}");
+                BubbleEvent = false;
+            }
         }
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
@@ -153,26 +166,17 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (string.IsNullOrWhiteSpace(productGroupCode))
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Please enter Product Group Code.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                    Global.GFunc.ShowError("Please enter Product Group Code.");
                     oForm.Items.Item("ETPDGPCD").Click();
                     BubbleEvent = false;
                     return;
                 }
 
-                SAPbouiCOM.Matrix samMatrix =
-                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
 
                 if (samMatrix.RowCount == 0)
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Please enter at least one SAM Range row.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                    Global.GFunc.ShowError("Please enter at least one SAM Range row.");
                     BubbleEvent = false;
                     return;
                 }
@@ -184,22 +188,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                     if (string.IsNullOrWhiteSpace(fromQty))
                     {
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Please enter From Quantity in SAM Range row " + i + ".",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                        Global.GFunc.ShowError($"Please enter From Quantity in SAM Range row {i}.");
                         BubbleEvent = false;
                         return;
                     }
 
                     if (string.IsNullOrWhiteSpace(toQty))
                     {
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Please enter To Quantity in SAM Range row " + i + ".",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                        Global.GFunc.ShowError($"Please enter To Quantity in SAM Range row {i}.");
                         BubbleEvent = false;
                         return;
                     }
@@ -243,11 +239,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Load CPM validation error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                Global.GFunc.ShowError($"BTNLDCPM_PressedBefore Error: {ex.Message}");
                 BubbleEvent = false;
             }
         }
@@ -310,6 +302,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 cpmMatrix.LoadFromDataSource();
                 cpmMatrix.AutoResizeColumns();
 
+                Global.GFunc.ShowSuccess("CPM data loaded successfully.");
+
                 Application.SBO_Application.StatusBar.SetText(
                     "CPM data loaded successfully.",
                     SAPbouiCOM.BoMessageTime.bmt_Short,
@@ -317,10 +311,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Load CPM error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError($"Load CPM error: {ex.Message}");
+
             }
             finally
             {
@@ -332,7 +324,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (oForm != null)
                         oForm.Freeze(false);
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    Global.GFunc.ShowError($"BTNLDCPM_PressedAfter Finally Error: {ex.Message}");
+                }
             }
         }
 
@@ -352,11 +347,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (string.IsNullOrWhiteSpace(etRouteStage.Value))
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Please enter the Product Group first.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                    Global.GFunc.ShowError("Please enter the Product Group first.");
                     oForm.Items.Item("ETPDGPCD").Click();
                     return;
                 }
@@ -372,39 +363,27 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (fromQty < 0)
                 {
                     SetMatrixValue(oMatrix, "CLFROM", currentRow, "0");
-                    Application.SBO_Application.StatusBar.SetText(
-                        "From Quantity cannot be negative.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    Global.GFunc.ShowError("From Quantity cannot be negative.");
                     return;
                 }
 
                 if (toQty < 0)
                 {
                     SetMatrixValue(oMatrix, "CLTO", currentRow, "");
-                    Application.SBO_Application.StatusBar.SetText(
-                        "To Quantity cannot be negative.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    Global.GFunc.ShowError("To Quantity cannot be negative.");
                     return;
                 }
 
                 if (toQty == 0)
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Enter To Quantity before adding new line.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    Global.GFunc.ShowError("Enter To Quantity before adding new line.");
                     return;
                 }
 
                 if (toQty <= fromQty)
                 {
                     SetMatrixValue(oMatrix, "CLTO", currentRow, "");
-                    Application.SBO_Application.StatusBar.SetText(
-                        "To Quantity must be greater than From Quantity.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    Global.GFunc.ShowError("To Quantity must be greater than From Quantity.");
                     return;
                 }
 
@@ -423,10 +402,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError(ex.Message);
             }
             finally
             {
@@ -464,12 +440,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (fromQty < 0)
                     {
                         SetMatrixValue(oMatrix, "CLFROM", pVal.Row, "0");
-
-                        Application.SBO_Application.StatusBar.SetText(
-                            "From Quantity cannot be negative.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                        Global.GFunc.ShowError("From Quantity cannot be negative.");
                         return;
                     }
                 }
@@ -482,24 +453,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (toQty < 0)
                     {
                         SetMatrixValue(oMatrix, "CLTO", pVal.Row, "");
-
-                        Application.SBO_Application.StatusBar.SetText(
-                            "To Quantity cannot be negative.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                        Global.GFunc.ShowError("To Quantity cannot be negative.");
                         return;
                     }
 
                     if (toQty != 0 && toQty <= fromQty)
                     {
                         SetMatrixValue(oMatrix, "CLTO", pVal.Row, "");
-
-                        Application.SBO_Application.StatusBar.SetText(
-                            "To Quantity must be greater than From Quantity.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                        Global.GFunc.ShowError("To Quantity must be greater than From Quantity.");
                         return;
                     }
                 }
@@ -508,10 +469,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError(ex.Message);
             }
             finally
             {
@@ -547,11 +505,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error filtering Route Stage CFL: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError($"Error filtering Route Stage CFL: {ex.Message}");
                 BubbleEvent = false;
             }
 
@@ -578,10 +532,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    $"Route Stage Code ChooseFromListAfter Error: {ex.Message}",
-                    SAPbouiCOM.BoMessageTime.bmt_Long,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError($"Route Stage Code ChooseFromListAfter Error: {ex.Message}");
             }
 
         }
@@ -609,11 +560,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error filtering Product Group CFL: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError($"Error filtering Product Group CFL:  {ex.Message}");
                 BubbleEvent = false;
             }
         }
@@ -639,10 +586,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPNM").Specific).Value = name;
 
                 //Adding new line on Matrix
-
                 EnsureLine(oForm, "MTXSAMRN", "@FIL_DR_SAMRNG");
-                SAPbouiCOM.Matrix oMatrix =
-                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                SAPbouiCOM.Matrix oMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
 
                 if (oMatrix.RowCount > 0)
                 {
@@ -667,10 +612,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    $"Product Group Code ChooseFromListAfter Error: {ex.Message}",
-                    SAPbouiCOM.BoMessageTime.bmt_Long,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError($"Product Group Code ChooseFromListAfter Error:  {ex.Message}");
             }
             finally
             {
@@ -702,11 +644,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error filtering Brand CFL: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError($"Error filtering Brand CFL:  {ex.Message}");
                 BubbleEvent = false;
             }
         }
@@ -730,10 +668,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    $"ETBRNDCD_ChooseFromListAfter Error: {ex.Message}",
-                    SAPbouiCOM.BoMessageTime.bmt_Long,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError($"ETBRNDCD_ChooseFromListAfter Error: {ex.Message}");
             }
         }
 

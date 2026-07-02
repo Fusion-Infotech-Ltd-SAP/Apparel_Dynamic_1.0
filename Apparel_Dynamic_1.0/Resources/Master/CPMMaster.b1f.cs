@@ -733,13 +733,13 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             if (string.IsNullOrWhiteSpace(fromDateText))
             {
-                Global.GFunc.ShowError("Enter From Date ");
+                Global.GFunc.ShowError("Enter From Date");
                 oForm.ActiveItem = "ETFRMDAT";
                 return BubbleEvent = false;
             }
             if (string.IsNullOrWhiteSpace(toDateText))
             {
-                Global.GFunc.ShowError("Enter  DpcDate");
+                Global.GFunc.ShowError("Enter DocDate");
                 oForm.ActiveItem = "ETDOCDAT";
                 return BubbleEvent = false;
             }

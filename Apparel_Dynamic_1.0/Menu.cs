@@ -349,17 +349,28 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Matrix MTXLEDTM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
                         MTXLEDTM.AutoResizeColumns();
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
+                        SAPbouiCOM.DBDataSource oDBH =(SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
+
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_LEADTMST");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_LEADTMST");
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            SAPbouiCOM.ComboBox ocmb =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_LEADTMST");
 
-                            //LoadShippingModeComboInMatrix(oForm);
+                            //Null Check 
+                            if (ocmb.Selected == null || string.IsNullOrWhiteSpace(ocmb.Selected.Value))
+                            {
+                                Global.GFunc.ShowError("No valid document numbering series found for this fiscal year.");
+                                return;
+                            }
+
+                            string seriesValue = ocmb.Selected.Value.Trim();
+                            long docno = oForm.BusinessObject.GetNextSerialNumber(seriesValue, "FIL_D_LEADTMST");
+                            if (docno <= 0)
+                            {
+                                Global.GFunc.ShowError("Next document number not found for the selected series.");
+                                return;
+                            }
+                            oDBH.SetValue("DocNum", 0, docno.ToString());
                             LoadMatrixCombos(oForm);
                             EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
                         }
@@ -1479,6 +1490,32 @@ namespace Apparel_Dynamic_1._0
 
                                 break;
                             }
+                        case "FIL_FRM_CPM":
+                            {
+                                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                                int lastRow = matrix.VisualRowCount;
+                                int currentRow = matrix.GetNextSelectedRow(0, SAPbouiCOM.BoOrderType.ot_RowOrder);
+
+                                if (currentRow <= 0)
+                                {
+                                    SAPbouiCOM.CellPosition cellPos = matrix.GetCellFocus();
+                                    currentRow = cellPos.rowIndex;
+                                }
+
+                                if (currentRow != lastRow)
+                                {
+                                    Application.SBO_Application.StatusBar.SetText(
+                                        "Only last row can be deleted.",
+                                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                                        SAPbouiCOM.BoStatusBarMessageType.smt_Error
+                                    );
+
+                                    BubbleEvent = false;
+                                    return;
+                                }
+
+                                break;
+                            }
                     }
                 }
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1293")
@@ -1551,6 +1588,57 @@ namespace Apparel_Dynamic_1._0
                             case "FIL_FRM_LEADTIME":
                                 {
                                     HandleLeadTimeDeleteAfter(oForm);
+                                    break;
+                                }
+                            case "FIL_FRM_CPM":
+                                {
+                                    oForm.Freeze(true);
+
+                                    SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                                    SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DR_SAMRNG");
+                                    matrix.FlushToDataSource();
+
+                                    // Remove ghost rows after SAP 1293 delete
+                                    for (int i = db.Size - 1; i >= 0; i--)
+                                    {
+                                        string fromQtyText = db.GetValue("U_SAMFROM", i).Trim();
+                                        string toQtyText = db.GetValue("U_SAMTO", i).Trim();
+
+                                        double fromQty = 0;
+                                        double toQty = 0;
+
+                                        double.TryParse(fromQtyText, out fromQty);
+                                        double.TryParse(toQtyText, out toQty);
+
+                                        if (fromQty <= 0 && toQty <= 0)
+                                        {
+                                            db.RemoveRecord(i);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    matrix.LoadFromDataSource();
+
+                                    // Re-number rows
+                                    for (int i = 1; i <= matrix.VisualRowCount; i++)
+                                    {
+                                        ((SAPbouiCOM.EditText)matrix.Columns.Item("#").Cells.Item(i).Specific).Value =
+                                            i.ToString();
+
+                                        ((SAPbouiCOM.EditText)matrix.Columns.Item("CLCODE").Cells.Item(i).Specific).Value =
+                                            "SAM Range " + i;
+                                    }
+
+                                    matrix.FlushToDataSource();
+
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                        oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                                    SetCPMMatrixEditableAfterDelete(matrix);
+                                    matrix.AutoResizeColumns();
                                     break;
                                 }
                         }
@@ -1769,6 +1857,38 @@ namespace Apparel_Dynamic_1._0
                     return true;
             }
             return false;
+        }
+
+        private void SetCPMMatrixEditableAfterDelete(SAPbouiCOM.Matrix matrix)
+        {
+            int fromQtyColNo = GetMatrixColumnNumber(matrix, "CLFROM");
+            int toQtyColNo = GetMatrixColumnNumber(matrix, "CLTO");
+
+            if (fromQtyColNo <= 0 || toQtyColNo <= 0)
+                return;
+
+            int rowCount = matrix.VisualRowCount;
+
+            if (rowCount <= 0)
+                return;
+
+            // If only one row remains:
+            // CLMINQTY and CLMAXQTY both editable
+            if (rowCount == 1)
+            {
+                matrix.CommonSetting.SetCellEditable(1, fromQtyColNo, true);
+                matrix.CommonSetting.SetCellEditable(1, toQtyColNo, true);
+                return;
+            }
+
+            // If more than one row:
+            // CLMINQTY disabled for all rows
+            // CLMAXQTY enabled only for last row
+            for (int i = 1; i <= rowCount; i++)
+            {
+                matrix.CommonSetting.SetCellEditable(i, fromQtyColNo, false);
+                matrix.CommonSetting.SetCellEditable(i, toQtyColNo, i == rowCount);
+            }
         }
 
         private void SetOrderTypeMatrixEditableAfterDelete(SAPbouiCOM.Matrix matrix)

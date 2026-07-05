@@ -1131,7 +1131,11 @@ namespace Apparel_Dynamic_1._0
                                 }
                                 break;
                             }
-
+                             case "FIL_FRM_CPM":
+                            {
+                                HideSampleRateColumns(oForm);
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1281,6 +1285,12 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_LEADTIME":
                             {
                                 SetItemsEnabled(oForm, true, "ETDOCNUM");
+                                break;
+                            }
+                        case "FIL_FRM_CPM":
+                            {
+                                HideSampleRateColumns(oForm);
+                                SetItemsEnabled(oForm, false, "ETDOCNUM", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM", "");
                                 break;
                             }
                     }
@@ -1671,6 +1681,35 @@ namespace Apparel_Dynamic_1._0
         }
 
         //_____________________________________________________ Method for Working Purpose________________________________________
+
+        private void HideSampleRateColumns(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                oForm.Freeze(true);
+
+                SAPbouiCOM.Matrix oMatrix =
+                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    try
+                    {
+                        oMatrix.Columns.Item($"CLSAMR{i}").Visible = false;
+                    }
+                    catch
+                    {
+                        // Ignore if the column does not exist
+                    }
+                }
+
+                oMatrix.AutoResizeColumns();
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
+        }
 
         private void HandleLeadTimeDeleteAfter(SAPbouiCOM.Form oForm)
         {

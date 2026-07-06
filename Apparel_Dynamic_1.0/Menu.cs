@@ -584,10 +584,25 @@ namespace Apparel_Dynamic_1._0
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
                             SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_CPM");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_CPM");
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_CPM");
+
+                            //Null Check 
+                            if (ocmb.Selected == null || string.IsNullOrWhiteSpace(ocmb.Selected.Value))
+                            {
+                                Global.GFunc.ShowError("No valid document numbering series found for this fiscal year.");
+                                return;
+                            }
+
+                            string seriesValue = ocmb.Selected.Value.Trim();
+                            long docno = oForm.BusinessObject.GetNextSerialNumber(seriesValue, "FIL_D_CPM");
+                            if (docno <= 0)
+                            {
+                                Global.GFunc.ShowError("Next document number not found for the selected series.");
+                                return;
+                            }
+                            oDBH.SetValue("DocNum", 0, docno.ToString());
+                            //Current DocDate 
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
                         }
 
                     }

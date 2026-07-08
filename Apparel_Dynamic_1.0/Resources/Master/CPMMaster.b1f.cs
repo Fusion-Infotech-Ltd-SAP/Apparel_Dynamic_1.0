@@ -33,14 +33,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeComponent()
         {
-            //         Static Text
+            //           Static Text
             this.STBRNDCD = ((SAPbouiCOM.StaticText)(this.GetItem("STBRNDCD").Specific));
             this.STPDGPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STPDGPCD").Specific));
             this.STRTSGCD = ((SAPbouiCOM.StaticText)(this.GetItem("STRTSGCD").Specific));
             this.STDOCNUM = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCNUM").Specific));
             this.STFRMDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STFRMDAT").Specific));
             this.STTODATE = ((SAPbouiCOM.StaticText)(this.GetItem("STTODATE").Specific));
-            //         Edit text
+            //           Edit text
             this.ETBRNDCD = ((SAPbouiCOM.EditText)(this.GetItem("ETBRNDCD").Specific));
             this.ETBRNDCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETBRNDCD_ChooseFromListBefore);
             this.ETBRNDCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETBRNDCD_ChooseFromListAfter);
@@ -57,16 +57,17 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETFRMDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETFRMDAT").Specific));
             this.ETTODATE = ((SAPbouiCOM.EditText)(this.GetItem("ETTODATE").Specific));
-            //         Combo box
+            //           Combo box
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //         tab
+            this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
+            //           tab
             this.TABSAMRN = ((SAPbouiCOM.Folder)(this.GetItem("TABSAMRN").Specific));
             this.TABCPM = ((SAPbouiCOM.Folder)(this.GetItem("TABCPM").Specific));
-            //         Matrix
+            //           Matrix
             this.MTXSAMRN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSAMRN").Specific));
             this.MTXSAMRN.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXSAMRN_LostFocusAfter);
             this.MTXCPM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCPM").Specific));
-            //         Button
+            //           Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -78,6 +79,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.BTNLDCPM.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNLDCPM_PressedAfter);
             this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
             this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
+            this.ETDOCDAT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETDOCDAT_LostFocusAfter);
             this.OnCustomInitialize();
 
         }
@@ -124,6 +126,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 samMatrix.AutoResizeColumns();
                 cpmMatrix.AutoResizeColumns();
                 SetSAMMatrixEditableAfterLoad(samMatrix);
+                SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT");
             }
             catch (Exception ex)
             {
@@ -150,6 +153,30 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             catch (Exception ex)
             {
                 Global.GFunc.ShowError($"Form_ActivateAfter Error: {ex.Message}");
+            }
+        }
+
+        private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                string docDate = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(docDate))
+                    return;
+
+                UpdateSeriesAndDocNumByDate(oForm, docDate);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Doc Date Series Error: " + ex.Message);
             }
         }
 
@@ -188,7 +215,38 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         }
 
+        private void CBSERIES_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm =Application.SBO_Application.Forms.Item(pVal.FormUID);
 
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                SAPbouiCOM.ComboBox cbSeries =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                SAPbouiCOM.EditText etDocNum =(SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
+
+                if (cbSeries.Selected == null ||
+                    string.IsNullOrWhiteSpace(cbSeries.Selected.Value))
+                    return;
+
+                string seriesValue = cbSeries.Selected.Value.Trim();
+                long docNo = oForm.BusinessObject.GetNextSerialNumber(seriesValue,"FIL_D_CPM");
+
+                if (docNo <= 0)
+                {
+                    Global.GFunc.ShowError("Next document number not found for selected series.");
+                    etDocNum.Value = "";
+                    return;
+                }
+                etDocNum.Value = docNo.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Series change error: " + ex.Message);
+            }
+        }
 
         private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
@@ -711,6 +769,138 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         //___________________________________________________________________________________________________________ 
         // User Define Function
 
+        private void UpdateSeriesAndDocNumByDate(SAPbouiCOM.Form oForm, string docDate)
+        {
+            try
+            {
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                string objectCode = "FIL_D_CPM";
+
+                SAPbouiCOM.ComboBox cbSeries =
+                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+
+                SAPbouiCOM.EditText etDocNum =
+                    (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
+
+                oForm.Freeze(true);
+
+                ClearComboBox(cbSeries);
+
+                SAPbobsCOM.Recordset rs =
+                    (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                string query = $@"
+                                SELECT 
+                                    T0.""Series"",
+                                    T0.""SeriesName"",
+                                    T0.""NextNumber""
+                                FROM ""NNM1"" T0
+                                INNER JOIN ""OFPR"" T1
+                                    ON T0.""Indicator"" = T1.""Indicator""
+                                WHERE T0.""ObjectCode"" = '{objectCode}'
+                                  AND T0.""Locked"" = 'N'
+                                  AND TO_DATE('{docDate}', 'YYYYMMDD') 
+                                        BETWEEN T1.""F_RefDate"" AND T1.""T_RefDate""
+                                ORDER BY T0.""Series""";
+
+                rs.DoQuery(query);
+
+                if (rs.RecordCount == 0)
+                {
+                    ClearComboBox(cbSeries);
+                    SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+
+                    oDBH.SetValue("Series", 0, "");
+                    oDBH.SetValue("DocNum", 0, "");
+                    etDocNum.Value = "";
+                    Global.GFunc.ShowError("No valid document numbering series found for selected Doc Date.");
+                    return;
+                }
+
+                string firstSeries = "";
+                string firstNextNumber = "";
+
+                while (!rs.EoF)
+                {
+                    string series = rs.Fields.Item("Series").Value.ToString();
+                    string seriesName = rs.Fields.Item("SeriesName").Value.ToString();
+                    string nextNumber = rs.Fields.Item("NextNumber").Value.ToString();
+
+                    cbSeries.ValidValues.Add(series, seriesName);
+
+                    if (string.IsNullOrWhiteSpace(firstSeries))
+                    {
+                        firstSeries = series;
+                        firstNextNumber = nextNumber;
+                    }
+
+                    rs.MoveNext();
+                }
+
+                if (string.IsNullOrWhiteSpace(firstSeries))
+                {
+                    Global.GFunc.ShowError("No valid series loaded for selected Doc Date.");
+                    return;
+                }
+
+                cbSeries.Select(firstSeries, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                long docNo = oForm.BusinessObject.GetNextSerialNumber(firstSeries, objectCode);
+
+                if (docNo <= 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(firstNextNumber))
+                        etDocNum.Value = firstNextNumber;
+                    else
+                        Global.GFunc.ShowError("Next document number not found for selected series.");
+
+                    return;
+                }
+
+                etDocNum.Value = docNo.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Series update error: " + ex.Message);
+            }
+            finally
+            {
+                try
+                {
+                    oForm.Freeze(false);
+                }
+                catch { }
+            }
+        }
+
+        private void ClearComboBox(SAPbouiCOM.ComboBox combo)
+        {
+            try
+            {
+                // First deselect current selected value
+                try
+                {
+                    combo.Select("", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                }
+                catch { }
+
+                for (int i = combo.ValidValues.Count - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        combo.ValidValues.Remove(i, SAPbouiCOM.BoSearchKey.psk_Index);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+
+
+
         private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
         {
             string brandCode = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM").GetValue("U_BRAND", 0).Trim();
@@ -847,6 +1037,21 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             double.TryParse(txt.Value, out value);
 
             return value;
+        }
+
+        private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
+        {
+            foreach (string itemId in itemIds)
+            {
+                try
+                {
+                    oForm.Items.Item(itemId).Enabled = enabled;
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         private void SetMatrixValue(SAPbouiCOM.Matrix oMatrix, string colUID, int row, string value)

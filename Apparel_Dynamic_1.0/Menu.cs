@@ -1233,11 +1233,7 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_PRDGRP":
                             {
-                                SAPbouiCOM.Item oUomItem = oForm.Items.Item("ETCODE");
-                                oUomItem.Enabled = true;
-
-                                SAPbouiCOM.Item oGenItem = oForm.Items.Item("ETGENDER");
-                                oGenItem.Enabled = true;
+                                SetItemsEnabled(oForm, true, "ETCODE", "ETGENDER", "ETPDTPNM", "ETPDLNNM");
                                 break;
                             }
                         case "FIL_FRM_BRNDMSTR":

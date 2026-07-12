@@ -15,10 +15,12 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         }
 
 
-        private SAPbouiCOM.StaticText STCODE, STNAME, STPDTYPE, STPDLINE;
-        private SAPbouiCOM.EditText ETCODE, ETNAME, ETDOCTRY, ETPDTYPE, ETPDLINE;
+        private SAPbouiCOM.StaticText STCODE, STNAME, STPDTYPE, STPDLINE, STGENDER;
+        private SAPbouiCOM.EditText ETCODE, ETNAME, ETDOCTRY, ETPDTYPE, ETPDLINE, ETPDTPNM, ETPDLNNM;
         private SAPbouiCOM.Button ADDButton, CancelButton;
         private SAPbouiCOM.CheckBox CKACTIVE;
+        private SAPbouiCOM.ComboBox CBGENDER;
+
         public override void OnInitializeComponent()
         {
             this.STCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCODE").Specific));
@@ -39,8 +41,10 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.ETPDLINE = ((SAPbouiCOM.EditText)(this.GetItem("ETPDLINE").Specific));
             this.ETPDLINE.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETPDLINE_ChooseFromListAfter);
             this.ETPDLINE.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETPDLINE_ChooseFromListBefore);
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STGENDER").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETGENDER").Specific));
+            this.STGENDER = ((SAPbouiCOM.StaticText)(this.GetItem("STGENDER").Specific));
+            this.ETPDTPNM = ((SAPbouiCOM.EditText)(this.GetItem("ETPDTPNM").Specific));
+            this.ETPDLNNM = ((SAPbouiCOM.EditText)(this.GetItem("ETPDLNNM").Specific));
+            this.CBGENDER = ((SAPbouiCOM.ComboBox)(this.GetItem("CBGENDER").Specific));
             this.OnCustomInitialize();
 
         }
@@ -61,16 +65,26 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
             oForm.Freeze(true);
+
             try
             {
-                SetItemsEnabled(oForm, false, "ETCODE","ETGENDER");
+                SetItemsEnabled(oForm, false, "ETCODE", "ETGENDER", "ETPDTPNM", "ETPDLNNM");
+
+                SAPbouiCOM.DBDataSource db =oForm.DataSources.DBDataSources.Item("@FIL_MH_OPGM");
+
+                string gender = db.GetValue("U_GENDER", 0).Trim();
+
+                if (!string.IsNullOrEmpty(gender))
+                {
+                    LoadGenderCombo(oForm, gender);
+                }
             }
             finally
             {
                 oForm.Freeze(false);
             }
-
         }
         private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
         {
@@ -96,9 +110,13 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             if (dt == null || dt.Rows.Count == 0)
                 return;
 
-            string Code = dt.GetValue("Code", 0).ToString();
+            string Code = dt.GetValue("Code", 0).ToString().Trim();
+            string Name = dt.GetValue("Name", 0).ToString().Trim();
+
             SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETPDTYPE").Specific;
             ETCD.Value = Code;
+            SAPbouiCOM.EditText ETNM = (SAPbouiCOM.EditText)oForm.Items.Item("ETPDTPNM").Specific;
+            ETNM.Value = Name;
 
         }
 
@@ -142,12 +160,28 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             if (dt == null || dt.Rows.Count == 0)
                 return;
 
-            string Code = dt.GetValue("Code", 0).ToString();
-            string Gender = dt.GetValue("U_GENDER", 0).ToString();
+            string Code = dt.GetValue("Code", 0).ToString().Trim();
+            string Gender = dt.GetValue("U_GENDER", 0).ToString().Trim();
+            string Name = dt.GetValue("Name", 0).ToString().Trim();
+
             SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETPDLINE").Specific;
             ETCD.Value = Code;
-            SAPbouiCOM.EditText ETGN = (SAPbouiCOM.EditText)oForm.Items.Item("ETGENDER").Specific;
-            ETGN.Value = Gender;
+            SAPbouiCOM.EditText ETNM = (SAPbouiCOM.EditText)oForm.Items.Item("ETPDLNNM").Specific;
+            ETNM.Value = Name;
+            LoadGenderCombo(oForm, Gender);
+            SAPbouiCOM.ComboBox cbGender =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBGENDER").Specific;
+
+            if (!string.IsNullOrWhiteSpace(Gender))
+            {
+                try
+                {
+                    cbGender.Select(Gender, SAPbouiCOM.BoSearchKey.psk_ByValue);
+                }
+                catch
+                {
+                    // Gender code not found in combo
+                }
+            }
 
         }
 
@@ -304,7 +338,45 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             return BubbleEvent;
         }
 
-        private SAPbouiCOM.StaticText StaticText0;
-        private SAPbouiCOM.EditText EditText0;
+        private void LoadGenderCombo(SAPbouiCOM.Form oForm, string gender)
+        {
+            SAPbouiCOM.ComboBox oCombo =
+                (SAPbouiCOM.ComboBox)oForm.Items.Item("CBGENDER").Specific;
+
+            while (oCombo.ValidValues.Count > 0)
+                oCombo.ValidValues.Remove(0, SAPbouiCOM.BoSearchKey.psk_Index);
+
+            string query = $@"
+                            SELECT ""Code"", ""Name""
+                            FROM ""@FIL_MH_OGEN""
+                            WHERE ""Code"" = '{gender.Replace("'", "''")}'";
+
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(
+                    SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                rs.DoQuery(query);
+
+                while (!rs.EoF)
+                {
+                    oCombo.ValidValues.Add(
+                        rs.Fields.Item("Code").Value.ToString().Trim(),
+                        rs.Fields.Item("Name").Value.ToString().Trim());
+
+                    rs.MoveNext();
+                }
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
     }
 }

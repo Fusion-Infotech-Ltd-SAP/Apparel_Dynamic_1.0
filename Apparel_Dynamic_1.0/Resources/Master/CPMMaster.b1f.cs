@@ -103,9 +103,26 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-           
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                {
+                    string today = DateTime.Now.ToString("yyyyMMdd");
+                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+                    oDBH.SetValue("U_DOCDATE", 0, today);
+
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CPM");
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("ADD Button Error: " + ex.Message);
+            }
         }
+
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
             SAPbouiCOM.Form oForm = null;
@@ -126,7 +143,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 samMatrix.AutoResizeColumns();
                 cpmMatrix.AutoResizeColumns();
                 SetSAMMatrixEditableAfterLoad(samMatrix);
-                SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT");
+                SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM");
+               
             }
             catch (Exception ex)
             {
@@ -148,6 +166,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                 {
                     HideSampleRateColumns(oForm);
+                    SetItemsEnabled(oForm, false, "ETDOCNUM");
                 }
             }
             catch (Exception ex)
@@ -172,7 +191,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (string.IsNullOrWhiteSpace(docDate))
                     return;
 
-                UpdateSeriesAndDocNumByDate(oForm, docDate);
+                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+                UpdateSeriesAndDocNumByDate(oForm, oDBH, docDate, "FIL_D_CPM");
+                
             }
             catch (Exception ex)
             {
@@ -611,6 +632,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
 
@@ -666,6 +689,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
                 oForm.Freeze(true);
 
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
@@ -749,6 +774,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
+
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
 
@@ -769,30 +797,28 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         //___________________________________________________________________________________________________________ 
         // User Define Function
 
-        private void UpdateSeriesAndDocNumByDate(SAPbouiCOM.Form oForm, string docDate)
+        private void UpdateSeriesAndDocNumByDate(
+           SAPbouiCOM.Form oForm,
+           SAPbouiCOM.DBDataSource oDBH,
+           string docDate,
+           string objectCode)
         {
             try
             {
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                     return;
 
-                string objectCode = "FIL_D_CPM";
-
-                SAPbouiCOM.ComboBox cbSeries =
-                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-
-                SAPbouiCOM.EditText etDocNum =
-                    (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
+                SAPbouiCOM.ComboBox cbSeries = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
 
                 oForm.Freeze(true);
 
                 ClearComboBox(cbSeries);
 
-                SAPbobsCOM.Recordset rs =
-                    (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                 string query = $@"
-                                SELECT 
+                                SELECT
                                     T0.""Series"",
                                     T0.""SeriesName"",
                                     T0.""NextNumber""
@@ -801,7 +827,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                                     ON T0.""Indicator"" = T1.""Indicator""
                                 WHERE T0.""ObjectCode"" = '{objectCode}'
                                   AND T0.""Locked"" = 'N'
-                                  AND TO_DATE('{docDate}', 'YYYYMMDD') 
+                                  AND TO_DATE('{docDate}', 'YYYYMMDD')
                                         BETWEEN T1.""F_RefDate"" AND T1.""T_RefDate""
                                 ORDER BY T0.""Series""";
 
@@ -810,11 +836,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (rs.RecordCount == 0)
                 {
                     ClearComboBox(cbSeries);
-                    SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
 
                     oDBH.SetValue("Series", 0, "");
                     oDBH.SetValue("DocNum", 0, "");
                     etDocNum.Value = "";
+
                     Global.GFunc.ShowError("No valid document numbering series found for selected Doc Date.");
                     return;
                 }
@@ -837,12 +863,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     }
 
                     rs.MoveNext();
-                }
-
-                if (string.IsNullOrWhiteSpace(firstSeries))
-                {
-                    Global.GFunc.ShowError("No valid series loaded for selected Doc Date.");
-                    return;
                 }
 
                 cbSeries.Select(firstSeries, SAPbouiCOM.BoSearchKey.psk_ByValue);

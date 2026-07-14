@@ -17,6 +17,25 @@ namespace Apparel_Dynamic_1._0.Helper
             return input.ToUpper();
         }
 
+        public  void ReleaseComObject(object comObject)
+        {
+            try
+            {
+                if (comObject != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(comObject);
+                }
+            }
+            catch
+            {
+                // Ignore release exceptions
+            }
+            finally
+            {
+                comObject = null;
+            }
+        }
+
         public  void SetMatrixComboValue(SAPbouiCOM.Matrix matrix,string columnID,string query)
         {
             SAPbobsCOM.Recordset rs = null;
@@ -55,6 +74,9 @@ namespace Apparel_Dynamic_1._0.Helper
                 }
             }
         }
+
+        
+
 
         public bool setComboBoxValue(SAPbouiCOM.ComboBox oComboBox, string strQry)
         {

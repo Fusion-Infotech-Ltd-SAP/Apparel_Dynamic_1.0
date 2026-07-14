@@ -1095,27 +1095,51 @@ namespace Apparel_Dynamic_1._0
                                 SetItemsEnabled(oForm, false, "BTNEWLN", "ETPRDNAM");
                                 break;
                             }
-                        case "FIL_FRM_LEADTIME": 
+                        case "FIL_FRM_LEADTIME":
                             {
-                                //Series Initialization
-                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                try
                                 {
-                                    SetItemsEnabled(oForm, false, "ETDOCNUM");
-                                    SetItemsEnabled(oForm, true, "CBSERIES","ETDOCDAT");
+                                    oForm.Freeze(true);
 
-                                    string today = DateTime.Now.ToString("yyyyMMdd");
-                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
-                                    oDBH.SetValue("U_DOCDATE", 0, today);
-                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                    // Series Initialization
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        SetItemsEnabled(oForm, false, "ETDOCNUM");
+                                        SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_LEADTMST");
-                                    LoadMatrixCombos(oForm);
-                                    EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_LEADTMST");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
 
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_LEADTMST");
+                                        LoadMatrixCombos(oForm);
+                                        EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
+                                    }
                                 }
+                                catch (Exception ex)
+                                {
+                                    Global.GFunc.ShowError("Lead Time initialization failed. " + ex.Message);
+                                }
+                                finally
+                                {
+                                    if (oForm != null)
+                                    {
+                                        try
+                                        {
+                                            oForm.Freeze(false);
+                                        }
+                                        catch
+                                        {
+                                            // Ignore unfreeze exceptions
+                                        }
+                                    }
+                                }
+
                                 break;
                             }
-                             case "FIL_FRM_CPM":
+                        case "FIL_FRM_CPM":
                             {
                                 SAPbouiCOM.Matrix MTXSAMRN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
                                 MTXSAMRN.AutoResizeColumns();
@@ -1277,7 +1301,8 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_LEADTIME":
                             {
-                                SetItemsEnabled(oForm, true, "ETDOCNUM");
+                                SetItemsEnabled(oForm, true, "ETDOCNUM", "ETDOCDAT");
+
                                 break;
                             }
                         case "FIL_FRM_CPM":

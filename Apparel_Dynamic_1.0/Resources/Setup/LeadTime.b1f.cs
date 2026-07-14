@@ -6,6 +6,7 @@ using System.Text;
 using Apparel_Dynamic_1._0.Helper;
 
 
+
 namespace Apparel_Dynamic_1._0.Resources.Setup
 {
     [FormAttribute("Apparel_Dynamic_1._0.Resources.Setup.LeadTime", "Resources/Setup/LeadTime.b1f")]
@@ -112,6 +113,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             string docDate,
             string objectCode)
         {
+            SAPbobsCOM.Recordset rs = null;
             try
             {
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
@@ -124,7 +126,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                 ClearComboBox(cbSeries);
 
-                SAPbobsCOM.Recordset rs =(SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs =(SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                 string query = $@"
                                 SELECT
@@ -199,6 +201,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 try
                 {
                     oForm.Freeze(false);
+                    Global.GFunc.ReleaseComObject(rs);
                 }
                 catch { }
             }
@@ -705,7 +708,5 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
         }
 
-        private SAPbouiCOM.EditText EditText0;
-        private SAPbouiCOM.StaticText StaticText0;
     }
 }

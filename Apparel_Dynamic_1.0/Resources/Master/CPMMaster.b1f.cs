@@ -143,7 +143,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 samMatrix.AutoResizeColumns();
                 cpmMatrix.AutoResizeColumns();
                 SetSAMMatrixEditableAfterLoad(samMatrix);
-                SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT");
+                SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM");
+               
             }
             catch (Exception ex)
             {
@@ -165,6 +166,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                 {
                     HideSampleRateColumns(oForm);
+                    SetItemsEnabled(oForm, false, "ETDOCNUM");
                 }
             }
             catch (Exception ex)
@@ -630,6 +632,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
 
@@ -685,6 +689,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
                 oForm.Freeze(true);
 
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
@@ -768,6 +774,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
+
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
 

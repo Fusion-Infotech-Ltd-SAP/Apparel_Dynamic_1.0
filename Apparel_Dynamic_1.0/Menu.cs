@@ -1141,20 +1141,45 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_CPM":
                             {
-                                SAPbouiCOM.Matrix MTXSAMRN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
-                                MTXSAMRN.AutoResizeColumns();
-
-                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                try
                                 {
-                                    string today = DateTime.Now.ToString("yyyyMMdd");
-                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
-                                    oDBH.SetValue("U_DOCDATE", 0, today);
+                                    oForm.Freeze(true);
+                                    SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                                    SetItemsEnabled(oForm, false, "ETBRNDNM", "ETPDGPNM", "ETRTSGNM", "ETDOCNUM");
 
-                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
-                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CPM");
+                                    SAPbouiCOM.Matrix MTXSAMRN =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                                    MTXSAMRN.AutoResizeColumns();
+
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+
+                                        SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CPM");
+                                    }
+
+                                    HideSampleRateColumns(oForm);
+
                                 }
-                                HideSampleRateColumns(oForm);
-                                SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCNUM", "ETDOCDAT");
+                                catch (Exception ex)
+                                {
+                                    Global.GFunc.ShowError("CPM form initialization failed. " + ex.Message);
+                                }
+                                finally
+                                {
+                                    try
+                                    {
+                                        oForm.Freeze(false);
+                                    }
+                                    catch
+                                    {
+                                        // Ignore unfreeze exceptions
+                                    }
+                                }
+
                                 break;
                             }
                     }
@@ -1308,7 +1333,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_CPM":
                             {
                                 HideSampleRateColumns(oForm);
-                                SetItemsEnabled(oForm, true, "ETDOCNUM", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM", "ETDOCDAT","ETDOCNUM");
+                                SetItemsEnabled(oForm, true, "ETDOCNUM", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM", "ETDOCDAT");
                                 SetItemsEnabled(oForm, false, "CBSERIES");
 
                                 break;

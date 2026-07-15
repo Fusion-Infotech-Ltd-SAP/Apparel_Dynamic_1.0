@@ -657,19 +657,20 @@ namespace Apparel_Dynamic_1._0
                         //New Line
                         EnsureLine(oForm, "MTXOTDTL", "@FIL_DR_TT1");
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_OTT");   //DEFINE  DATASOURCES.
+                        // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_OTT");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_OTT");
+                            SetItemsEnabled(oForm, false, "ETDOCNUM", "ETMERCNM");
+                            SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OTT");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
 
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
                             //Date
-                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETOTDATE").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETOTDATE").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OTT");
 
                         }
                     }
@@ -1019,7 +1020,46 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_OTT":
                             {
-                                SetItemsEnabled(oForm, false, "ETDOCNUM", "ETMERCNM");
+                                try
+                                {
+                                    oForm.Freeze(true);
+
+                                    // Series Initialization
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        SetItemsEnabled(oForm, false, "ETDOCNUM", "ETMERCNM");
+                                        SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OTT");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+                                        //DocDate
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                        //OTT Date
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETOTDATE").Specific).Value = today;
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OTT");
+                                       
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Global.GFunc.ShowError("OTT initialization failed. " + ex.Message);
+                                }
+                                finally
+                                {
+                                    if (oForm != null)
+                                    {
+                                        try
+                                        {
+                                            oForm.Freeze(false);
+                                        }
+                                        catch
+                                        {
+                                            // Ignore unfreeze exceptions
+                                        }
+                                    }
+                                }
+                               
                                 break;
                             }
                         case "FIL_FRM_SLCNTRCT":
@@ -1304,6 +1344,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_OTT":
                             {
                                 SetItemsEnabled(oForm, true, "ETDOCNUM", "ETMERCNM");
+                                SetItemsEnabled(oForm, false, "CBSERIES");
                                 break;
                             }
                         case "FIL_FRM_SLCNTRCT":

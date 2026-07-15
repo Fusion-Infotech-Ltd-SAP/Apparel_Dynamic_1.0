@@ -9,6 +9,143 @@ namespace Apparel_Dynamic_1._0.Helper
 {
     class GlobalFunction
     {
+        public void UpdateSeriesAndDocNumByDate(
+        SAPbouiCOM.Form oForm,
+        SAPbouiCOM.DBDataSource oDBH,
+        string docDate,
+        string objectCode)
+        {
+            try
+            {
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                SAPbouiCOM.ComboBox cbSeries = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
+
+                oForm.Freeze(true);
+
+                ClearComboBox(cbSeries);
+
+                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                string query = $@"
+                                SELECT
+                                    T0.""Series"",
+                                    T0.""SeriesName"",
+                                    T0.""NextNumber""
+                                FROM ""NNM1"" T0
+                                INNER JOIN ""OFPR"" T1
+                                    ON T0.""Indicator"" = T1.""Indicator""
+                                WHERE T0.""ObjectCode"" = '{objectCode}'
+                                  AND T0.""Locked"" = 'N'
+                                  AND TO_DATE('{docDate}', 'YYYYMMDD')
+                                        BETWEEN T1.""F_RefDate"" AND T1.""T_RefDate""
+                                ORDER BY T0.""Series""";
+
+                rs.DoQuery(query);
+
+                if (rs.RecordCount == 0)
+                {
+                    ClearComboBox(cbSeries);
+
+                    oDBH.SetValue("Series", 0, "");
+                    oDBH.SetValue("DocNum", 0, "");
+                    etDocNum.Value = "";
+
+                    Global.GFunc.ShowError("No valid document numbering series found for selected Doc Date.");
+                    return;
+                }
+
+                string firstSeries = "";
+                string firstNextNumber = "";
+
+                while (!rs.EoF)
+                {
+                    string series = rs.Fields.Item("Series").Value.ToString();
+                    string seriesName = rs.Fields.Item("SeriesName").Value.ToString();
+                    string nextNumber = rs.Fields.Item("NextNumber").Value.ToString();
+
+                    cbSeries.ValidValues.Add(series, seriesName);
+
+                    if (string.IsNullOrWhiteSpace(firstSeries))
+                    {
+                        firstSeries = series;
+                        firstNextNumber = nextNumber;
+                    }
+
+                    rs.MoveNext();
+                }
+
+                cbSeries.Select(firstSeries, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                long docNo = oForm.BusinessObject.GetNextSerialNumber(firstSeries, objectCode);
+
+                if (docNo <= 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(firstNextNumber))
+                        etDocNum.Value = firstNextNumber;
+                    else
+                        Global.GFunc.ShowError("Next document number not found for selected series.");
+
+                    return;
+                }
+
+                etDocNum.Value = docNo.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Series update error: " + ex.Message);
+            }
+            finally
+            {
+                try
+                {
+                    oForm.Freeze(false);
+                }
+                catch { }
+            }
+        }
+
+        public void ClearComboBox(SAPbouiCOM.ComboBox combo)
+        {
+            try
+            {
+                // First deselect current selected value
+                try
+                {
+                    combo.Select("", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                }
+                catch { }
+
+                for (int i = combo.ValidValues.Count - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        combo.ValidValues.Remove(i, SAPbouiCOM.BoSearchKey.psk_Index);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        public void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
+        {
+            foreach (string itemId in itemIds)
+            {
+                try
+                {
+                    oForm.Items.Item(itemId).Enabled = enabled;
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
         public string ToUpperCase(string input)
         {
             if (string.IsNullOrEmpty(input))

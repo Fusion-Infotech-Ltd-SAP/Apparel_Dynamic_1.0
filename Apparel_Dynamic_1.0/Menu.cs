@@ -795,21 +795,19 @@ namespace Apparel_Dynamic_1._0
 
                         EnsureLine(oForm, "MTXMRCON", "@FIL_DR_CADMFAB");
 
-
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_CADFABCN");   //DEFINE  DATASOURCES.
+                        // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_CADFABCN");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_CADFABCN");
+                            SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CADFABCN");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CADFABCN");
                         }
-                        //Date
-                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
-
 
                     }
                     catch (Exception ex)
@@ -1222,6 +1220,62 @@ namespace Apparel_Dynamic_1._0
 
                                 break;
                             }
+                        case "FIL_FRM_CAD":
+                            {
+                                try
+                                {       
+                                    oForm.Freeze(true);
+
+                                    SAPbouiCOM.Matrix MTXCDCLR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCLR").Specific;
+                                    SAPbouiCOM.Matrix MTXMRCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                                    SAPbouiCOM.Grid GRDSCLR = (SAPbouiCOM.Grid)oForm.Items.Item("GRDSCLR").Specific;
+                                    SAPbouiCOM.Grid GRDSIZE = (SAPbouiCOM.Grid)oForm.Items.Item("GRDSIZE").Specific;
+                                    SAPbouiCOM.Grid GRDCDCON = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+
+
+                                    MTXCDCLR.AutoResizeColumns();
+                                    MTXMRCON.AutoResizeColumns();
+                                    GRDSCLR.AutoResizeColumns();
+                                    GRDSIZE.AutoResizeColumns();
+                                    GRDCDCON.AutoResizeColumns();
+
+                                    EnsureLine(oForm, "MTXMRCON", "@FIL_DR_CADMFAB");
+
+                                    // Series Initialization
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM");
+                                        SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CADFABCN");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CADFABCN");
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = ""; 
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific).Value = "";
+                                    }
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Application.SBO_Application.MessageBox("Error Found : " + ex.Message);
+                                }
+                                finally
+                                {
+                                    if (oForm != null)
+                                    {
+                                        try
+                                        {
+                                            oForm.Freeze(false);
+                                        }
+                                        catch { }
+                                    }
+                                }
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1377,6 +1431,14 @@ namespace Apparel_Dynamic_1._0
                                 SetItemsEnabled(oForm, true, "ETDOCNUM", "ETBRNDNM", "ETPDGPNM", "ETRTSGNM", "ETDOCDAT");
                                 SetItemsEnabled(oForm, false, "CBSERIES");
 
+                                break;
+                            }
+                        case "FIL_FRM_CAD":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETDOCDAT", "ETMERCNM", "ETSTYLDS");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
+                                ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = "";
+                                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific).Value = "";
                                 break;
                             }
                     }

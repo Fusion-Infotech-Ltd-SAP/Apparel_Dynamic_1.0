@@ -501,16 +501,19 @@ namespace Apparel_Dynamic_1._0
                         EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
                         EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");   //DEFINE  DATASOURCES.
+                        // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_OPSM");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_OPSM");
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OPSM");
+
                         }
                     }
                     catch (Exception e)
@@ -998,17 +1001,20 @@ namespace Apparel_Dynamic_1._0
 
                                     EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
                                     EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
-
-                                    //Series Initialization
-                                    SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");   //DEFINE  DATASOURCES.
+                                    
+                                    // Series Initialization
                                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                     {
-                                        SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                                        Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_OPSM");  //Object Type
-                                        string ocmbvalue = ocmb.Selected.Value;
-                                        long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_OPSM");
+                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                                        oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OPSM");
+
                                     }
 
                                 Global.GFunc.SetItemsEnabled(oForm, false, "ETGENAME", "ETPDGPNM", "ETPDTPNM", "ETPDLNNM",
@@ -1391,6 +1397,7 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETSLCODE", "ETGENAME", "ETPDGPNM", "ETPDTPNM", "ETPDLNNM", 
                                 "ETBRNDNM", "ETDEPTNM", "ETSDSNNM", "ETPDTPCD", "ETPDLNCD", "ETSMPLCD",
                                 "ETDOCNUM", "ETSMPLNM", "ETSMTPNM", "ETRTSGNM", "ETMERDNM", "ETBUYRNM","ETSMTPCD");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
                                 break;
                             }
                         case "FIL_FRM_OTT":

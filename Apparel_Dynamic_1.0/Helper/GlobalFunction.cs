@@ -9,6 +9,44 @@ namespace Apparel_Dynamic_1._0.Helper
 {
     class GlobalFunction
     {
+        //For DocNum (CBSeries) DropDown Select After Event
+        public void UpdateDocNumberBySeries(SAPbouiCOM.Form oForm, string objectCode)
+        {
+            try
+            {
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                SAPbouiCOM.ComboBox cbSeries =
+                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
+
+                SAPbouiCOM.EditText etDocNum =
+                    (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
+
+                if (cbSeries.Selected == null ||
+                    string.IsNullOrWhiteSpace(cbSeries.Selected.Value))
+                    return;
+
+                string seriesValue = cbSeries.Selected.Value.Trim();
+
+                long docNo = oForm.BusinessObject.GetNextSerialNumber(seriesValue, objectCode);
+
+                if (docNo <= 0)
+                {
+                    Global.GFunc.ShowError("Next document number not found for selected series.");
+                    etDocNum.Value = string.Empty;
+                    return;
+                }
+
+                etDocNum.Value = docNo.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"UpdateDocNumberBySeries Error: {ex.Message}");
+            }
+        }
+
+
         public void UpdateSeriesAndDocNumByDate(
         SAPbouiCOM.Form oForm,
         SAPbouiCOM.DBDataSource oDBH,

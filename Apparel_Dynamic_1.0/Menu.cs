@@ -398,21 +398,20 @@ namespace Apparel_Dynamic_1._0
                         MTXBYRS.AutoResizeColumns();
                         MTXATTAC.AutoResizeColumns();
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");   //DEFINE  DATASOURCES.
+                        // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_SMPLMAST");  //Object Type
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_SMPLMAST");
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                            oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_SMPLMAST");
+
                         }
-                        //Date
-                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCNDT").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
-
-
                     }
                     catch (Exception e)
                     {
@@ -864,19 +863,20 @@ namespace Apparel_Dynamic_1._0
                                 MTXBYRS.AutoResizeColumns();
                                 MTXATTAC.AutoResizeColumns();
 
-                                //Series Initialization
-                                SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");   //DEFINE  DATASOURCES.
+                                // Series Initialization
                                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                 {
-                                    SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                                    Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_SMPLMAST");  //Object Type
-                                    string ocmbvalue = ocmb.Selected.Value;
-                                    long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_SMPLMAST");
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                                    oDBH.SetValue("DocNum", 0, docno.ToString()); // only set the value in string.
+                                    string today = DateTime.Now.ToString("yyyyMMdd");
+                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");
+                                    oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_SMPLMAST");
+
                                 }
-                                //Date
-                                ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCNDT").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
+
                                 //Sample Code Enable
                                 SAPbouiCOM.Item oSampleCode = oForm.Items.Item("ETSLCODE");
                                 oSampleCode.Enabled = true;
@@ -1302,7 +1302,7 @@ namespace Apparel_Dynamic_1._0
                                 SAPbouiCOM.Item oBtnItmCr = oForm.Items.Item("BTNITMCR");
                                 oBtnItmCr.Enabled = false;
                                 oBtnItmTx.Enabled = false;
-
+                                Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETSLTYNM", "ETITMGNM", "ETRUTSNM", "ETMERNAM", "ETCRDNAM");
                                 SampleEnableButtons(oForm);
                                 break;

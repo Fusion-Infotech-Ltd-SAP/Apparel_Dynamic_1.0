@@ -615,22 +615,21 @@ namespace Apparel_Dynamic_1._0
                         oMTXCMP.AutoResizeColumns();
                         oMTXOTCST.AutoResizeColumns();
 
-                        //Series Initialization
-                        SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                        // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_PRECOSTING");
-                            string ocmbvalue = ocmb.Selected.Value;
-                            long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_PRECOSTING");
-                            oDBH.SetValue("DocNum", 0, docno.ToString());
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETVERSON");
 
-                            //Date
-                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDATE").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_PRECOSTING");
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1"; //Default version 
-
                         }
-                        
+
                     }
                     catch (Exception e)
                     {
@@ -891,23 +890,21 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_SMPLPCST":
                             {
-                                //Series Initialization
-                                SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                                // Series Initialization
                                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                 {
-                                    SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                                    Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_PRECOSTING");
-                                    string ocmbvalue = ocmb.Selected.Value;
-                                    long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_PRECOSTING");
-                                    oDBH.SetValue("DocNum", 0, docno.ToString());
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETVERSON");
+
+                                    string today = DateTime.Now.ToString("yyyyMMdd");
+                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                                    oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_PRECOSTING");
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1"; //Default version 
                                 }
-                                //Date
-                                ((SAPbouiCOM.EditText)oForm.Items.Item("ETDATE").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
-                                ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1"; //Default version 
-
-                                //Enable off
-                                Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETDATE", "ETVERSON");
-
+                                
                                 break;
                             }
                         case "FIL_FRM_ROUTEMSTR":
@@ -1313,7 +1310,10 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_SMPLPCST":
                             {
                                 //Enable off
-                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETDATE", "ETVERSON");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", 
+                                                                          "ETVERSON", "ETTCNAMT", "ETDOCDAT");
+                                Global.GFunc.SetItemsEnabled(oForm, false,"CBSERIES");
+
                                 break;
                             }
                         case "FIL_FRM_ROUTEMSTR":

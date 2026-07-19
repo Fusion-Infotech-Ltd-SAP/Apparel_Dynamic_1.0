@@ -42,6 +42,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_STP", "APP_STP_USETYPE", "Use Type", 14, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_ORDRTYPE", "Order Type", 15, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_LEADTIME", "Lead Time", 16, 1, false);
+                CreateMainMenu("APP_STP", "APP_STP_PARAMSTR", "Parameter Master", 17, 1, false);
 
 
                 //Apparel ->  Master
@@ -368,7 +369,21 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
-                
+                // Parameter Master
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_PARAMSTR")
+                {
+                    string formUID = "FIL_FRM_PARAMSTR";
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                        return;
+                    }
+                    ParameterMaster activeForm = new ParameterMaster();
+                    activeForm.Show();
+                }
+
                 //___________________________________________________________Master________________________________________________
                 //Sample Master
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_SAM_SM")

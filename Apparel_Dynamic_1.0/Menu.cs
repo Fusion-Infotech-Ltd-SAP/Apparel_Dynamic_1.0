@@ -1303,7 +1303,8 @@ namespace Apparel_Dynamic_1._0
                                 oBtnItmCr.Enabled = false;
                                 oBtnItmTx.Enabled = false;
                                 Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
-                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETSLTYNM", "ETITMGNM", "ETRUTSNM", "ETMERNAM", "ETCRDNAM");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETSLTYNM", "ETITMGNM", 
+                                                            "ETRUTSNM", "ETMERNAM", "ETCRDNAM","ETDOCDAT");
                                 SampleEnableButtons(oForm);
                                 break;
                             }

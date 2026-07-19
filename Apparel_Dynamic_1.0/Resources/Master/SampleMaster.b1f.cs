@@ -186,7 +186,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
                 oForm.Freeze(true);
-                Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES","ETDOCDAT");
+                Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES","ETDOCDAT", "ETSLTYNM", 
+                                    "ETITMGNM", "ETRUTSNM", "ETMERNAM", "ETCRDNAM","ETDOCNUM");
                 // Matrices
                 SAPbouiCOM.Matrix mtxSize = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSIZE").Specific;
                 SAPbouiCOM.Matrix mtxColor = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
@@ -1591,6 +1592,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETMERCOD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1610,6 +1613,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETRUTSTG_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1661,6 +1666,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETITMGRP_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1710,6 +1717,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETSLTYPE_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1727,6 +1736,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETGENDER_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)

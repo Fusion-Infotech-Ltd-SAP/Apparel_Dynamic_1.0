@@ -20,7 +20,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                                      STBRNDCD, STDEPTCD, STDOCNUM, STSMPBSE,
                                      STSMPLCD, STPDLDTM, STHSCODE, STRTSGCD,
                                      STMERDCD, STBUYRCD, STSBDVSN, STUOM, STSLDESC,
-                                     STSZTPCD, STSUBCLR;
+                                     STSZTPCD, STSUBCLR, STDOCDAT;
 
        
 
@@ -34,7 +34,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                                     ETDOCTRY, ETDOCNUM, ETSMPLCD, ETSMPLNM,
                                     ETUOM, ETPDLDTM, ETHSCODE, ETRTSGCD, ETSLDESC,
                                     ETRTSGNM, ETMERDCD, ETMERDNM, ETBUYRCD,
-                                    ETBUYRNM, ETSDSNCD, ETSDSNNM, ETSZTPCD, ETGENAME;
+                                    ETBUYRNM, ETSDSNCD, ETSDSNNM, ETSZTPCD, ETGENAME, ETDOCDAT;
 
 
 
@@ -46,6 +46,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         // -------- ComboBox --------
         private SAPbouiCOM.ComboBox CBSERIES, CBSMPBSE;
+
+        
 
         // -------- Folder --------
         private SAPbouiCOM.Folder FOLSIZE, FOLCOLOR, FOLITEM, FOLATTAC;
@@ -60,7 +62,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private string styleCode = "";
         public override void OnInitializeComponent()
         {
-            //                    -------- Static Text --------
+            //                     -------- Static Text --------
             this.STSLCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCODE").Specific));
             this.STCSCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCSCODE").Specific));
             this.STCSDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STCSDESC").Specific));
@@ -85,7 +87,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STSZTPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSZTPCD").Specific));
             this.STSUBCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSUBCLR").Specific));
             this.STSLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STSLDESC").Specific));
-            //                    -------- Edit Text --------
+            //                     -------- Edit Text --------
             this.ETSLCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCODE").Specific));
             this.ETSLCODE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSLCODE_LostFocusAfter);
             this.ETCSCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCSCODE").Specific));
@@ -139,16 +141,17 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETSZTPCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSZTPCD_ChooseFromListBefore);
             this.ETSLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETSLDESC").Specific));
             this.ETGENAME = ((SAPbouiCOM.EditText)(this.GetItem("ETGENAME").Specific));
-            //                    -------- ComboBox --------
+            //                     -------- ComboBox --------
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
+            this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSMPBSE = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSMPBSE").Specific));
             this.CBSMPBSE.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSMPBSE_ComboSelectAfter);
-            //                    -------- Folder --------
+            //                     -------- Folder --------
             this.FOLSIZE = ((SAPbouiCOM.Folder)(this.GetItem("FOLSIZE").Specific));
             this.FOLCOLOR = ((SAPbouiCOM.Folder)(this.GetItem("FOLCOLOR").Specific));
             this.FOLITEM = ((SAPbouiCOM.Folder)(this.GetItem("FOLITEM").Specific));
             this.FOLATTAC = ((SAPbouiCOM.Folder)(this.GetItem("FOLATTAC").Specific));
-            //                    -------- Matrix --------
+            //                     -------- Matrix --------
             this.MTXSIZE = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSIZE").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXCOLOR.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXCOLOR_ValidateAfter);
@@ -160,7 +163,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.MTXSBCLR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSBCLR_ChooseFromListBefore);
             this.MTXITEM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXITEM").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-            //                    -------- Button --------
+            //                     -------- Button --------
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -179,6 +182,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.DELBTN = ((SAPbouiCOM.Button)(this.GetItem("DELBTN").Specific));
             this.DELBTN.ClickAfter += new SAPbouiCOM._IButtonEvents_ClickAfterEventHandler(this.DELBTN_ClickAfter);
             this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_0").Specific));
+            this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
+            this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
+            this.ETDOCDAT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETDOCDAT_LostFocusAfter);
             this.OnCustomInitialize();
 
         }
@@ -196,6 +202,37 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void OnCustomInitialize()
         {
+
+        }
+
+        private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
+
+                string docDate = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value.Trim();
+                if (string.IsNullOrWhiteSpace(docDate))
+                    return;
+
+                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");
+                Global.GFunc.UpdateSeriesAndDocNumByDate(oForm, oDBH, docDate, "FIL_D_OPSM");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Doc Date Series Error: " + ex.Message);
+            }
+
+        }
+
+        private void CBSERIES_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            Global.GFunc.UpdateDocNumberBySeries(oForm, "FIL_D_OPSM");
 
         }
 
@@ -222,7 +259,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
 
                 SetItemsEnabled(oForm, false, "ETSLCODE", "ETGENAME", "ETPDGPNM", "ETPDTPNM", "ETPDLNNM",
-                                "ETBRNDNM", "ETDEPTNM", "ETSDSNNM", "ETPDTPCD", "ETPDLNCD", 
+                                "ETBRNDNM", "ETDEPTNM", "ETSDSNNM", "ETPDTPCD", "ETPDLNCD","CBSERIES","ETDOCDAT", 
                                 "ETDOCNUM", "ETSMPLNM", "ETSMTPNM", "ETRTSGNM", "ETMERDNM", "ETBUYRNM", "ETSMTPCD");
 
                 SampleEnableButtons(ref oForm);
@@ -1754,6 +1791,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETRTSGCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1772,6 +1811,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETMERDCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1792,6 +1833,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETBUYRCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -1842,6 +1885,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETSDSNCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -2039,6 +2084,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETDEPTCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -2058,6 +2105,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETBRNDCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -2223,6 +2272,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETGENDER_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
             SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
             SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
             if (dt == null || dt.Rows.Count == 0)
@@ -2337,5 +2388,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private SAPbouiCOM.EditText EditText0;
         private SAPbouiCOM.LinkedButton LinkedButton0;
+        private SAPbouiCOM.StaticText StaticText0;
+        private SAPbouiCOM.EditText EditText1;
     }
 }

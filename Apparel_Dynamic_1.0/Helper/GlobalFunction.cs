@@ -167,7 +167,7 @@ namespace Apparel_Dynamic_1._0.Helper
             }
             catch { }
         }
-
+        //Item Enable Disable
         public void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
         {
             foreach (string itemId in itemIds)

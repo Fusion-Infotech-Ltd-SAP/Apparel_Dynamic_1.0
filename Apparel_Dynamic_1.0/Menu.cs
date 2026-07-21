@@ -617,8 +617,8 @@ namespace Apparel_Dynamic_1._0
                         OtherCostParam activeForm = new OtherCostParam();
                         activeForm.Show();
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_OCSTPRM");
-                        //SAPbouiCOM.Matrix MTXSAMRN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
-                        //MTXSAMRN.AutoResizeColumns();
+                        SAPbouiCOM.Matrix MTXCSPRM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                        MTXCSPRM.AutoResizeColumns();
 
                     }
                     catch (Exception ex)

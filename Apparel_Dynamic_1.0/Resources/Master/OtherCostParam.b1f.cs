@@ -18,14 +18,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         /// </summary>
         public override void OnInitializeComponent()
         {
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
-            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_1").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("Item_2").Specific));
-            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("Item_3").Specific));
-            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("Item_4").Specific));
-            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_5").Specific));
-            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_6").Specific));
-            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_7").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSCOD").Specific));
+            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSNAM").Specific));
+            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSCOD").Specific));
+            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSNAM").Specific));
+            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
+            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSPRM").Specific));
+            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.OnCustomInitialize();
 
         }

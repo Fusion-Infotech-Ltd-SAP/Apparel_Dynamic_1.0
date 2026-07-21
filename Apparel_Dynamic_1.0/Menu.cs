@@ -49,6 +49,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_MST", "APP_MST_ROUTNG", "Route Master", 1, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_SZTPMSTR", "Size Type Master", 2, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_CPM", "CPM Master", 3, 1, false);
+                CreateMainMenu("APP_MST", "APP_MST_OTHCSTPRM", "Other Cost Parameter", 3, 1, false);
 
 
                 //Apparel -> Transcation
@@ -591,6 +592,34 @@ namespace Apparel_Dynamic_1._0
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
                             UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CPM");
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Application.SBO_Application.MessageBox("Error Found : " + ex.Message);
+                    }
+
+                }
+
+                //Other Cost Parameter 
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_OTHCSTPRM")
+                {
+                    try
+                    {
+                        string formUID = "FIL_FRM_OCSTPRM";
+                        if (IsFormOpen(formUID))
+                        {
+                            Global.G_UI_Application.Forms.Item(formUID).Select();
+                            Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                                SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                            return;
+                        }
+
+                        OtherCostParam activeForm = new OtherCostParam();
+                        activeForm.Show();
+                        SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_OCSTPRM");
+                        //SAPbouiCOM.Matrix MTXSAMRN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                        //MTXSAMRN.AutoResizeColumns();
+
                     }
                     catch (Exception ex)
                     {

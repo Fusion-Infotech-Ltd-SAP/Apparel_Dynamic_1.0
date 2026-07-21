@@ -58,6 +58,9 @@
     <Compile Include="Resources\Master\CPMMaster.b1f.cs">
       <DependentUpon>CPMMaster.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Master\OtherCostParam.b1f.cs">
+      <DependentUpon>OtherCostParam.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Master\RouteMaster.b1f.cs">
       <DependentUpon>RouteMaster.b1f</DependentUpon>
     </Compile>
@@ -148,6 +151,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Master\CPMMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Master\OtherCostParam.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Master\RouteMaster.b1f">

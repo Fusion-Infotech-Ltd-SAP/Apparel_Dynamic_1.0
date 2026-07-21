@@ -13,8 +13,6 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         public ParameterMaster()
         {
         }
-
-        private SAPbouiCOM.Grid GRDPARAM;
         private SAPbouiCOM.ComboBox CBBSDON;
         private SAPbouiCOM.CheckBox CKACTIVE;
         private SAPbouiCOM.StaticText STCODE, STBSDON;
@@ -34,9 +32,9 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.CKACTIVE = ((SAPbouiCOM.CheckBox)(this.GetItem("CKACTIVE").Specific));
-            this.GRDPARAM = ((SAPbouiCOM.Grid)(this.GetItem("GRDPARAM").Specific));
             this.CBBSDON = ((SAPbouiCOM.ComboBox)(this.GetItem("CBBSDON").Specific));
             this.OnCustomInitialize();
+
         }
 
         public override void OnInitializeFormEvents()
@@ -69,12 +67,12 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             try
             {
                 Global.GFunc.SetItemsEnabled(oForm, false, "ETCODE");
-                LoadGridData(oForm,
-                                "DT_PARAMST",
-                                "GRDPARAM",
-                                "@FIL_MH_PARMMAST",
-                                "\"Code\", \"U_BASEDON\", \"U_ACTIVE\""
-                            );
+                //LoadGridData(oForm,
+                //                "DT_PARAMST",
+                //                "GRDPARAM",
+                //                "@FIL_MH_PARMMAST",
+                //                "\"Code\", \"U_BASEDON\", \"U_ACTIVE\""
+                //            );
             }
             finally
             {

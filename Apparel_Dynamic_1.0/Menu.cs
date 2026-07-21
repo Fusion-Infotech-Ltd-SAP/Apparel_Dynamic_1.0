@@ -1239,7 +1239,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_CAD":
                             {
                                 try
-                                {       
+                                {
                                     oForm.Freeze(true);
 
                                     SAPbouiCOM.Matrix MTXCDCLR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCLR").Specific;
@@ -1270,7 +1270,7 @@ namespace Apparel_Dynamic_1._0
                                         ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
                                         UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CADFABCN");
 
-                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = ""; 
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = "";
                                         ((SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific).Value = "";
                                     }
 
@@ -1290,6 +1290,11 @@ namespace Apparel_Dynamic_1._0
                                         catch { }
                                     }
                                 }
+                                break;
+                            }
+                        case "FIL_FRM_PARAMSTR":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
                     }
@@ -1462,6 +1467,11 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
                                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = "";
                                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific).Value = "";
+                                break;
+                            }
+                        case "FIL_FRM_PARAMSTR":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
                     }

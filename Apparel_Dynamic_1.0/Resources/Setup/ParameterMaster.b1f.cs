@@ -105,7 +105,6 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
                 {
-
                     string code = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value.Trim();
                     string UCode = Global.GFunc.ToUpperCase(code);
                     ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = UCode;
@@ -115,10 +114,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                         if (!IsValidCode(UCode, out string err))
                         {
-                            Application.SBO_Application.StatusBar.SetText(err,
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                            Global.GFunc.ShowError(err);
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = "";
                             return;
                         }
@@ -131,10 +127,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                         if (!oRS.EoF)
                         {
-                            Application.SBO_Application.StatusBar.SetText("Code already exists!",
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                            Global.GFunc.ShowError("Code already exists!");
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = "";
                         }
                     }
@@ -142,9 +135,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText("Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Error: "+ ex.Message);
             }
 
         }

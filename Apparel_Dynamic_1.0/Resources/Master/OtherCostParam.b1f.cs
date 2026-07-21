@@ -13,43 +13,36 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         {
         }
 
-        /// <summary>
-        /// Initialize components. Called by framework after form created.
-        /// </summary>
+        private SAPbouiCOM.StaticText STCUSCOD, STCUSNAM;
+        private SAPbouiCOM.EditText ETCUSCOD, ETDOCTRY, ETCUSNAM;
+
+        private SAPbouiCOM.Matrix MTXCSPRM;
+        private SAPbouiCOM.Button ADDButton, CancelButton;
+
+
         public override void OnInitializeComponent()
         {
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSCOD").Specific));
-            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSNAM").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSCOD").Specific));
-            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSNAM").Specific));
-            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
-            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSPRM").Specific));
-            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
-            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
+            this.STCUSCOD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSCOD").Specific));
+            this.STCUSNAM = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSNAM").Specific));
+            this.ETCUSCOD = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSCOD").Specific));
+            this.ETCUSNAM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSNAM").Specific));
+            this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
+            this.MTXCSPRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSPRM").Specific));
+            this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.OnCustomInitialize();
 
         }
 
-        /// <summary>
-        /// Initialize form event. Called by framework before form creation.
-        /// </summary>
         public override void OnInitializeFormEvents()
         {
         }
 
-        private SAPbouiCOM.StaticText StaticText0;
 
         private void OnCustomInitialize()
         {
 
         }
-
-        private SAPbouiCOM.StaticText StaticText1;
-        private SAPbouiCOM.EditText EditText0;
-        private SAPbouiCOM.EditText EditText1;
-        private SAPbouiCOM.EditText EditText2;
-        private SAPbouiCOM.Matrix Matrix0;
-        private SAPbouiCOM.Button Button0;
-        private SAPbouiCOM.Button Button1;
+        
     }
 }

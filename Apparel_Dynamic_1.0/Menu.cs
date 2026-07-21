@@ -619,7 +619,7 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_OCSTPRM");
                         SAPbouiCOM.Matrix MTXCSPRM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
                         MTXCSPRM.AutoResizeColumns();
-
+                        
                     }
                     catch (Exception ex)
                     {

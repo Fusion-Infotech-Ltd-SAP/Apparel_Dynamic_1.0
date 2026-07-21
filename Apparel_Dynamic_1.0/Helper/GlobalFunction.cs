@@ -183,6 +183,49 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
+        //Matrix New Line Add
+        public static void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
+        {
+            SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
+            SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
+            if (matrix.RowCount == 0)
+            {
+                Global.GFunc.SetNewLine(matrix, db, 1, "");
+            }
+        }
+
+        public static void AddLineIfLastRowHasValue(
+           SAPbouiCOM.Form oForm,
+           string matrixID,
+           string dbTable,
+           string columnName
+           )
+        {
+            try
+            {
+                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
+                matrix.FlushToDataSource();
+                int dbRowCount = db.Size;
+                if (dbRowCount == 0)
+                {
+                    Global.GFunc.SetNewLine(matrix, db, 1, "");
+                    return;
+                }
+                int lastDbRow = dbRowCount - 1;
+                string lastValue = db.GetValue(columnName, lastDbRow).Trim();
+                if (!string.IsNullOrEmpty(lastValue) && !lastValue.Equals("0.0"))
+                {
+                    Global.GFunc.SetNewLine(matrix, db, dbRowCount + 1, "");
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.MessageBox("AddLineIfLastRowHasValue Error: " + ex.Message);
+            }
+        }
+
+
 
         public string ToUpperCase(string input)
         {

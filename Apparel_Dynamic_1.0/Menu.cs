@@ -1872,6 +1872,42 @@ namespace Apparel_Dynamic_1._0
                                     matrix.AutoResizeColumns();
                                     break;
                                 }
+
+                            case "FIL_FRM_OCSTPRM":
+                                {
+                                    oForm.Freeze(true);
+
+                                    SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                                    SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_MR_CSOTHCST");
+
+                                    matrix.FlushToDataSource();
+
+                                    // Remove ghost rows
+                                    for (int i = db.Size - 1; i >= 0; i--)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(db.GetValue("U_PRMCODE", i).Trim()))
+                                            db.RemoveRecord(i);
+                                    }
+
+                                    // Reset LineId
+                                    for (int i = 0; i < db.Size; i++)
+                                    {
+                                        db.SetValue("LineId", i, (i + 1).ToString());
+                                    }
+
+                                    matrix.LoadFromDataSource();
+
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                        oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                                    // Add a new blank row at the end
+                                    Global.GFunc.AddLineIfLastRowHasValue(oForm,"MTXCSPRM","@FIL_MR_CSOTHCST","U_PRMCODE");
+                                    matrix.AutoResizeColumns();
+
+                                    break;
+                                }
+
+
                         }
                     }
                     catch (Exception ex)

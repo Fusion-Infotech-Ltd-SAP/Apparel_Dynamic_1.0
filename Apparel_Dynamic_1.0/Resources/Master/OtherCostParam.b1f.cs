@@ -48,7 +48,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         public override void OnInitializeFormEvents()
         {
             this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
 
         }
 
@@ -274,6 +275,27 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+
+                if (eventInfo.ItemUID != "MTXCSPRM" || eventInfo.Row <= 0)
+                    return;
+
+                oForm.EnableMenu("1293", true);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_RightClickBefore Error: {ex.Message}");
+                BubbleEvent = false;
+            }
+
+        }
+
         private void ETCUSCOD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             // Customer Code CFL Select After 
@@ -365,16 +387,22 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
         {
             string cusCode = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSOTHCST").GetValue("Code", 0).Trim();
-            string cusName = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSOTHCST").GetValue("Name", 0).Trim();
-
-
+           
             if (string.IsNullOrWhiteSpace(cusCode))
             {
                 Global.GFunc.ShowError("Enter Customer Code");
                 oForm.ActiveItem = "ETCUSCOD";
                 return BubbleEvent = false;
             }
-            
+
+            // Customer duplicate check only in Add mode
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE && IsCustomerAlreadyExists(cusCode))
+            {
+                Global.GFunc.ShowError($"Customer '{cusCode}' already exists in Other Cost Parameter.");
+                oForm.ActiveItem = "ETCUSCOD";
+                return BubbleEvent = false;
+            }
+
             // Matrix must contain at least one Parameter Code
             if (MTXCSPRM.RowCount == 0)
             {
@@ -393,9 +421,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             if (!ValidateMatrixRows(oForm))
                 return BubbleEvent = false;
             
-
             Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_MR_CSOTHCST", MTXCSPRM, "U_PRMCODE");
-
             return BubbleEvent;
         }
 
@@ -448,6 +474,39 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
 
             throw new Exception("Column not found: " + columnId);
+        }
+
+        private bool IsCustomerAlreadyExists(string customerCode)
+        {
+            SAPbobsCOM.Recordset recordset = null;
+
+            try
+            {
+                string safeCustomerCode = customerCode.Replace("'", "''");
+
+                string query = $@"
+                                SELECT COUNT(*) AS ""Total""
+                                FROM ""@FIL_MH_CSOTHCST"" H
+                                INNER JOIN ""@FIL_MR_CSOTHCST"" R
+                                    ON H.""Code"" = R.""Code""
+                                WHERE H.""Code"" = '{safeCustomerCode}'";
+
+                recordset = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                recordset.DoQuery(query);
+
+                int total = Convert.ToInt32(recordset.Fields.Item("Total").Value);
+                return total > 0;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Customer existence check error: {ex.Message}");
+                return false;
+            }
+            finally
+            {
+                if (recordset != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(recordset);
+            }
         }
     }
 }

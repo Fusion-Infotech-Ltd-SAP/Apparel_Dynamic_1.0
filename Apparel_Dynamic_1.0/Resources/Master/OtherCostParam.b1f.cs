@@ -32,9 +32,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETCUSNAM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSNAM").Specific));
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
             this.MTXCSPRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSPRM").Specific));
+            this.MTXCSPRM.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXCSPRM_LostFocusAfter);
+            this.MTXCSPRM.ComboSelectAfter += new SAPbouiCOM._IMatrixEvents_ComboSelectAfterEventHandler(this.MTXCSPRM_ComboSelectAfter);
             this.MTXCSPRM.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXCSPRM_ChooseFromListAfter);
             this.MTXCSPRM.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXCSPRM_ChooseFromListBefore);
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.ETCRDCOD = ((SAPbouiCOM.EditText)(this.GetItem("ETCRDCOD").Specific));
             this.ETCRDNAM = ((SAPbouiCOM.EditText)(this.GetItem("ETCRDNAM").Specific));
@@ -61,6 +64,75 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 Global.GFunc.EnsureLine(oForm, "MTXCSPRM", "@FIL_MR_CSOTHCST");
             }
+        }
+
+        private void MTXCSPRM_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.ColUID != "CLBSDON")
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                SAPbouiCOM.ComboBox cbBasedOn = (SAPbouiCOM.ComboBox)oMatrix.Columns.Item("CLBSDON").Cells.Item(pVal.Row).Specific;
+
+                if (cbBasedOn.Selected == null)
+                    return;
+
+                string basedOn = cbBasedOn.Selected.Value.Trim();
+                EnableDisableColumns(oForm, oMatrix, pVal.Row, basedOn);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Based On ComboSelectAfter Error: {ex.Message}");
+            }
+        }
+
+        private void MTXCSPRM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.Row <= 0)
+                    return;
+
+                if (pVal.ColUID != "CLPERCN" && pVal.ColUID != "CLVALUE")
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                SAPbouiCOM.EditText editText = (SAPbouiCOM.EditText)oMatrix.Columns.Item(pVal.ColUID).Cells.Item(pVal.Row).Specific;
+
+                double value;
+                if (!double.TryParse(editText.Value.Trim(), out value))
+                    value = 0;
+
+                if (value < 0)
+                {
+                    editText.Value = "0.0";
+                    Global.GFunc.ShowError("Percentage or Value cannot be negative.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Matrix LostFocusAfter Error: {ex.Message}");
+            }
+        }
+
+        private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            // Do not validate in OK mode
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                return;
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                ValidateForm(ref oForm, ref BubbleEvent);
+            }
+
         }
 
         private void MTXCSPRM_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -117,6 +189,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 string code = dt.GetValue("Code", 0).ToString().Trim();
                 string basedOn = dt.GetValue("U_BASEDON", 0).ToString().Trim();
 
+                if (IsDuplicateParameterCode(oMatrix, pVal.Row, code))
+                {
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPRMCOD").Cells.Item(pVal.Row).Specific).Value = "";
+                    Global.GFunc.ShowError($"Parameter Code '{code}' already exists in another row.");
+                    return;
+                }
 
                 SAPbouiCOM.EditText etParameterCode = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPRMCOD").Cells.Item(pVal.Row).Specific;
                 etParameterCode.Value = code;
@@ -200,6 +278,89 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
 
         //____________________________________________________________________________Custom Method__________________________________________________________________
+        private bool ValidateMatrixRows(SAPbouiCOM.Form oForm)
+        {
+            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+            HashSet<string> parameterCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            for (int row = 1; row <= oMatrix.RowCount; row++)
+            {
+                string parameterCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPRMCOD").Cells.Item(row).Specific).Value.Trim();
+                string percentageText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPERCN").Cells.Item(row).Specific).Value.Trim();
+                string valueText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVALUE").Cells.Item(row).Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(parameterCode))
+                    continue;
+
+                if (!parameterCodes.Add(parameterCode))
+                {
+                    Global.GFunc.ShowError($"Duplicate Parameter Code found: {parameterCode}");
+                    oMatrix.Columns.Item("CLPRMCOD").Cells.Item(row).Click(SAPbouiCOM.BoCellClickType.ct_Regular);
+                    return false;
+                }
+
+                double percentage;
+                if (!double.TryParse(percentageText, out percentage))
+                    percentage = 0;
+
+                double amount;
+                if (!double.TryParse(valueText, out amount))
+                    amount = 0;
+
+                if (percentage < 0)
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPERCN").Cells.Item(row).Specific).Value = "0.0";
+
+                if (amount < 0)
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVALUE").Cells.Item(row).Specific).Value = "0.0";
+            }
+
+            oMatrix.FlushToDataSource();
+            return true;
+        }
+        private bool IsDuplicateParameterCode(SAPbouiCOM.Matrix oMatrix, int currentRow, string parameterCode)
+        {
+            for (int row = 1; row <= oMatrix.RowCount; row++)
+            {
+                if (row == currentRow)
+                    continue;
+
+                string existingCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPRMCOD").Cells.Item(row).Specific).Value.Trim();
+
+                if (existingCode.Equals(parameterCode, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            string cusCode = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSOTHCST").GetValue("Code", 0).Trim();
+            string cusName = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSOTHCST").GetValue("Name", 0).Trim();
+
+
+            if (string.IsNullOrWhiteSpace(cusCode))
+            {
+                Global.GFunc.ShowError("Enter Customer Code");
+                oForm.ActiveItem = "ETCUSCOD";
+                return BubbleEvent = false;
+            }
+            if (string.IsNullOrWhiteSpace(cusName))
+            {
+                Global.GFunc.ShowError("Customer Name");
+                oForm.ActiveItem = "ETCUSNAM";
+                return BubbleEvent = false;
+            }
+
+            if (!ValidateMatrixRows(oForm))
+                return BubbleEvent = false;
+
+            Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_MR_CSOTHCST", MTXCSPRM, "U_PRMCODE");
+
+            return BubbleEvent;
+        }
+
+
         private void EnableDisableColumns(SAPbouiCOM.Form oForm, SAPbouiCOM.Matrix oMatrix, int row, string value)
         {
             try

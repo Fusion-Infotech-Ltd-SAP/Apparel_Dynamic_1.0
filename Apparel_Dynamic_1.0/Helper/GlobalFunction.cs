@@ -226,6 +226,23 @@ namespace Apparel_Dynamic_1._0.Helper
         }
 
 
+        public void PreventEmptyLastRow(SAPbouiCOM.Form oForm, string dbDatasourceUID, SAPbouiCOM.Matrix matrix, string columnName)
+        {
+            SAPbouiCOM.DBDataSource oDB = oForm.DataSources.DBDataSources.Item(dbDatasourceUID);
+            int rowCount = matrix.VisualRowCount;
+
+            if (rowCount > 0)
+            {
+                string lastValue = oDB.GetValue(columnName, rowCount - 1).Trim();
+
+                if (string.IsNullOrEmpty(lastValue) || lastValue.Equals("0.0"))
+                {
+                    matrix.DeleteRow(rowCount);
+                    oDB.RemoveRecord(rowCount - 1);
+                }
+            }
+        }
+
 
         public string ToUpperCase(string input)
         {

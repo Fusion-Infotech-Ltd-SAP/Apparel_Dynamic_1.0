@@ -184,7 +184,7 @@ namespace Apparel_Dynamic_1._0.Helper
         }
 
         //Matrix New Line Add
-        public static void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
+        public  void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
         {
             SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
             SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
@@ -194,7 +194,7 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
-        public static void AddLineIfLastRowHasValue(
+        public  void AddLineIfLastRowHasValue(
            SAPbouiCOM.Form oForm,
            string matrixID,
            string dbTable,

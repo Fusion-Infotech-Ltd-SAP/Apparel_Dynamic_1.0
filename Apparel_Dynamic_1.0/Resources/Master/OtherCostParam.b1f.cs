@@ -47,7 +47,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         public override void OnInitializeFormEvents()
         {
-            this.ActivateAfter += new ActivateAfterHandler(this.Form_ActivateAfter);
+            this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
+            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
 
         }
 
@@ -91,6 +92,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void MTXCSPRM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
+            //Negative Check
             try
             {
                 if (pVal.Row <= 0)
@@ -210,8 +212,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError(
-                    $"Parameter Master ChooseFromListAfter Error: {ex.Message}");
+                Global.GFunc.ShowError($"Parameter Master ChooseFromListAfter Error: {ex.Message}");
             }
         }
 
@@ -243,6 +244,34 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 BubbleEvent = false;
             }
 
+        }
+
+        private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCSPRM", "@FIL_MR_CSOTHCST", "U_PRMCODE");
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETCUSNAM", "ETCUSCOD");
+
+                // Enable/Disable columns based on Based On value
+                for (int row = 1; row <= oMatrix.RowCount; row++)
+                {
+                    SAPbouiCOM.ComboBox cbBasedOn = (SAPbouiCOM.ComboBox)oMatrix.Columns.Item("CLBSDON").Cells.Item(row).Specific;
+
+                    if (cbBasedOn.Selected == null)
+                        continue;
+
+                    string basedOn = cbBasedOn.Selected.Value.Trim();
+                    EnableDisableColumns(oForm, oMatrix, row, basedOn);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_DataLoadAfter Error: {ex.Message}");
+            }
         }
 
         private void ETCUSCOD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -345,15 +374,25 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 oForm.ActiveItem = "ETCUSCOD";
                 return BubbleEvent = false;
             }
-            if (string.IsNullOrWhiteSpace(cusName))
+            
+            // Matrix must contain at least one Parameter Code
+            if (MTXCSPRM.RowCount == 0)
             {
-                Global.GFunc.ShowError("Customer Name");
-                oForm.ActiveItem = "ETCUSNAM";
+                Global.GFunc.ShowError("Enter at least one Parameter Code.");
                 return BubbleEvent = false;
             }
 
+            //Single row without paramcode check
+            string firstParamCode = ((SAPbouiCOM.EditText)MTXCSPRM.Columns.Item("CLPRMCOD").Cells.Item(1).Specific).Value.Trim();
+            if (MTXCSPRM.RowCount == 1 && string.IsNullOrWhiteSpace(firstParamCode))
+            {
+                Global.GFunc.ShowError("Enter at least one Parameter Code.");
+                return BubbleEvent = false;
+            }
+            //Dupliucate ParamCode Check
             if (!ValidateMatrixRows(oForm))
                 return BubbleEvent = false;
+            
 
             Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_MR_CSOTHCST", MTXCSPRM, "U_PRMCODE");
 

@@ -1326,6 +1326,12 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_OCSTPRM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSCOD");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETCUSNAM");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1501,6 +1507,11 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_PARAMSTR":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_OCSTPRM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSNAM", "ETCUSCOD");
                                 break;
                             }
                     }

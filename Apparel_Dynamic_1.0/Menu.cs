@@ -49,6 +49,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_MST", "APP_MST_ROUTNG", "Route Master", 1, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_SZTPMSTR", "Size Type Master", 2, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_CPM", "CPM Master", 3, 1, false);
+                CreateMainMenu("APP_MST", "APP_MST_OTHCSTPRM", "Other Cost Parameter", 3, 1, false);
 
 
                 //Apparel -> Transcation
@@ -591,6 +592,34 @@ namespace Apparel_Dynamic_1._0
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
                             UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CPM");
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Application.SBO_Application.MessageBox("Error Found : " + ex.Message);
+                    }
+
+                }
+
+                //Other Cost Parameter 
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_OTHCSTPRM")
+                {
+                    try
+                    {
+                        string formUID = "FIL_FRM_OCSTPRM";
+                        if (IsFormOpen(formUID))
+                        {
+                            Global.G_UI_Application.Forms.Item(formUID).Select();
+                            Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                                SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                            return;
+                        }
+
+                        OtherCostParam activeForm = new OtherCostParam();
+                        activeForm.Show();
+                        SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_OCSTPRM");
+                        SAPbouiCOM.Matrix MTXCSPRM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                        MTXCSPRM.AutoResizeColumns();
+                        
                     }
                     catch (Exception ex)
                     {
@@ -1297,6 +1326,12 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_OCSTPRM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSCOD");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETCUSNAM");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1472,6 +1507,11 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_PARAMSTR":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_OCSTPRM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSNAM", "ETCUSCOD");
                                 break;
                             }
                     }
@@ -1832,6 +1872,42 @@ namespace Apparel_Dynamic_1._0
                                     matrix.AutoResizeColumns();
                                     break;
                                 }
+
+                            case "FIL_FRM_OCSTPRM":
+                                {
+                                    oForm.Freeze(true);
+
+                                    SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSPRM").Specific;
+                                    SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_MR_CSOTHCST");
+
+                                    matrix.FlushToDataSource();
+
+                                    // Remove ghost rows
+                                    for (int i = db.Size - 1; i >= 0; i--)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(db.GetValue("U_PRMCODE", i).Trim()))
+                                            db.RemoveRecord(i);
+                                    }
+
+                                    // Reset LineId
+                                    for (int i = 0; i < db.Size; i++)
+                                    {
+                                        db.SetValue("LineId", i, (i + 1).ToString());
+                                    }
+
+                                    matrix.LoadFromDataSource();
+
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                        oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                                    // Add a new blank row at the end
+                                    Global.GFunc.AddLineIfLastRowHasValue(oForm,"MTXCSPRM","@FIL_MR_CSOTHCST","U_PRMCODE");
+                                    matrix.AutoResizeColumns();
+
+                                    break;
+                                }
+
+
                         }
                     }
                     catch (Exception ex)

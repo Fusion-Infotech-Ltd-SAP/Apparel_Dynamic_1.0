@@ -65,34 +65,65 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         private void ETPRDCOD_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
+            SAPbobsCOM.Recordset rs = null;
+
             try
             {
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
-                string cflUID = cflArg.ChooseFromListUID;
 
-                if (cflUID == "CFL_PRD")
+                if (cflArg.ChooseFromListUID != "CFL_PRD")
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFL_PRD");
+                SAPbouiCOM.Conditions oCons = new SAPbouiCOM.Conditions();
+
+                SAPbouiCOM.Condition currentCondition = oCons.Add();
+                currentCondition.Alias = "U_ACTIVE";
+                currentCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                currentCondition.CondVal = "Y";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                string query = @"
+                                SELECT DISTINCT ""U_PRDGRP""
+                                FROM ""@FIL_MH_ORDRTYPE""
+                                WHERE IFNULL(""U_PRDGRP"", '') <> ''";
+
+                rs.DoQuery(query);
+
+                while (!rs.EoF)
                 {
-                    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                    SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflUID);
-                    SAPbouiCOM.Conditions oCons = new SAPbouiCOM.Conditions();
-                    SAPbouiCOM.Condition oCon1 = oCons.Add();
-                    oCon1.Alias = "U_ACTIVE";
-                    oCon1.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
-                    oCon1.CondVal = "Y";
-                    oCFL.SetConditions(oCons);
+                    string existingCode = Convert.ToString(rs.Fields.Item("U_PRDGRP").Value).Trim();
+
+                    if (!string.IsNullOrWhiteSpace(existingCode))
+                    {
+                        currentCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
+
+                        currentCondition = oCons.Add();
+                        currentCondition.Alias = "Code";
+                        currentCondition.Operation = SAPbouiCOM.BoConditionOperation.co_NOT_EQUAL;
+                        currentCondition.CondVal = existingCode;
+                    }
+
+                    rs.MoveNext();
                 }
+
+                oCFL.SetConditions(oCons);
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error filtering Product Group CFL: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError("Error filtering Product Group CFL: " + ex.Message);
                 BubbleEvent = false;
             }
-
-
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
         }
 
         private void ETPRDCOD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

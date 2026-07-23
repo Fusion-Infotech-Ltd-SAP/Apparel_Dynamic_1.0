@@ -607,31 +607,32 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 }
             }
 
-            SAPbouiCOM.Matrix oMatrix =
-                (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
+            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
+
+            if (oMatrix.VisualRowCount <= 0)
+            {
+                Global.GFunc.ShowError("At least one row is required in the matrix.");
+                return BubbleEvent = false;
+            }
 
             for (int i = 1; i <= oMatrix.VisualRowCount; i++)
             {
                 string minQtyText = GetMatrixStringValue(oMatrix, "CLMINQTY", i);
                 string maxQtyText = GetMatrixStringValue(oMatrix, "CLMAXQTY", i);
 
-                // Skip only last auto-added empty row
-                //if (i == oMatrix.RowCount && string.IsNullOrWhiteSpace(maxQtyText))
-                //    continue;
-
                 double minQty = GetMatrixDoubleValue(oMatrix, "CLMINQTY", i);
                 double maxQty = GetMatrixDoubleValue(oMatrix, "CLMAXQTY", i);
 
                 if (string.IsNullOrWhiteSpace(minQtyText) || minQty <= 0)
                 {
-                    Global.GFunc.ShowError("Minimum Quantity must have value in row " + i);
+                    Global.GFunc.ShowError("Minimum Quantity must be greater than 0 in row " + i);
                     oMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Click();
                     return BubbleEvent = false;
                 }
 
                 if (string.IsNullOrWhiteSpace(maxQtyText) || maxQty <= 0)
                 {
-                    Global.GFunc.ShowError("Maximum Quantity must have value in row " + i);
+                    Global.GFunc.ShowError("Maximum Quantity must be greater than 0 in row " + i);
                     oMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Click();
                     return BubbleEvent = false;
                 }

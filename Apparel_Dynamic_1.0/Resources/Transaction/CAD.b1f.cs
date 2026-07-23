@@ -1868,13 +1868,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 grdCdCon.Height = Math.Max(70, contentBottom - gridTop - buttonHeightSpace);
 
                 btnLoadCad.Top = contentBottom - 18;
-                btnLoadCad.Left = grdCdCon.Left;
+                btnLoadCad.Left = grdCdCon.Left+ 100;
                 btnLoadCad.Width = 65;
+                
 
                 btnSave.Top = btnLoadCad.Top;
                 btnSave.Left = btnLoadCad.Left + btnLoadCad.Width + 5;
                 btnSave.Width = 65;
-
+                
                 // =========================
                 // Pane 3: FOLTEMP
                 // Matrix: MTXCDCON

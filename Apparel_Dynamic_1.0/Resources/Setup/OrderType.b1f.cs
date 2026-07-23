@@ -35,7 +35,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.ETCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCODE").Specific));
             this.ETNAME = ((SAPbouiCOM.EditText)(this.GetItem("ETNAME").Specific));
             this.MTXORDR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXORDR").Specific));
-            this.MTXORDR.ClickBefore += new SAPbouiCOM._IMatrixEvents_ClickBeforeEventHandler(this.MTXORDR_ClickBefore);
+            this.MTXORDR.KeyDownAfter += new SAPbouiCOM._IMatrixEvents_KeyDownAfterEventHandler(this.MTXORDR_KeyDownAfter);
             this.MTXORDR.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXORDR_LostFocusAfter);
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -197,98 +197,11 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 if (pVal.ColUID != "CLMINQTY" && pVal.ColUID != "CLMAXQTY")
                     return;
 
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
-                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_MR_ORDRTYPE");
-
-                oForm.Freeze(true);
-
-                if (pVal.ColUID == "CLMINQTY" && pVal.Row == 1)
-                {
-                    double minQty = GetMatrixDoubleValue(oMatrix, "CLMINQTY", 1);
-                    if (minQty < 0)
-                    {
-                        SetMatrixValue(oMatrix, "CLMINQTY", 1, "0");
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Minimum Quantity cannot be negative.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                        );
-                        return;
-                    }
-                }
-
-                if (pVal.ColUID == "CLMAXQTY")
-                {
-                    double minQty = GetMatrixDoubleValue(oMatrix, "CLMINQTY", pVal.Row);
-                    double maxQty = GetMatrixDoubleValue(oMatrix, "CLMAXQTY", pVal.Row);
-
-                    if (maxQty < 0)
-                    {
-                        SetMatrixValue(oMatrix, "CLMAXQTY", pVal.Row, "0");
-
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Maximum Quantity cannot be negative.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                        );
-
-                        return;
-                    }
-
-                    if (maxQty != 0 && maxQty <= minQty)
-                    {
-                        SetMatrixValue(oMatrix, "CLMAXQTY", pVal.Row, "");
-
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Maximum Quantity must be greater than Minimum Quantity.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                        );
-
-                        return;
-                    }
-
-                    // If CLMAXQTY is non-zero, create next row
-                    if (maxQty != 0 && oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                    {
-                        int nextRow = pVal.Row + 1;
-
-                        // Add row only if current row is the last row
-                        if (pVal.Row == oMatrix.RowCount)
-                        {
-                            oMatrix.FlushToDataSource();
-                            Global.GFunc.SetNewLine(oMatrix, db, nextRow, "");
-                            oMatrix.LoadFromDataSource();
-                            SetMatrixValue(oMatrix, "#", nextRow, nextRow.ToString());
-                        }
-
-                        SetMatrixValue(oMatrix, "CLCODE", nextRow, "Code " + nextRow);
-                        SetMatrixValue(oMatrix, "CLMINQTY", nextRow, (maxQty + 1).ToString("0"));
-                    }
-                }
-
-                //SetMinQtyEditable(oMatrix);
-                SetOrderTypeMatrixEditableAfterLoad(oMatrix);
+                ProcessOrderTypeQuantity(pVal.FormUID, pVal.Row, pVal.ColUID);
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
-            }
-            finally
-            {
-                try
-                {
-                    SAPbouiCOM.Form oForm =
-                        Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-                    oForm.Freeze(false);
-                }
-                catch { }
+                Global.GFunc.ShowError(ex.Message);
             }
         }
 
@@ -650,31 +563,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             return BubbleEvent;
         }
 
-        private void MTXORDR_ClickBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
-        {
-            BubbleEvent = true;
-
-            try
-            {
-                if (pVal.Row <= 0)
-                    return;
-
-                SAPbouiCOM.Form oForm =
-                    Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-                SAPbouiCOM.Matrix matrix =
-                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
-
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Matrix Click Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
-            }
-        }
+        
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
         {
@@ -689,6 +578,93 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
             catch { }
 
+        }
+
+        private void MTXORDR_KeyDownAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.CharPressed != 9)
+                    return;
+
+                if (pVal.Row <= 0)
+                    return;
+
+                if (pVal.ColUID != "CLMINQTY" && pVal.ColUID != "CLMAXQTY")
+                    return;
+
+                ProcessOrderTypeQuantity(pVal.FormUID, pVal.Row, pVal.ColUID);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Matrix TAB Error: " + ex.Message);
+            }
+        }
+
+        private void ProcessOrderTypeQuantity(string formUID, int row, string colUID)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(formUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_MR_ORDRTYPE");
+
+                oForm.Freeze(true);
+
+                if (colUID == "CLMINQTY" && row == 1)
+                {
+                    double minQty = GetMatrixDoubleValue(oMatrix, "CLMINQTY", row);
+
+                    if (minQty < 0)
+                    {
+                        SetMatrixValue(oMatrix, "CLMINQTY", row, "0");
+                        Global.GFunc.ShowError("Minimum Quantity cannot be negative.");
+                        return;
+                    }
+                }
+
+                if (colUID == "CLMAXQTY")
+                {
+                    double minQty = GetMatrixDoubleValue(oMatrix, "CLMINQTY", row);
+                    double maxQty = GetMatrixDoubleValue(oMatrix, "CLMAXQTY", row);
+
+                    if (maxQty < 0)
+                    {
+                        SetMatrixValue(oMatrix, "CLMAXQTY", row, "0");
+                        Global.GFunc.ShowError("Maximum Quantity cannot be negative.");
+                        return;
+                    }
+
+                    if (maxQty != 0 && maxQty <= minQty)
+                    {
+                        SetMatrixValue(oMatrix, "CLMAXQTY", row, "");
+                        Global.GFunc.ShowError("Maximum Quantity must be greater than Minimum Quantity.");
+                        return;
+                    }
+
+                    if (maxQty != 0 && oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE && row == oMatrix.RowCount)
+                    {
+                        int nextRow = row + 1;
+
+                        oMatrix.FlushToDataSource();
+                        Global.GFunc.SetNewLine(oMatrix, db, nextRow, "");
+                        oMatrix.LoadFromDataSource();
+
+                        SetMatrixValue(oMatrix, "#", nextRow, nextRow.ToString());
+                        SetMatrixValue(oMatrix, "CLCODE", nextRow, "Code " + nextRow);
+                        SetMatrixValue(oMatrix, "CLMINQTY", nextRow, (maxQty + 1).ToString("0"));
+                    }
+                }
+
+                SetOrderTypeMatrixEditableAfterLoad(oMatrix);
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
+            }
         }
 
 

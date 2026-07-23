@@ -454,7 +454,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                 // Enable Add New Line button only after existing data loaded
                 oForm.Items.Item("BTNEWLN").Enabled = true;
-
+                Global.GFunc.SetItemsEnabled(oForm,false, "ETPRDNAM");
                 SAPbouiCOM.Matrix oMatrix =
                     (SAPbouiCOM.Matrix)oForm.Items.Item("MTXORDR").Specific;
 

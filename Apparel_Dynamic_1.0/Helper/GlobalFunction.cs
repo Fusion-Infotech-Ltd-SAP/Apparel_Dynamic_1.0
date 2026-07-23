@@ -183,6 +183,19 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
+        public  void ReEnableChooseFromList(
+        SAPbouiCOM.Form oForm,
+        string itemId,
+        string cflUid,
+        string alias)
+        {
+            SAPbouiCOM.EditText et =(SAPbouiCOM.EditText)oForm.Items.Item(itemId).Specific;
+
+            et.ChooseFromListUID = cflUid;
+            et.ChooseFromListAlias = alias;
+        }
+
+
         //Matrix New Line Add
         public  void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
         {

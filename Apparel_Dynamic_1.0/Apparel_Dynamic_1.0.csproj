@@ -88,6 +88,9 @@
     <Compile Include="Resources\Setup\Gender.b1f.cs">
       <DependentUpon>Gender.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Setup\IncoTerms.b1f.cs">
+      <DependentUpon>IncoTerms.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Setup\LeadTime.b1f.cs">
       <DependentUpon>LeadTime.b1f</DependentUpon>
     </Compile>
@@ -181,6 +184,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Setup\Gender.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Setup\IncoTerms.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Setup\LeadTime.b1f">

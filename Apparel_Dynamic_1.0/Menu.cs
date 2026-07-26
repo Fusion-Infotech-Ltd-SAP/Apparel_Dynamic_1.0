@@ -1176,6 +1176,8 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_ORDRTYPE":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, false, "BTNEWLN", "ETPRDNAM");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETPRDCOD");
+                                Global.GFunc.ReEnableChooseFromList(oForm, "ETPRDCOD", "CFL_PRD", "Code");
                                 break;
                             }
                         case "FIL_FRM_LEADTIME":

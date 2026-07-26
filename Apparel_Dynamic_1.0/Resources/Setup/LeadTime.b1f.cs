@@ -35,6 +35,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.MTXLEDTM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXLEDTM").Specific));
+            this.MTXLEDTM.KeyDownAfter += new SAPbouiCOM._IMatrixEvents_KeyDownAfterEventHandler(this.MTXLEDTM_KeyDownAfter);
             this.MTXLEDTM.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXLEDTM_LostFocusAfter);
             this.MTXLEDTM.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXLEDTM_ChooseFromListAfter);
             this.MTXLEDTM.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXLEDTM_ChooseFromListBefore);
@@ -71,8 +72,8 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
             SetItemsEnabled(oForm, false, "CBSERIES", "ETDOCNUM", "ETDOCDAT");
             LoadMatrixCombos(oForm);
-            EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
-            AddLineIfLastRowHasValue(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST", "U_CARDCODE");
+            Global.GFunc.EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
+            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST", "U_CARDCODE");
             oMatrix.AutoResizeColumns();
         }
 
@@ -101,7 +102,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                 UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_LEADTMST");
                 LoadMatrixCombos(oForm);
-                EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
+                Global.GFunc.EnsureLine(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST");
             }
 
         }
@@ -270,6 +271,9 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 return BubbleEvent = false;
             }
 
+            if (!ValidateDuplicateLeadTimeRows(oForm))
+                return BubbleEvent = false;
+
             PreventEmptyLastRow(oForm, "@FIL_DR_LEADTMST", MTXLEDTM, "U_CARDCODE");
 
             return BubbleEvent;
@@ -290,7 +294,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
         }
 
-        private void MTXLEDTM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        private void MTXLEDTM_LostFocusAfter(object sboObject,SAPbouiCOM.SBOItemEventArg pVal)
         {
             if (_isAddButtonPressed)
             {
@@ -298,82 +302,12 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 return;
             }
 
-            SAPbouiCOM.Form oForm = null;
+            if (pVal.Row <= 0)
+                return;
+            if (pVal.ColUID != "CLLEADTM")
+                return;
 
-            try
-            {
-                if (pVal.Row <= 0)
-                    return;
-
-                if (pVal.ColUID != "CLLEADTM")
-                    return;
-
-                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.Matrix matrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
-                SAPbouiCOM.DBDataSource db =oForm.DataSources.DBDataSources.Item("@FIL_DR_LEADTMST");
-                matrix.FlushToDataSource();
-
-                int currentRow = pVal.Row;
-                int currentIndex = currentRow - 1;
-
-                string vendorCode = db.GetValue("U_CARDCODE", currentIndex).Trim();
-                string shipFromCountry = db.GetValue("U_CONTRYCODE", currentIndex).Trim();
-                string shippingMode = db.GetValue("U_SHIPMODE", currentIndex).Trim();
-                string incoTerm = db.GetValue("U_INCOTRMS", currentIndex).Trim();
-                string itemGroup = db.GetValue("U_ITMGRPCD", currentIndex).Trim();
-
-                if (string.IsNullOrWhiteSpace(vendorCode) ||
-                    string.IsNullOrWhiteSpace(shipFromCountry) ||
-                    string.IsNullOrWhiteSpace(shippingMode) ||
-                    string.IsNullOrWhiteSpace(incoTerm) ||
-                    string.IsNullOrWhiteSpace(itemGroup))
-                {
-                    return;
-                }
-
-                for (int i = 0; i < db.Size; i++)
-                {
-                    if (i == currentIndex)
-                        continue;
-
-                    string oldVendorCode = db.GetValue("U_CARDCODE", i).Trim();
-                    string oldShipFromCountry = db.GetValue("U_CONTRYCODE", i).Trim();
-                    string oldShippingMode = db.GetValue("U_SHIPMODE", i).Trim();
-                    string oldIncoTerm = db.GetValue("U_INCOTRMS", i).Trim();
-                    string oldItemGroup = db.GetValue("U_ITMGRPCD", i).Trim();
-
-                    if (vendorCode == oldVendorCode &&
-                        shipFromCountry == oldShipFromCountry &&
-                        shippingMode == oldShippingMode &&
-                        incoTerm == oldIncoTerm &&
-                        itemGroup == oldItemGroup)
-                    {
-                        Global.GFunc.ShowError(
-                            "Duplicate combination found with row no. " + (i + 1)
-                        );
-
-                        ClearLeadTimeRow(db, currentIndex);
-                        matrix.LoadFromDataSource();
-
-                        return;
-                    }
-                }
-
-                //AddLineIfLastRowHasValue(oForm,"MTXLEDTM","@FIL_DR_LEADTMST", "U_CARDCODE");
-
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                {
-                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-                }
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Lead Time duplicate validation error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
-            }
+            ValidateLeadTimeCombination(pVal.FormUID,pVal.Row);
         }
 
         private void PreventEmptyLastRow(SAPbouiCOM.Form oForm, string dbDatasourceUID, SAPbouiCOM.Matrix matrix, string columnName)
@@ -384,7 +318,6 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             if (rowCount > 0)
             {
                 string lastValue = oDB.GetValue(columnName, rowCount - 1).Trim();
-
                 if (string.IsNullOrEmpty(lastValue) || lastValue.Equals("0.0"))
                 {
                     matrix.DeleteRow(rowCount);
@@ -447,6 +380,29 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                // GC.Collect();
             }
+        }
+
+        private void MTXLEDTM_KeyDownAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                // TAB key ASCII value
+                if (pVal.CharPressed != 9)
+                    return;
+
+                if (pVal.Row <= 0)
+                    return;
+
+                if (pVal.ColUID != "CLLEADTM")
+                    return;
+
+                ValidateLeadTimeCombination(pVal.FormUID, pVal.Row);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Lead Time TAB validation error: " + ex.Message);
+            }
+
         }
 
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -590,7 +546,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 {
                     string itemGroupName = dt.GetValue("ItmsGrpNam", 0).ToString();
                     oMatrix.SetCellWithoutValidation(row, "CLITMGRP", itemGroupName);
-                    AddLineIfLastRowHasValue(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST", "U_CARDCODE");
+                    Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXLEDTM", "@FIL_DR_LEADTMST", "U_CARDCODE");
                 }
                 else
                 {
@@ -615,7 +571,76 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         }
 
 
-       
+        private bool ValidateLeadTimeCombination(string formUID, int currentRow)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                if (currentRow <= 0)
+                    return true;
+
+                oForm = Application.SBO_Application.Forms.Item(formUID);
+                SAPbouiCOM.Matrix matrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
+                SAPbouiCOM.DBDataSource db =oForm.DataSources.DBDataSources.Item("@FIL_DR_LEADTMST");
+                matrix.FlushToDataSource();
+                int currentIndex = currentRow - 1;
+
+                if (currentIndex < 0 || currentIndex >= db.Size)
+                    return true;
+
+                string vendorCode =db.GetValue("U_CARDCODE", currentIndex).Trim();
+                string shipFromCountry =db.GetValue("U_CONTRYCODE", currentIndex).Trim();
+                string shippingMode =db.GetValue("U_SHIPMODE", currentIndex).Trim();
+                string incoTerm =db.GetValue("U_INCOTRMS", currentIndex).Trim();
+                string itemGroup =db.GetValue("U_ITMGRPCD", currentIndex).Trim();
+
+                if (string.IsNullOrWhiteSpace(vendorCode) ||
+                    string.IsNullOrWhiteSpace(shipFromCountry) ||
+                    string.IsNullOrWhiteSpace(shippingMode) ||
+                    string.IsNullOrWhiteSpace(incoTerm) ||
+                    string.IsNullOrWhiteSpace(itemGroup))
+                {
+                    return true;
+                }
+
+                for (int i = 0; i < db.Size; i++)
+                {
+                    if (i == currentIndex)
+                        continue;
+
+                    string oldVendorCode =db.GetValue("U_CARDCODE", i).Trim();
+                    string oldShipFromCountry =db.GetValue("U_CONTRYCODE", i).Trim();
+                    string oldShippingMode =db.GetValue("U_SHIPMODE", i).Trim();
+                    string oldIncoTerm =db.GetValue("U_INCOTRMS", i).Trim();
+                    string oldItemGroup =db.GetValue("U_ITMGRPCD", i).Trim();
+
+                    if (vendorCode == oldVendorCode &&
+                        shipFromCountry == oldShipFromCountry &&
+                        shippingMode == oldShippingMode &&
+                        incoTerm == oldIncoTerm &&
+                        itemGroup == oldItemGroup)
+                    {
+                        Global.GFunc.ShowError("Duplicate combination found with row no. " +(i + 1));
+                        ClearLeadTimeRow(db, currentIndex);
+                        matrix.LoadFromDataSource();
+                        return false;
+                    }
+                }
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                {
+                    oForm.Mode =SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Lead Time duplicate validation error: " +ex.Message);
+                return false;
+            }
+        }
 
         private void LoadMatrixCombos(SAPbouiCOM.Form oForm)
         {
@@ -666,47 +691,56 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
         }
 
-
-        public static void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
+        private bool ValidateDuplicateLeadTimeRows(SAPbouiCOM.Form oForm)
         {
-            SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
-            SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
-            if (matrix.RowCount == 0)
+            SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXLEDTM").Specific;
+            SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DR_LEADTMST");
+
+            matrix.FlushToDataSource();
+
+            for (int i = 0; i < db.Size; i++)
             {
-                Global.GFunc.SetNewLine(matrix, db, 1, "");
+                string vendorCode = db.GetValue("U_CARDCODE", i).Trim();
+                string shipFromCountry = db.GetValue("U_CONTRYCODE", i).Trim();
+                string shippingMode = db.GetValue("U_SHIPMODE", i).Trim();
+                string incoTerm = db.GetValue("U_INCOTRMS", i).Trim();
+                string itemGroup = db.GetValue("U_ITMGRPCD", i).Trim();
+
+                if (string.IsNullOrWhiteSpace(vendorCode) ||
+                    string.IsNullOrWhiteSpace(shipFromCountry) ||
+                    string.IsNullOrWhiteSpace(shippingMode) ||
+                    string.IsNullOrWhiteSpace(incoTerm) ||
+                    string.IsNullOrWhiteSpace(itemGroup))
+                {
+                    continue;
+                }
+
+                for (int j = i + 1; j < db.Size; j++)
+                {
+                    string oldVendorCode = db.GetValue("U_CARDCODE", j).Trim();
+                    string oldShipFromCountry = db.GetValue("U_CONTRYCODE", j).Trim();
+                    string oldShippingMode = db.GetValue("U_SHIPMODE", j).Trim();
+                    string oldIncoTerm = db.GetValue("U_INCOTRMS", j).Trim();
+                    string oldItemGroup = db.GetValue("U_ITMGRPCD", j).Trim();
+
+                    if (vendorCode == oldVendorCode &&
+                        shipFromCountry == oldShipFromCountry &&
+                        shippingMode == oldShippingMode &&
+                        incoTerm == oldIncoTerm &&
+                        itemGroup == oldItemGroup)
+                    {
+                        Global.GFunc.ShowError("Duplicate combination found between row no. " + (i + 1) + " and row no. " + (j + 1));
+
+                        matrix.Columns.Item("CLVNCOD").Cells.Item(j + 1).Click();
+                        return false;
+                    }
+                }
             }
+
+            return true;
         }
 
-        public static void AddLineIfLastRowHasValue(
-          SAPbouiCOM.Form oForm,
-          string matrixID,
-          string dbTable,
-          string columnName
-          )
-        {
-            try
-            {
-                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
-                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
-                matrix.FlushToDataSource();
-                int dbRowCount = db.Size;
-                if (dbRowCount == 0)
-                {
-                    Global.GFunc.SetNewLine(matrix, db, 1, "");
-                    return;
-                }
-                int lastDbRow = dbRowCount - 1;
-                string lastValue = db.GetValue(columnName, lastDbRow).Trim();
-                if (!string.IsNullOrEmpty(lastValue) && !lastValue.Equals("0.0"))
-                {
-                    Global.GFunc.SetNewLine(matrix, db, dbRowCount + 1, "");
-                }
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.MessageBox("AddLineIfLastRowHasValue Error: " + ex.Message);
-            }
-        }
+       
 
     }
 }

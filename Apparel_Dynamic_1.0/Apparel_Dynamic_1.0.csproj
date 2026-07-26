@@ -64,6 +64,9 @@
     <Compile Include="Resources\Master\RouteMaster.b1f.cs">
       <DependentUpon>RouteMaster.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Master\SAM.b1f.cs">
+      <DependentUpon>SAM.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Master\SampleMaster.b1f.cs">
       <DependentUpon>SampleMaster.b1f</DependentUpon>
     </Compile>
@@ -160,6 +163,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Master\RouteMaster.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Master\SAM.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Master\SampleMaster.b1f">

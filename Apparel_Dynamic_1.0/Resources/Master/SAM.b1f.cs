@@ -18,17 +18,17 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         /// </summary>
         public override void OnInitializeComponent()
         {
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
-            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_1").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("Item_2").Specific));
-            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("Item_3").Specific));
-            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("Item_4").Specific));
-            this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("Item_6").Specific));
-            this.Folder1 = ((SAPbouiCOM.Folder)(this.GetItem("Item_7").Specific));
-            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_8").Specific));
-            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_9").Specific));
-            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_10").Specific));
-            this.Grid0 = ((SAPbouiCOM.Grid)(this.GetItem("Item_11").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STCODE").Specific));
+            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("STDESC").Specific));
+            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETCODE").Specific));
+            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("ETDESC").Specific));
+            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
+            this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("FOLSAM").Specific));
+            this.Folder1 = ((SAPbouiCOM.Folder)(this.GetItem("FOLCPM").Specific));
+            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
+            this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSAM").Specific));
+            this.Grid0 = ((SAPbouiCOM.Grid)(this.GetItem("GRDCPM").Specific));
             this.OnCustomInitialize();
 
         }

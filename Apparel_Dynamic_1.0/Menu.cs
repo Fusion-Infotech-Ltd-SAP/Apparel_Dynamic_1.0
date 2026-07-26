@@ -51,6 +51,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_MST", "APP_MST_SZTPMSTR", "Size Type Master", 2, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_CPM", "CPM Master", 3, 1, false);
                 CreateMainMenu("APP_MST", "APP_MST_OTHCSTPRM", "Other Cost Parameter", 3, 1, false);
+                CreateMainMenu("APP_MST", "APP_MST_SAM", "SAM", 4, 1, false);
 
 
                 //Apparel -> Transcation
@@ -614,7 +615,6 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
-
                 //Other Cost Parameter 
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_OTHCSTPRM")
                 {
@@ -642,7 +642,33 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
+                //SAM
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_SAM")
+                {
+                    string formUID = "APP_MST_SAM";
 
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText(
+                            "Form is already open.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short,
+                            SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                        return;
+                    }
+                    try
+                    {
+                        SAM activeForm = new SAM();
+                        activeForm.Show();
+                        SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_SAM");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Global.GFunc.ShowError("Failed to open SAM form.\n" + ex.Message);
+                    }
+                }
                 //___________________________________________________________Transaction________________________________________________
                 //Sample PreCositng
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_SAM_SPC")
@@ -694,7 +720,6 @@ namespace Apparel_Dynamic_1._0
                         Application.SBO_Application.MessageBox("Error Found : " + e.Message);
                     }
                 }
-
                 //OTT
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_MRD_OTT")
                 {

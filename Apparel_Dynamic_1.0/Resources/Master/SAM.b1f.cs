@@ -61,13 +61,22 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
-            throw new System.NotImplementedException();
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            // Do not validate in OK mode
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                return;
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                ValidateForm(ref oForm, ref BubbleEvent);
+            }
 
         }
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            throw new System.NotImplementedException();
+            
 
         }
 
@@ -119,6 +128,47 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         }
 
         //________________________________________________________________ User Defined Method____________________________________________________
+
+        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            try
+            {
+                string styleCode = oForm.DataSources.DBDataSources.Item("@FIL_MH_SAM").GetValue("Code", 0).Trim();
+
+                if (string.IsNullOrWhiteSpace(styleCode))
+                {
+                    Global.GFunc.ShowError("Enter Style Code");
+                    oForm.ActiveItem = "ETCODE";
+                    return BubbleEvent = false;
+                }
+
+                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
+                for (int row = 1; row <= matrix.RowCount; row++)
+                {
+                    string samValue = ((SAPbouiCOM.EditText)matrix.Columns.Item("CLSAM").Cells.Item(row).Specific).Value.Trim();
+
+                    double sam = 0;
+                    double.TryParse(samValue, out sam);
+
+                    if (sam <= 0)
+                    {
+                        Global.GFunc.ShowError("SAM value must be greater than 0 at row " + row);
+                        matrix.Columns.Item("CLSAM").Cells.Item(row).Click(SAPbouiCOM.BoCellClickType.ct_Regular);
+                        return BubbleEvent = false;
+                    }
+                }
+
+                return BubbleEvent;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("ValidateForm : " + ex);
+                return BubbleEvent = false;
+            }
+        }
+
+
+
         private void LoadRouteStagesToMatrix(SAPbouiCOM.Form oForm, string routeCode)
         {
             try

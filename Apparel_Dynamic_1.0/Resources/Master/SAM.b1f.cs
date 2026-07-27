@@ -129,6 +129,39 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         //________________________________________________________________ User Defined Method____________________________________________________
 
+        private bool CheckDuplicateStyleCode(SAPbouiCOM.Form oForm, string styleCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(styleCode))
+                    return true;
+
+                string safeStyleCode = styleCode.Replace("'", "''");
+                string query = $@"SELECT COUNT(*) AS ""Total"" FROM ""@FIL_MH_SAM"" WHERE ""Code"" = '{safeStyleCode}'";
+
+                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(query);
+
+                int count = Convert.ToInt32(rs.Fields.Item("Total").Value);
+
+                if (count > 0)
+                {
+                    Global.GFunc.ShowError("Style Code '" + styleCode + "' already exists.");
+                    oForm.ActiveItem = "ETCODE";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("CheckDuplicateStyleCode : " + ex.Message);
+                return false;
+            }
+        }
+
+
+
         private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
         {
             try
@@ -141,6 +174,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     oForm.ActiveItem = "ETCODE";
                     return BubbleEvent = false;
                 }
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE && !CheckDuplicateStyleCode(oForm, styleCode))
+                    return BubbleEvent = false;
+
 
                 SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
                 for (int row = 1; row <= matrix.RowCount; row++)

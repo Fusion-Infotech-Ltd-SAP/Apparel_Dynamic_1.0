@@ -689,16 +689,14 @@ namespace Apparel_Dynamic_1._0
                     {
                         //Component Matrix
                         SAPbouiCOM.Matrix oMTXCMP = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
-                        SAPbouiCOM.Column oAmtCMP = oMTXCMP.Columns.Item("CLAMT");
-                        oAmtCMP.ColumnSetting.SumType = SAPbouiCOM.BoColumnSumType.bst_Auto;
+                        oMTXCMP.AutoResizeColumns();
 
                         //Other Cost Matrix
                         SAPbouiCOM.Matrix oMTXOTCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
-                        SAPbouiCOM.Column oAmtOTCST = oMTXOTCST.Columns.Item("CLAMT");
-                        oAmtOTCST.ColumnSetting.SumType = SAPbouiCOM.BoColumnSumType.bst_Auto;
-
-                        oMTXCMP.AutoResizeColumns();
                         oMTXOTCST.AutoResizeColumns();
+
+
+                      
 
                         // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)

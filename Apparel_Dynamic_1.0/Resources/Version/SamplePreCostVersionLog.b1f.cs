@@ -15,7 +15,7 @@ namespace Apparel_Dynamic_1._0.Resources.Version
 
 
         private SAPbouiCOM.StaticText STSMPLCD, STCURR, STTCNAMT, STNO, STDOCNUM, STDATE, STVERSON, STBUYER;
-        private SAPbouiCOM.EditText ETCURR, ETTCNAMT, ETNO, ETBYRNM, ETSMPLNM, ETDOCNUM, ETDATE, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD;
+        private SAPbouiCOM.EditText ETCURR, ETTCNAMT, ETNO, ETBYRNM, ETSMPLNM, ETDOCNUM, ETDOCDAT, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD;
         private SAPbouiCOM.Folder FOLCMPNT, FOLOTCST;
         private SAPbouiCOM.Matrix MTXCMPNT, MTXOTCST;
         private SAPbouiCOM.Button ADDButton, CancelButton;
@@ -34,7 +34,7 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.ETTCNAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETTCNAMT").Specific));
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
-            this.ETDATE = ((SAPbouiCOM.EditText)(this.GetItem("ETDATE").Specific));
+            this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
             this.ETVERSON = ((SAPbouiCOM.EditText)(this.GetItem("ETVERSON").Specific));
             this.ETBUYER = ((SAPbouiCOM.EditText)(this.GetItem("ETBUYER").Specific));
             this.FOLCMPNT = ((SAPbouiCOM.Folder)(this.GetItem("FOLCMPNT").Specific));

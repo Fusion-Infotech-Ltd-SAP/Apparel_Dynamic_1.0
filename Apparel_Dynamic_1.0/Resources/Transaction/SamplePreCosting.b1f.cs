@@ -140,7 +140,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
             //UpdateTotalAmountBothMatrices(oForm);
 
-            UpdateAllCostTotals(oForm);
+            //UpdateAllCostTotals(oForm);
         }
 
         private string GetRouteFromSampleCode(SAPbouiCOM.Form oForm)

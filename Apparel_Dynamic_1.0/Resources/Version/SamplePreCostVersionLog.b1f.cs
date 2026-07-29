@@ -14,8 +14,12 @@ namespace Apparel_Dynamic_1._0.Resources.Version
         }
 
 
-        private SAPbouiCOM.StaticText STSMPLCD, STCURR, STTCNAMT, STNO, STDOCNUM, STDATE, STVERSON, STBUYER;
-        private SAPbouiCOM.EditText ETCURR, ETTCNAMT, ETNO, ETBYRNM, ETSMPLNM, ETDOCNUM, ETDOCDAT, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD;
+        private SAPbouiCOM.StaticText STSMPLCD, STCURR, STPRFPER, STFOBAMT, STOCTAMT, STCMTAMT,
+                                      STPRFAMT, STTCNAMT, STNO, STDOCNUM, STDATE, STVERSON, STBUYER;
+
+        private SAPbouiCOM.EditText   ETCURR, ETTCNAMT, ETNO, ETSERIES, ETBYRNM, ETSMPLNM, ETDOCNUM, ETPRFAMT, ETPRFPER, ETFOBAMT, ETCMTAMT,
+                                      ETDOCDAT, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD, ETOCTAMT;
+
         private SAPbouiCOM.Folder FOLCMPNT, FOLOTCST;
         private SAPbouiCOM.Matrix MTXCMPNT, MTXOTCST;
         private SAPbouiCOM.Button ADDButton, CancelButton;
@@ -46,7 +50,17 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.ETSMPLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSMPLCD").Specific));
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETSERIES").Specific));
+            this.ETSERIES = ((SAPbouiCOM.EditText)(this.GetItem("ETSERIES").Specific));
+            this.STPRFPER = ((SAPbouiCOM.StaticText)(this.GetItem("STPRFPER").Specific));
+            this.STPRFAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STPRFAMT").Specific));
+            this.STFOBAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STFOBAMT").Specific));
+            this.STOCTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STOCTAMT").Specific));
+            this.STCMTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STCMTAMT").Specific));
+            this.ETPRFPER = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFPER").Specific));
+            this.ETPRFAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFAMT").Specific));
+            this.ETFOBAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETFOBAMT").Specific));
+            this.ETCMTAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETCMTAMT").Specific));
+            this.ETOCTAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETOCTAMT").Specific));
             this.OnCustomInitialize();
 
         }
@@ -62,5 +76,15 @@ namespace Apparel_Dynamic_1._0.Resources.Version
         }
 
         private SAPbouiCOM.EditText EditText0;
+        private SAPbouiCOM.StaticText StaticText0;
+        private SAPbouiCOM.StaticText StaticText1;
+        private SAPbouiCOM.StaticText StaticText2;
+        private SAPbouiCOM.StaticText StaticText3;
+        private SAPbouiCOM.StaticText StaticText4;
+        private SAPbouiCOM.EditText EditText1;
+        private SAPbouiCOM.EditText EditText2;
+        private SAPbouiCOM.EditText EditText3;
+        private SAPbouiCOM.EditText EditText4;
+        private SAPbouiCOM.EditText EditText5;
     }
 }

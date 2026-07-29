@@ -327,6 +327,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = "";
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value = "";
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific).Value = "";
 
             // Clear Matrices
             SAPbouiCOM.Matrix mtxComp = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
@@ -351,7 +356,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                                 T0.""U_CARDNAME"",
                                 T0.""U_CURRENCY"",
                                 T0.""U_TOTCONAMT"",
-                                T0.""U_DOCDATE""
+                                T0.""U_DOCDATE"",
+                                T0.""U_PROFITPC"",
+                                T0.""U_PROFITAM"",
+                                T0.""U_FOBAMUNT"",
+                                T0.""U_TOTCAMNT"",
+                                T0.""U_TOTOAMNT""
+    
                             FROM ""@AFIL_DH_PRECOSTING"" T0
                             LEFT JOIN ""NNM1"" T1 ON T0.""Series"" = T1.""Series""
                             WHERE T0.""DocEntry"" = '{docEntry}'
@@ -375,6 +386,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETBYRNM").Specific).Value = rs.Fields.Item("U_CARDNAME").Value.ToString();
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = rs.Fields.Item("U_CURRENCY").Value.ToString();
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = rs.Fields.Item("U_TOTCONAMT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific).Value = rs.Fields.Item("U_PROFITPC").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific).Value = rs.Fields.Item("U_PROFITAM").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific).Value = rs.Fields.Item("U_FOBAMUNT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = rs.Fields.Item("U_TOTCAMNT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = rs.Fields.Item("U_TOTOAMNT").Value.ToString();
 
                 DateTime docDate = Convert.ToDateTime(rs.Fields.Item("U_DOCDATE").Value);
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = docDate.ToString("yyyyMMdd");

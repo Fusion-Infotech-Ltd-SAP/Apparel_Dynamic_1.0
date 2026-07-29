@@ -75,16 +75,5 @@ namespace Apparel_Dynamic_1._0.Resources.Version
 
         }
 
-        private SAPbouiCOM.EditText EditText0;
-        private SAPbouiCOM.StaticText StaticText0;
-        private SAPbouiCOM.StaticText StaticText1;
-        private SAPbouiCOM.StaticText StaticText2;
-        private SAPbouiCOM.StaticText StaticText3;
-        private SAPbouiCOM.StaticText StaticText4;
-        private SAPbouiCOM.EditText EditText1;
-        private SAPbouiCOM.EditText EditText2;
-        private SAPbouiCOM.EditText EditText3;
-        private SAPbouiCOM.EditText EditText4;
-        private SAPbouiCOM.EditText EditText5;
     }
 }

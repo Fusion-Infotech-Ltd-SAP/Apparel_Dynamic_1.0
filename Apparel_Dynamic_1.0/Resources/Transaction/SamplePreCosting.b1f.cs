@@ -71,7 +71,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.FOLOTCST = ((SAPbouiCOM.Folder)(this.GetItem("FOLOTCST").Specific));
             this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
             this.FOLVERSN = ((SAPbouiCOM.Folder)(this.GetItem("FOLVERSN").Specific));
-            this.FOLVERSN.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLVERSN_ClickAfter);
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -117,7 +116,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
         }
 
@@ -131,16 +131,25 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            //Enable off
-            Global.GFunc.SetItemsEnabled(oForm, false,"ETSMPLCD","ETSMPLNM","ETBYRNM","ETDOCNUM","ETDOCDAT","ETVERSON","CBSERIES");
-            Global.GFunc.SetItemsEnabled(oForm, true, "BTNLCSTH", "BTNVRNUP");
-            AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
-            string route = GetRouteFromSampleCode(oForm);
-            LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
-            //UpdateTotalAmountBothMatrices(oForm);
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            //UpdateAllCostTotals(oForm);
+                // Enable / Disable Items
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLCD", "ETTCNAMT", "ETSMPLNM", "ETBYRNM", "ETDOCNUM", "ETDOCDAT", "ETVERSON", "CBSERIES");
+                Global.GFunc.SetItemsEnabled(oForm, true, "BTNLCSTH", "BTNVRNUP");
+
+                AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
+
+                string route = GetRouteFromSampleCode(oForm);
+                LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
+
+                LoadVersionGrid(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Form Data Load Error: " + ex.Message);
+            }
         }
 
         private string GetRouteFromSampleCode(SAPbouiCOM.Form oForm)
@@ -518,8 +527,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             {
                 AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
             }
-           
-            
+                  
         }
 
 
@@ -548,6 +556,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+        private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            LoadVersionGrid(oForm);
+        }
+
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
@@ -571,89 +585,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
 
         }
-
-        private void FOLVERSN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = null;
-            SAPbouiCOM.EditText etDocEntry, etDocNum, etVersion;
-            SAPbouiCOM.Grid oGrid;
-            SAPbouiCOM.DataTable oDT;
-
-            try
-            {
-                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                etDocEntry = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific;
-                etDocNum = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
-                etVersion = (SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific;
-
-                // Parse values
-                string docEntry = etDocEntry.Value.Trim();
-                string docNum = etDocNum.Value.Trim();
-                int version = Convert.ToInt32(string.IsNullOrEmpty(etVersion.Value) ? "0" : etVersion.Value);
-
-                if (version <= 1)
-                {
-                    Application.SBO_Application.StatusBar
-                        .SetText("Version must be greater than 1",
-                                 SAPbouiCOM.BoMessageTime.bmt_Short,
-                                 SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
-
-                    oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
-                    oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
-                    oDT.Clear();
-                    return;
-                }
-
-                oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
-                oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
-                oDT.Clear();
-                string sQuery = $@"
-                                    SELECT
-                                        T.""DocEntry"",
-                                        T.""DocNum"",
-                                        T.""Creator"",
-                                        T.""CreateDate"",
-                                        T.""UpdateDate"",
-                                        T.""U_VERSION"" AS ""Version"",
-                                        T.""LogInst"" AS ""MAX_LOGINST""
-                                    FROM ""@AFIL_DH_PRECOSTING"" T
-                                    JOIN (
-                                        SELECT
-                                            ""DocEntry"",
-                                            ""DocNum"",
-                                            ""U_VERSION"",
-                                            MAX(""LogInst"") AS ""MAX_LOGINST""
-                                        FROM ""@AFIL_DH_PRECOSTING""
-                                        WHERE ""DocEntry"" = '{docEntry}'
-                                          AND ""DocNum""   = '{docNum}'
-                                        GROUP BY
-                                            ""DocEntry"",
-                                            ""DocNum"",
-                                            ""U_VERSION""
-                                    ) M
-                                    ON  T.""DocEntry""  = M.""DocEntry""
-                                    AND T.""DocNum""    = M.""DocNum""
-                                    AND T.""U_VERSION"" = M.""U_VERSION""
-                                    AND T.""LogInst""   = M.""MAX_LOGINST""
-                                    WHERE T.""DocEntry"" = '{docEntry}'
-                                      AND T.""DocNum""   = '{docNum}'
-                                    ORDER BY T.""U_VERSION""";
-
-
-                oDT.ExecuteQuery(sQuery);
-                oGrid.DataTable = oDT;
-                oGrid.AutoResizeColumns();
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar
-                    .SetText(ex.Message,
-                             SAPbouiCOM.BoMessageTime.bmt_Long,
-                             SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-            }
-        }
-
-      
 
         private void BTNVRNUP_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -1576,7 +1507,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                //Application.SBO_Application.MessageBox("Error: " + ex.Message);
+                Application.SBO_Application.MessageBox("Error: " + ex.Message);
             }
         }
 
@@ -1746,7 +1677,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         if (profitPercent < 0)
                         {
                             _hasInvalidProfitValue = true;
-                            Global.GFunc.ShowError("Profit Percentage cannot be negative.");
+                            //Global.GFunc.ShowError("Profit Percentage cannot be negative.");
                             profitPercent = 0;
                         }
                         profitAmount = totalCost * profitPercent / 100;
@@ -1757,7 +1688,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         if (profitAmount < 0)
                         {
                             _hasInvalidProfitValue = true;
-                            Global.GFunc.ShowError("Profit Amount cannot be negative.");
+                            //Global.GFunc.ShowError("Profit Amount cannot be negative.");
                             profitAmount = 0;
                         }
                         profitPercent = totalCost == 0 ? 0 : (profitAmount / totalCost) * 100;
@@ -1768,7 +1699,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         if (fobAmount < totalCost)
                         {
                             _hasInvalidProfitValue = true;
-                            Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
+                            //Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
                             profitAmount = 0;
                             profitPercent = 0;
                         }
@@ -1881,6 +1812,101 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             return 0;
         }
+
+        private void LoadVersionGrid(SAPbouiCOM.Form oForm)
+        {
+            if (oForm == null)
+                return;
+
+            try
+            {
+                string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+                string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
+                string versionValue = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+                SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
+                SAPbouiCOM.DataTable oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
+
+                if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum))
+                {
+                    oDT.Clear();
+                    return;
+                }
+
+                if (!int.TryParse(versionValue, out int version) || version <= 1)
+                {
+                    oDT.Clear();
+
+                    Application.SBO_Application.StatusBar.SetText(
+                        "Version must be greater than 1.",
+                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                        SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                    return;
+                }
+
+                string safeDocEntry = docEntry.Replace("'", "''");
+                string safeDocNum = docNum.Replace("'", "''");
+
+                string sQuery = $@"
+                                SELECT
+                                    T.""DocEntry"",
+                                    T.""DocNum"",
+                                    T.""Creator"",
+                                    T.""CreateDate"",
+                                    T.""UpdateDate"",
+                                    T.""U_VERSION"" AS ""Version"",
+                                    T.""LogInst"" AS ""MAX_LOGINST""
+                                FROM ""@AFIL_DH_PRECOSTING"" T
+                                INNER JOIN
+                                (
+                                    SELECT
+                                        ""DocEntry"",
+                                        ""DocNum"",
+                                        ""U_VERSION"",
+                                        MAX(""LogInst"") AS ""MAX_LOGINST""
+                                    FROM ""@AFIL_DH_PRECOSTING""
+                                    WHERE ""DocEntry"" = '{safeDocEntry}'
+                                      AND ""DocNum"" = '{safeDocNum}'
+                                    GROUP BY
+                                        ""DocEntry"",
+                                        ""DocNum"",
+                                        ""U_VERSION""
+                                ) M
+                                    ON T.""DocEntry"" = M.""DocEntry""
+                                   AND T.""DocNum"" = M.""DocNum""
+                                   AND T.""U_VERSION"" = M.""U_VERSION""
+                                   AND T.""LogInst"" = M.""MAX_LOGINST""
+                                WHERE T.""DocEntry"" = '{safeDocEntry}'
+                                  AND T.""DocNum"" = '{safeDocNum}'
+                                ORDER BY T.""U_VERSION""";
+
+                oForm.Freeze(true);
+
+                oDT.ExecuteQuery(sQuery);
+                oGrid.DataTable = oDT;
+                oGrid.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "Load Version Grid Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Long,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                try
+                {
+                    oForm.Freeze(false);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+
 
         public static void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
         {

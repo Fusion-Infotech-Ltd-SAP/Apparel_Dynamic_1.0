@@ -975,9 +975,9 @@ namespace Apparel_Dynamic_1._0
                                 // Series Initialization
                                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                 {
-                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
-                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETVERSON");
-
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLCD", "CBSERIES", "ETDOCDAT");
+                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETTCNAMT", "ETDOCNUM", "ETVERSON");
+                                    Global.GFunc.ReEnableChooseFromList(oForm, "ETSMPLCD", "CFL_SMPL", "U_SMPLCODE");
                                     string today = DateTime.Now.ToString("yyyyMMdd");
                                     SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
                                     oDBH.SetValue("U_DOCDATE", 0, today);
@@ -1411,7 +1411,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_SMPLPCST":
                             {
                                 //Enable off
-                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", 
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETSMPLCD",
                                                                           "ETVERSON", "ETTCNAMT", "ETDOCDAT");
                                 Global.GFunc.SetItemsEnabled(oForm, false,"CBSERIES");
 

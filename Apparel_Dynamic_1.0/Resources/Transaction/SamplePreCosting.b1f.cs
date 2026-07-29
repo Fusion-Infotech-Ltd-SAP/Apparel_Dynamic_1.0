@@ -691,8 +691,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
                     return;
 
                 _lastProfitInput = "PERCENT";
@@ -714,8 +713,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE )
                     return;
 
                 _lastProfitInput = "AMOUNT";
@@ -737,8 +735,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
                     return;
 
                 _lastProfitInput = "FOB";
@@ -1507,7 +1504,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.MessageBox("Error: " + ex.Message);
+               // Application.SBO_Application.MessageBox("Error: " + ex.Message);
             }
         }
 

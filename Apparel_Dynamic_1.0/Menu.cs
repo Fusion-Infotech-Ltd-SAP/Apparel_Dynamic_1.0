@@ -695,9 +695,6 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Matrix oMTXOTCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
                         oMTXOTCST.AutoResizeColumns();
 
-
-                      
-
                         // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {

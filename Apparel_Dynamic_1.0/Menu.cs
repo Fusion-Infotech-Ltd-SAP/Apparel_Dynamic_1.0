@@ -664,6 +664,11 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_SAM");
                         SAPbouiCOM.Matrix MTXSAM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
                         MTXSAM.AutoResizeColumns();
+
+                        //oForm.Freeze(true);
+                        //oForm.Settings.MatrixUID = "MTXSAM";
+                        //oForm.Settings.Enabled = true;
+                        //oForm.Freeze(false);
                     }
                     catch (Exception ex)
                     {

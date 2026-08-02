@@ -46,12 +46,18 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.OnCustomInitialize();
 
         }
-
         public override void OnInitializeFormEvents()
         {
+           
+            this.ActivateAfter += new ActivateAfterHandler(this.Form_ActivateAfter);
+
         }
 
+        private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            EnableFormSettings();
 
+        }
 
         private void OnCustomInitialize()
         {
@@ -128,6 +134,38 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         }
 
         //________________________________________________________________ User Defined Method____________________________________________________
+        private void EnableFormSettings()
+        {
+            SAPbouiCOM.Form oForm = null;
+            bool isFrozen = false;
+
+            try
+            {
+                oForm = (SAPbouiCOM.Form)this.UIAPIRawForm;
+
+                oForm.Freeze(true);
+                isFrozen = true;
+
+                if (!oForm.Settings.Enabled)
+                {
+                    oForm.Settings.MatrixUID = "MTXSAM";
+                    oForm.Settings.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Failed to enable Form Settings.\n" + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null && isFrozen)
+                {
+                    oForm.Freeze(false);
+                }
+            }
+        }
+
+
 
         private bool CheckDuplicateStyleCode(SAPbouiCOM.Form oForm, string styleCode)
         {

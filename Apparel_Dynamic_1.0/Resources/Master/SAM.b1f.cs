@@ -269,15 +269,15 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 }
 
                 string finalQuery = $@"
-            SELECT
-                A.""LineId"" AS ""LineId"",
-                A.""U_OTYPECODE"" AS ""Order Type"",
-                A.""U_MINQTY"" AS ""Min Qty"",
-                A.""U_MAXQTY"" AS ""Max Qty"",
-                {string.Join(",", dynamicColumns)}
-            FROM ""@FIL_DR_CPMD"" A
-            WHERE A.""DocEntry""={cpmDocEntry}
-            ORDER BY A.""LineId""";
+                                        SELECT
+                                            A.""LineId"" AS ""LineId"",
+                                            A.""U_OTYPECODE"" AS ""Order Type"",
+                                            A.""U_MINQTY"" AS ""Min Qty"",
+                                            A.""U_MAXQTY"" AS ""Max Qty"",
+                                            {string.Join(",", dynamicColumns)}
+                                        FROM ""@FIL_DR_CPMD"" A
+                                        WHERE A.""DocEntry""={cpmDocEntry}
+                                        ORDER BY A.""LineId""";
 
                 SAPbouiCOM.DataTable dtCPM = oForm.DataSources.DataTables.Item("DT_CPM");
                 SAPbouiCOM.Grid grdCPM = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCPM").Specific;

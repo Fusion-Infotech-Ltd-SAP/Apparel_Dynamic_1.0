@@ -430,13 +430,24 @@ namespace Apparel_Dynamic_1._0.Helper
 
             }
         }
-        public void ShowError(string ErrorMessage)
+        public void ShowError(string message)
         {
-            Application.SBO_Application.StatusBar.SetText(ErrorMessage, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            Application.SBO_Application.StatusBar.SetText(message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
         }
-        public void ShowSuccess(string ErrorMessage)
+
+        public void ShowSuccess(string message)
         {
-            Application.SBO_Application.StatusBar.SetText(ErrorMessage, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+            Application.SBO_Application.StatusBar.SetText(message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+        }
+
+        public void ShowWarning(string message)
+        {
+            Application.SBO_Application.StatusBar.SetText(message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+        }
+
+        public void ShowInfo(string message)
+        {
+            Application.SBO_Application.StatusBar.SetText(message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_None);
         }
         public void AddRow(SAPbouiCOM.Matrix oMatrix, SAPbouiCOM.DBDataSource oDataSource)
         {

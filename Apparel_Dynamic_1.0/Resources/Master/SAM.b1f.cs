@@ -50,7 +50,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         public override void OnInitializeFormEvents()
         {
             this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
         }
 
@@ -85,56 +86,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
-            SAPbouiCOM.Form oForm = null;
-            SAPbobsCOM.Recordset oRecordset = null;
-
-            try
-            {
-                oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(pVal.FormUID);
-                ResetSAMRowColors(oForm);
-                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value.Trim();
-
-                if (string.IsNullOrWhiteSpace(styleCode))
-                {
-                    return;
-                }
-
-                string safeStyleCode = styleCode.Replace("'", "''");
-
-                oRecordset = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-
-                string query = $@"SELECT TOP 1 C.""DocEntry"" FROM ""@FIL_DH_OPSM"" O INNER JOIN ""@FIL_DH_CPM"" C ON IFNULL(C.""U_BRAND"",'')=IFNULL(O.""U_BRAND"",'') AND IFNULL(C.""U_PRDGRP"",'')=IFNULL(O.""U_PRGROUP"",'') AND IFNULL(C.""U_RSTGECODE"",'')=IFNULL(O.""U_ROUTESTAGE"",'') WHERE O.""U_STYLECODE""='{safeStyleCode}' ORDER BY C.""DocEntry"" DESC";
-
-                oRecordset.DoQuery(query);
-
-                if (oRecordset.RecordCount == 0)
-                {
-                    Global.GFunc.ShowError("No CPM Master entry was found for this Style's Brand, Product Group and Route Stage.");
-                    return;
-                }
-
-                int cpmDocEntry = Convert.ToInt32(oRecordset.Fields.Item("DocEntry").Value);
-
-                HighlightSAMOutOfRangeRows(oForm, cpmDocEntry);
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Failed to validate SAM ranges: " + ex.Message);
-            }
-            finally
-            {
-                if (oRecordset != null)
-                {
-                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordset);
-                    oRecordset = null;
-                }
-            }
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            RefreshSAMRowColors(pVal.FormUID);
+            Global.GFunc.SetItemsEnabled(oForm, false, "ETDESC");
         }
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            
-
+            RefreshSAMRowColors(pVal.FormUID);
         }
 
         private void FOLCPM_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -151,7 +110,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (string.IsNullOrWhiteSpace(styleCode))
                 {
-                    Global.GFunc.ShowError("Please select a Style Code first.");
+                    Global.GFunc.ShowWarning("Please select a Style Code first.");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -165,7 +124,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (oRecordset.RecordCount == 0)
                 {
-                    Global.GFunc.ShowError("No Operation Style Master entry was found for Style Code " + styleCode + ".");
+                    Global.GFunc.ShowWarning("No Operation Style Master entry was found for Style Code " + styleCode + ".");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -176,7 +135,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (string.IsNullOrWhiteSpace(routeStage) || string.IsNullOrWhiteSpace(productGroup) || string.IsNullOrWhiteSpace(brand))
                 {
-                    Global.GFunc.ShowError("Brand, Product Group or Route Stage is missing in the Operation Style Master.");
+                    Global.GFunc.ShowWarning("Brand, Product Group or Route Stage is missing in the Operation Style Master.");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -191,7 +150,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (oRecordset.RecordCount == 0)
                 {
-                    Global.GFunc.ShowError("There is no entry in the CPM Master for Brand " + brand + ", Product Group " + productGroup + " and Route Stage " + routeStage + ".");
+                    Global.GFunc.ShowWarning("There is no entry in the CPM Master for Brand " + brand + ", Product Group " + productGroup + " and Route Stage " + routeStage + ".");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -229,7 +188,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (oRecordset.RecordCount == 0)
                 {
-                    Global.GFunc.ShowError("No Stage SAM data was found for Style Code " + styleCode + ".");
+                    Global.GFunc.ShowWarning("No Stage SAM data was found for Style Code " + styleCode + ".");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -263,7 +222,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 if (dynamicColumns.Count == 0)
                 {
-                    Global.GFunc.ShowError("No applicable Stage columns were found for Style Code " + styleCode + ".");
+                    Global.GFunc.ShowWarning("No applicable Stage columns were found for Style Code " + styleCode + ".");
                     ClearCPMGrid(oForm);
                     return;
                 }
@@ -324,6 +283,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            RefreshSAMRowColors(pVal.FormUID);
+        }
 
         private void ETCODE_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -373,6 +336,86 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         }
 
         //________________________________________________________________ User Defined Method____________________________________________________
+        private bool ValidateNegativeAmount(SAPbouiCOM.Matrix oMatrix, string columnID, ref bool BubbleEvent)
+        {
+            for (int row = 1; row <= oMatrix.RowCount; row++)
+            {
+                double value;
+                double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item(columnID).Cells.Item(row).Specific).Value.Trim(), out value);
+
+                if (value < 0)
+                {
+                    Global.GFunc.ShowError("Amount cannot be negative at row " + row + ".");
+                    oMatrix.Columns.Item(columnID).Cells.Item(row).Click(SAPbouiCOM.BoCellClickType.ct_Regular);
+                    return BubbleEvent = false;
+                }
+            }
+
+            return true;
+        }
+        private void RefreshSAMRowColors(string formUID)
+        {
+            SAPbouiCOM.Form oForm = null;
+            SAPbobsCOM.Recordset oRecordset = null;
+            bool isFrozen = false;
+
+            try
+            {
+                oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(formUID);
+                oForm.Freeze(true);
+                isFrozen = true;
+
+                ResetSAMRowColors(oForm);
+
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
+                oMatrix.LoadFromDataSource();
+
+                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(styleCode))
+                    return;
+
+                string safeStyleCode = styleCode.Replace("'", "''");
+                oRecordset = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                string query = $@"SELECT TOP 1 C.""DocEntry"" FROM ""@FIL_DH_OPSM"" O INNER JOIN ""@FIL_DH_CPM"" C ON IFNULL(C.""U_BRAND"",'')=IFNULL(O.""U_BRAND"",'') AND IFNULL(C.""U_PRDGRP"",'')=IFNULL(O.""U_PRGROUP"",'') AND IFNULL(C.""U_RSTGECODE"",'')=IFNULL(O.""U_ROUTESTAGE"",'') WHERE O.""U_STYLECODE""='{safeStyleCode}' ORDER BY C.""DocEntry"" DESC";
+
+                oRecordset.DoQuery(query);
+
+                if (oRecordset.RecordCount == 0)
+                {
+                    ResetSAMRowColors(oForm);
+                    Global.GFunc.ShowWarning("No CPM Master entry was found for this Style's Brand, Product Group and Route Stage.");
+                    return;
+                }
+
+                int cpmDocEntry = Convert.ToInt32(oRecordset.Fields.Item("DocEntry").Value);
+                HighlightSAMOutOfRangeRows(oForm, cpmDocEntry);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Failed to refresh SAM row colors: " + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null && isFrozen)
+                {
+                    try
+                    {
+                        oForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                if (oRecordset != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordset);
+                    oRecordset = null;
+                }
+            }
+        }
         private void ResetSAMRowColors(SAPbouiCOM.Form oForm)
         {
             try
@@ -438,11 +481,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (!isWithinRange)
                     {
                         oMatrix.CommonSetting.SetRowBackColor(row, System.Drawing.Color.LightBlue.ToArgb());
-
+                        oMatrix.CommonSetting.SetRowFontColor(row, System.Drawing.Color.Red.ToArgb());
                     }
                     else
                     {
                         oMatrix.CommonSetting.SetRowBackColor(row, -1);
+                        oMatrix.CommonSetting.SetRowFontColor(row, -1);
                     }
                 }
             }
@@ -571,6 +615,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                         return BubbleEvent = false;
                     }
                 }
+
+                if (!ValidateNegativeAmount(matrix, "CLSAM", ref BubbleEvent))
+                    return BubbleEvent;
 
                 return BubbleEvent;
             }

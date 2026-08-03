@@ -1379,6 +1379,11 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_SAM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETDESC");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1564,6 +1569,11 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_INCOTRMS":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_SAM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDESC");
                                 break;
                             }
                     }

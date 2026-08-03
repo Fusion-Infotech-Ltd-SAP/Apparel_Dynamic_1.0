@@ -121,7 +121,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 string styleQuery = $@"SELECT TOP 1 IFNULL(""U_ROUTESTAGE"",'') AS ""RouteStage"",IFNULL(""U_PRGROUP"",'') AS ""ProductGroup"",IFNULL(""U_BRAND"",'') AS ""Brand"" FROM ""@FIL_DH_OPSM"" WHERE ""U_STYLECODE""='{safeStyleCode}'";
 
                 oRecordset.DoQuery(styleQuery);
-
                 if (oRecordset.RecordCount == 0)
                 {
                     Global.GFunc.ShowWarning("No Operation Style Master entry was found for Style Code " + styleCode + ".");

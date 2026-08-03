@@ -2010,6 +2010,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oDT.ExecuteQuery(sQuery);
                 oGrid.DataTable = oDT;
                 oGrid.AutoResizeColumns();
+                oGrid.Columns.Item("MAX_LOGINST").Visible = false;
             }
             catch (Exception ex)
             {
@@ -2029,7 +2030,18 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 }
             }
         }
-
+        private void HideGridColumn(SAPbouiCOM.Grid oGrid, string columnId)
+        {
+            try
+            {
+                if (oGrid != null && oGrid.Columns.Count > 0)
+                    oGrid.Columns.Item(columnId).Visible = false;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Hide Grid Column Error: " + ex.Message);
+            }
+        }
         private bool ValidateCostTotals(SAPbouiCOM.Form oForm)
         {
             try

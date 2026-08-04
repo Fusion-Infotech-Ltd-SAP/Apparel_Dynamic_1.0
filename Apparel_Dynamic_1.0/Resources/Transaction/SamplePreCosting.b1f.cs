@@ -16,11 +16,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
         }
 
-        private SAPbouiCOM.StaticText STSMPLCD, STCURR, STTCNAMT, STDOCNUM, STDATE, STVERSON, STBUYER, STDOCDAT;
+        private SAPbouiCOM.StaticText STSMPLCD, STCMTAMT, STOCTAMT, STCURR, STTCNAMT, STDOCNUM, STDATE, STVERSON,
+                                       STPRFPER, STPRFAMT , STFOBAMT, STBUYER, STDOCDAT;
 
         private SAPbouiCOM.ComboBox CBNO;
 
-        private SAPbouiCOM.EditText ETCURR, ETTCNAMT, ETNO, ETBYRNM, ETSMPLNM, ETDOCNUM, ETDOCDAT, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD;
+        private SAPbouiCOM.EditText ETCURR, ETTCNAMT, ETPRFPER, ETCMTAMT,ETNO, ETOCTAMT, ETBYRNM, ETPRFAMT, ETFOBAMT,
+                                        ETSMPLNM, ETDOCNUM, ETDOCDAT, ETVERSON, ETBUYER, ETDOCTRY, ETSMPLCD;
 
         private SAPbouiCOM.Folder FOLCMPNT, FOLOTCST, FOLVERSN;
 
@@ -39,6 +41,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private string SelVersion = "";
         private string SelLogInst = "";
 
+
+        private bool _isProfitCalculationRunning = false;
+        private string _lastProfitInput = "PERCENT";
+        private bool _hasInvalidProfitValue = false;
 
         public override void OnInitializeComponent()
         {
@@ -64,8 +70,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.FOLCMPNT = ((SAPbouiCOM.Folder)(this.GetItem("FOLCMPNT").Specific));
             this.FOLOTCST = ((SAPbouiCOM.Folder)(this.GetItem("FOLOTCST").Specific));
             this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
+            // this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
             this.FOLVERSN = ((SAPbouiCOM.Folder)(this.GetItem("FOLVERSN").Specific));
-            this.FOLVERSN.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLVERSN_ClickAfter);
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -90,6 +96,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.BTNLCSTH.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNLCSTH_PressedAfter);
             this.ETSMPLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSMPLCD").Specific));
             this.ETSMPLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSMPLCD_ChooseFromListAfter);
+            this.STPRFPER = ((SAPbouiCOM.StaticText)(this.GetItem("STPRFPER").Specific));
+            this.STPRFAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STPRFAMT").Specific));
+            this.STFOBAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STFOBAMT").Specific));
+            this.ETPRFPER = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFPER").Specific));
+            this.ETPRFPER.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETPRFPER_LostFocusAfter);
+            this.ETPRFAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFAMT").Specific));
+            this.ETPRFAMT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETPRFAMT_LostFocusAfter);
+            this.ETFOBAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETFOBAMT").Specific));
+            this.ETFOBAMT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETFOBAMT_LostFocusAfter);
+            this.STCMTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STCMTAMT").Specific));
+            this.ETCMTAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETCMTAMT").Specific));
+            this.STOCTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STOCTAMT").Specific));
+            this.ETOCTAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETOCTAMT").Specific));
             this.OnCustomInitialize();
 
         }
@@ -98,25 +117,40 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
         }
+
 
 
         private void OnCustomInitialize()
         {
 
         }
+
+
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            //Enable off
-            Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBYRNM", "ETDOCNUM", "ETDOCDAT", "ETVERSON","CBSERIES");
-            Global.GFunc.SetItemsEnabled(oForm, true, "BTNLCSTH", "BTNVRNUP");
-            AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
-            string route = GetRouteFromSampleCode(oForm);
-            LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
+                // Enable / Disable Items
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLCD", "ETTCNAMT", "ETSMPLNM", "ETBYRNM", "ETDOCNUM", "ETDOCDAT", "ETVERSON", "CBSERIES");
+                Global.GFunc.SetItemsEnabled(oForm, true, "BTNLCSTH", "BTNVRNUP");
+
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
+
+                string route = GetRouteFromSampleCode(oForm);
+                LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
+
+                LoadVersionGrid(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Form Data Load Error: " + ex.Message);
+            }
         }
 
         private string GetRouteFromSampleCode(SAPbouiCOM.Form oForm)
@@ -303,6 +337,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = "";
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value = "";
             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific).Value = "";
+            ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific).Value = "";
 
             // Clear Matrices
             SAPbouiCOM.Matrix mtxComp = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
@@ -327,7 +366,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                                 T0.""U_CARDNAME"",
                                 T0.""U_CURRENCY"",
                                 T0.""U_TOTCONAMT"",
-                                T0.""U_DOCDATE""
+                                T0.""U_DOCDATE"",
+                                T0.""U_PROFITPC"",
+                                T0.""U_PROFITAM"",
+                                T0.""U_FOBAMUNT"",
+                                T0.""U_TOTCAMNT"",
+                                T0.""U_TOTOAMNT""
+    
                             FROM ""@AFIL_DH_PRECOSTING"" T0
                             LEFT JOIN ""NNM1"" T1 ON T0.""Series"" = T1.""Series""
                             WHERE T0.""DocEntry"" = '{docEntry}'
@@ -351,6 +396,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETBYRNM").Specific).Value = rs.Fields.Item("U_CARDNAME").Value.ToString();
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = rs.Fields.Item("U_CURRENCY").Value.ToString();
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = rs.Fields.Item("U_TOTCONAMT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific).Value = rs.Fields.Item("U_PROFITPC").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific).Value = rs.Fields.Item("U_PROFITAM").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific).Value = rs.Fields.Item("U_FOBAMUNT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = rs.Fields.Item("U_TOTCAMNT").Value.ToString();
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = rs.Fields.Item("U_TOTOAMNT").Value.ToString();
 
                 DateTime docDate = Convert.ToDateTime(rs.Fields.Item("U_DOCDATE").Value);
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = docDate.ToString("yyyyMMdd");
@@ -458,44 +508,25 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            //Series Initialization
-            SAPbouiCOM.DBDataSource oDBH = (SAPbouiCOM.DBDataSource)oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+            // Series Initialization
             if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
             {
-                SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSERIES").Specific;
-                Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_PRECOSTING");
-                string ocmbvalue = ocmb.Selected.Value;
-                long docno = oForm.BusinessObject.GetNextSerialNumber(ocmbvalue, "FIL_D_PRECOSTING");
-                oDBH.SetValue("DocNum", 0, docno.ToString());
+                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETVERSON");
 
-                //Date
-                ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = DateTime.Now.ToString("yyyyMMdd");
+                string today = DateTime.Now.ToString("yyyyMMdd");
+                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                oDBH.SetValue("U_DOCDATE", 0, today);
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                Global.GFunc.UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_PRECOSTING");
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1"; //Default version 
-                                                                                          //Enable off
-                SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETDOCDAT", "ETVERSON");
             }
             else if(oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
             {
-                AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
             }
-            
-        }
-
-
-
-        private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
-        {
-            foreach (string itemId in itemIds)
-            {
-                try
-                {
-                    oForm.Items.Item(itemId).Enabled = enabled;
-                }
-                catch
-                {
-
-                }
-            }
+                  
         }
 
         private void CBNO_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -503,6 +534,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             Global.GFunc.UpdateDocNumberBySeries(oForm, "FIL_D_PRECOSTING");
 
+        }
+
+      
+
+        private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            LoadVersionGrid(oForm);
         }
 
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -529,182 +568,264 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
-        private void FOLVERSN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //private void BTNVRNUP_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //    try
+        //    {
+        //        //Confirmation
+        //        int ret = Application.SBO_Application.MessageBox(
+        //            "Are you sure you want to increase the version?",
+        //            1, "OK", "Cancel");
+
+        //        if (ret != 1)
+        //            return;
+
+        //        //Read values from edit texts
+        //        string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+        //        string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
+        //        string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+        //        if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum) || string.IsNullOrWhiteSpace(version))
+        //        {
+        //            Application.SBO_Application.StatusBar.SetText(
+        //                "DocEntry, DocNum, and Version are required.",
+        //                SAPbouiCOM.BoMessageTime.bmt_Short,
+        //                SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+        //            return;
+        //        }
+
+        //        //Check if current version exists in DB
+        //        string sql = $@"
+        //                        Select 1 from ""@FIL_DH_PRECOSTING"" 
+        //                            where ""DocEntry"" = '{docEntry}'
+        //                            and ""DocNum""   = '{docNum}'
+        //                            and ""U_VERSION""= '{version}'";
+
+        //        SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //        rs.DoQuery(sql);
+
+        //        //If exists
+        //        if (rs.RecordCount > 0)
+        //        {
+        //            if (!int.TryParse(version, out int v))
+        //            {
+        //                Application.SBO_Application.StatusBar.SetText(
+        //                    "Version is not numeric, cannot increment.",
+        //                    SAPbouiCOM.BoMessageTime.bmt_Short,
+        //                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //                return;
+        //            }
+
+        //            v++;
+
+        //            //SAPbouiCOM.DBDataSource dsH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+        //            //dsH.SetValue("U_VERSION", 0, v.ToString());
+
+
+        //            ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = v.ToString();
+        //            // Matrix Other Cost
+        //            SAPbouiCOM.Matrix mtxOtherCost = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+        //            UpdateMatrixVersion(mtxOtherCost, "CLVERSN", v);
+
+        //            // Matrix Component
+        //            SAPbouiCOM.Matrix mtxComponent = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
+        //            UpdateMatrixVersion(mtxComponent, "CLVERSN", v);
+
+        //            // =================================================
+
+
+        //            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //            {
+        //                oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+        //            }
+
+        //            Application.SBO_Application.StatusBar.SetText(
+        //                "Version increased successfully.",
+        //                SAPbouiCOM.BoMessageTime.bmt_Short,
+        //                SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+        //        }
+        //        else
+        //        {
+        //            //Otherwise message
+        //            Application.SBO_Application.MessageBox(
+        //                "You have to update/save this version to DB first, then you can increase the version.",
+        //                1, "OK");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "BTNVRNUP_PressedAfter Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        private void BTNVRNUP_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
-            SAPbouiCOM.EditText etDocEntry, etDocNum, etVersion;
-            SAPbouiCOM.Grid oGrid;
-            SAPbouiCOM.DataTable oDT;
+            SAPbobsCOM.Recordset rs = null;
 
             try
             {
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                etDocEntry = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific;
-                etDocNum = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific;
-                etVersion = (SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific;
 
-                // Parse values
-                string docEntry = etDocEntry.Value.Trim();
-                string docNum = etDocNum.Value.Trim();
-                int version = Convert.ToInt32(string.IsNullOrEmpty(etVersion.Value) ? "0" : etVersion.Value);
+                int confirmation = Application.SBO_Application.MessageBox("Are you sure you want to increase the version?", 1, "OK", "Cancel");
 
-                if (version <= 1)
-                {
-                    Application.SBO_Application.StatusBar
-                        .SetText("Version must be greater than 1",
-                                 SAPbouiCOM.BoMessageTime.bmt_Short,
-                                 SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
-
-                    oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
-                    oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
-                    oDT.Clear();
-                    return;
-                }
-
-                oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
-                oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
-                oDT.Clear();
-                string sQuery = $@"
-                                    SELECT
-                                        T.""DocEntry"",
-                                        T.""DocNum"",
-                                        T.""Creator"",
-                                        T.""CreateDate"",
-                                        T.""UpdateDate"",
-                                        T.""U_VERSION"" AS ""Version"",
-                                        T.""LogInst"" AS ""MAX_LOGINST""
-                                    FROM ""@AFIL_DH_PRECOSTING"" T
-                                    JOIN (
-                                        SELECT
-                                            ""DocEntry"",
-                                            ""DocNum"",
-                                            ""U_VERSION"",
-                                            MAX(""LogInst"") AS ""MAX_LOGINST""
-                                        FROM ""@AFIL_DH_PRECOSTING""
-                                        WHERE ""DocEntry"" = '{docEntry}'
-                                          AND ""DocNum""   = '{docNum}'
-                                        GROUP BY
-                                            ""DocEntry"",
-                                            ""DocNum"",
-                                            ""U_VERSION""
-                                    ) M
-                                    ON  T.""DocEntry""  = M.""DocEntry""
-                                    AND T.""DocNum""    = M.""DocNum""
-                                    AND T.""U_VERSION"" = M.""U_VERSION""
-                                    AND T.""LogInst""   = M.""MAX_LOGINST""
-                                    WHERE T.""DocEntry"" = '{docEntry}'
-                                      AND T.""DocNum""   = '{docNum}'
-                                    ORDER BY T.""U_VERSION""";
-
-
-                oDT.ExecuteQuery(sQuery);
-                oGrid.DataTable = oDT;
-                oGrid.AutoResizeColumns();
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar
-                    .SetText(ex.Message,
-                             SAPbouiCOM.BoMessageTime.bmt_Long,
-                             SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-            }
-        }
-
-
-
-
-        private void BTNVRNUP_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-            try
-            {
-                //Confirmation
-                int ret = Application.SBO_Application.MessageBox(
-                    "Are you sure you want to increase the version?",
-                    1, "OK", "Cancel");
-
-                if (ret != 1)
+                if (confirmation != 1)
                     return;
 
-                //Read values from edit texts
                 string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
                 string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
                 string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
 
                 if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum) || string.IsNullOrWhiteSpace(version))
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "DocEntry, DocNum, and Version are required.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                    Global.GFunc.ShowError("DocEntry, DocNum and Version are required.");
                     return;
                 }
 
-                //Check if current version exists in DB
-                string sql = $@"
-                                Select 1 from ""@FIL_DH_PRECOSTING"" 
-                                    where ""DocEntry"" = '{docEntry}'
-                                    and ""DocNum""   = '{docNum}'
-                                    and ""U_VERSION""= '{version}'";
+                if (!int.TryParse(docEntry, out int parsedDocEntry))
+                {
+                    Global.GFunc.ShowError("DocEntry is invalid.");
+                    return;
+                }
 
-                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                if (!int.TryParse(docNum, out int parsedDocNum))
+                {
+                    Global.GFunc.ShowError("DocNum is invalid.");
+                    return;
+                }
+
+                if (!int.TryParse(version, out int currentVersion))
+                {
+                    Global.GFunc.ShowError("Version is not numeric and cannot be increased.");
+                    return;
+                }
+
+                string safeVersion = version.Replace("'", "''");
+
+                string sql = $@"
+                                SELECT COUNT(*) AS ""CNT""
+                                FROM ""@FIL_DH_PRECOSTING""
+                                WHERE ""DocEntry"" = {parsedDocEntry}
+                                  AND ""DocNum"" = {parsedDocNum}
+                                  AND TRIM(IFNULL(""U_VERSION"", '')) = '{safeVersion}'";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rs.DoQuery(sql);
 
-                //If exists
-                if (rs.RecordCount > 0)
+                int recordCount = Convert.ToInt32(rs.Fields.Item("CNT").Value);
+
+                if (recordCount <= 0)
                 {
-                    if (!int.TryParse(version, out int v))
-                    {
-                        Application.SBO_Application.StatusBar.SetText(
-                            "Version is not numeric, cannot increment.",
-                            SAPbouiCOM.BoMessageTime.bmt_Short,
-                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                        return;
-                    }
+                    Global.GFunc.ShowError("The current version was not found in the database. Save or update it first, then increase the version.");
+                    return;
+                }
 
-                    v++;
+                int newVersion = currentVersion + 1;
 
-                    //SAPbouiCOM.DBDataSource dsH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
-                    //dsH.SetValue("U_VERSION", 0, v.ToString());
+                oForm.Freeze(true);
 
+                try
+                {
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = newVersion.ToString();
 
-                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = v.ToString();
-                    // Matrix Other Cost
-                    SAPbouiCOM.Matrix mtxOtherCost = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
-                    UpdateMatrixVersion(mtxOtherCost, "CLVERSN", v);
+                    SAPbouiCOM.Matrix otherCostMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                    SAPbouiCOM.Matrix componentMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
 
-                    // Matrix Component
-                    SAPbouiCOM.Matrix mtxComponent = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
-                    UpdateMatrixVersion(mtxComponent, "CLVERSN", v);
-
-                    // =================================================
-
+                    UpdateMatrixVersion(otherCostMatrix, "CLVERSN", newVersion);
+                    UpdateMatrixVersion(componentMatrix, "CLVERSN", newVersion);
 
                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                    {
                         oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-                    }
-
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Version increased successfully.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Success);
                 }
-                else
+                finally
                 {
-                    //Otherwise message
-                    Application.SBO_Application.MessageBox(
-                        "You have to update/save this version to DB first, then you can increase the version.",
-                        1, "OK");
+                    oForm.Freeze(false);
                 }
+
+                Global.GFunc.ShowSuccess("Version increased from " + currentVersion + " to " + newVersion + " successfully.");
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "BTNVRNUP_PressedAfter Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("BTNVRNUP_PressedAfter Error: " + ex.Message);
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
+
+        private void ETPRFPER_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (_isProfitCalculationRunning)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                _lastProfitInput = "PERCENT";
+                CalculateProfitFields(oForm, "PERCENT");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Percentage Calculation Error: " + ex.Message);
+            }
+        }
+
+        private void ETPRFAMT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (_isProfitCalculationRunning)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE )
+                    return;
+
+                _lastProfitInput = "AMOUNT";
+                CalculateProfitFields(oForm, "AMOUNT");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Amount Calculation Error: " + ex.Message);
+            }
+        }
+
+        private void ETFOBAMT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (_isProfitCalculationRunning)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
+                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                _lastProfitInput = "FOB";
+                CalculateProfitFields(oForm, "FOB");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("FOB Amount Calculation Error: " + ex.Message);
             }
         }
 
@@ -825,6 +946,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             {
                 ValidateForm(ref oForm, ref BubbleEvent);
             }
+           
         }
 
         private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
@@ -852,13 +974,23 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 return BubbleEvent = false;
             }
 
-            // NEW: unique combination validation (Sample + Buyer)
-            if (IsDuplicateSampleBuyer(oForm, sampleCode, buyer))
-            {
-                Global.GFunc.ShowError($"Duplicate not allowed: Sample [{sampleCode}] + Buyer [{buyer}] already exists.");
-                oForm.ActiveItem = "ETBUYER";
+            if (!ValidateCostTotals(oForm))
                 return BubbleEvent = false;
+
+            if (!ValidateProfitFields(oForm)) 
+                return BubbleEvent = false;
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+            {
+                //unique combination validation (Sample + Buyer)
+                if (IsDuplicateSampleBuyer(oForm, sampleCode, buyer))
+                {
+                    Global.GFunc.ShowError($"Duplicate not allowed: Sample [{sampleCode}] + Buyer [{buyer}] already exists.");
+                    oForm.ActiveItem = "ETBUYER";
+                    return BubbleEvent = false;
+                }
             }
+           
 
             PreventEmptyLastRow(oForm, "@FIL_DR_PRECOSTCOMP", MTXCMPNT, "U_ROUTSTAG");
             ValidateRouteCompStage(oForm, ref BubbleEvent);
@@ -866,7 +998,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             {
                 Global.GFunc.ShowError("Route Stage or Component Stage Missing");
                 //AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
-                EnsureLine(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP");
+                Global.GFunc.EnsureLine(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP");
                 return BubbleEvent;
             }
 
@@ -899,20 +1031,20 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || string.IsNullOrEmpty(curDocEntry))
             {
                 q = $@"
-            SELECT COUNT(*) AS ""CNT""
-            FROM ""@FIL_DH_PRECOSTING""
-            WHERE ""U_SMPLCODE"" = '{safeSample}'
-              AND ""U_CARDCODE"" = '{safeBuyer}'";
+                    SELECT COUNT(*) AS ""CNT""
+                    FROM ""@FIL_DH_PRECOSTING""
+                    WHERE ""U_SMPLCODE"" = '{safeSample}'
+                      AND ""U_CARDCODE"" = '{safeBuyer}'";
             }
             else
             {
                 // UPDATE MODE -> exclude this DocEntry
                 q = $@"
-            SELECT COUNT(*) AS ""CNT""
-            FROM ""@FIL_DH_PRECOSTING""
-            WHERE ""U_SMPLCODE"" = '{safeSample}'
-              AND ""U_CARDCODE"" = '{safeBuyer}'
-              AND ""DocEntry"" <> {curDocEntry}";
+                        SELECT COUNT(*) AS ""CNT""
+                        FROM ""@FIL_DH_PRECOSTING""
+                        WHERE ""U_SMPLCODE"" = '{safeSample}'
+                          AND ""U_CARDCODE"" = '{safeBuyer}'
+                          AND ""DocEntry"" <> {curDocEntry}";
             }
 
             SAPbobsCOM.Recordset rs =
@@ -1008,8 +1140,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             try
             {
-                //if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                //    return;
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    return;
 
                 SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
                 bool isEmpty = (oMatrix.RowCount == 0);
@@ -1057,93 +1189,239 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+
+
+
         }
+
+
+        //private void MTXOTCST_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        if (pVal.ColUID != "CLAMT") return;
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        UpdateTotalAmountBothMatrices(oForm);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error on Amount Calculation: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        //
+        //private bool _isAmtQtyClearRunning = false;
+        //private void MTXCMPNT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    if (_isAmtQtyClearRunning) return;
+
+        //    try
+        //    {
+        //        if (pVal.Row <= 0) return;
+
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
+
+        //        string routeStage = ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("CLRSTGCD")
+        //                                .Cells.Item(pVal.Row).Specific).Value.Trim();
+
+        //        SAPbouiCOM.EditText oAmt =
+        //            (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(pVal.Row).Specific;
+
+        //        SAPbouiCOM.EditText oQty =
+        //            (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLQTY").Cells.Item(pVal.Row).Specific;
+
+        //        // Quantity Lost Focus
+        //        if (pVal.ColUID == "CLQTY")
+        //        {
+        //            string qtyValue = oQty.Value.Trim();
+
+        //            if (string.IsNullOrWhiteSpace(routeStage) &&
+        //                !string.IsNullOrWhiteSpace(qtyValue) &&
+        //                qtyValue != "0" && qtyValue != "0.00")
+        //            {
+        //                _isAmtQtyClearRunning = true;
+
+        //                oQty.Value = "";
+        //                oAmt.Value = "";
+
+        //                UpdateTotalAmountBothMatrices(oForm);
+        //            }
+
+        //            return;
+        //        }
+
+        //        // Amount Lost Focus
+        //        if (pVal.ColUID == "CLAMT")
+        //        {
+        //            string amtValue = oAmt.Value.Trim();
+
+        //            if (string.IsNullOrWhiteSpace(routeStage) &&
+        //                !string.IsNullOrWhiteSpace(amtValue) &&
+        //                amtValue != "0" && amtValue != "0.00")
+        //            {
+        //                _isAmtQtyClearRunning = true;
+
+        //                oAmt.Value = "";
+        //                oQty.Value = "";
+
+        //                UpdateTotalAmountBothMatrices(oForm);
+        //            }
+
+        //            return;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //    finally
+        //    {
+        //        _isAmtQtyClearRunning = false;
+        //    }
+        //}
+
+
+        //private void UpdateTotalAmountBothMatrices(SAPbouiCOM.Form oForm)
+        //{
+        //    double total = 0;
+
+        //    total += GetMatrixColumnSum(oForm, "MTXCMPNT", "CLAMT");
+        //    total += GetMatrixColumnSum(oForm, "MTXOTCST", "CLAMT");
+
+        //    ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value =
+        //        total.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+        //}
+
 
         private void MTXOTCST_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            try
-            {
-                if (pVal.ColUID != "CLAMT") return;
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                UpdateTotalAmountBothMatrices(oForm);
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error on Amount Calculation: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-            }
-        }
-
-        //
-        private bool _isAmtQtyClearRunning = false;
-        private void MTXCMPNT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            if (_isAmtQtyClearRunning) return;
+            SAPbouiCOM.Form oForm = null;
 
             try
             {
-                if (pVal.Row <= 0) return;
-
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
-
-                string routeStage = ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("CLRSTGCD")
-                                        .Cells.Item(pVal.Row).Specific).Value.Trim();
-
-                SAPbouiCOM.EditText oAmt =
-                    (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(pVal.Row).Specific;
-
-                SAPbouiCOM.EditText oQty =
-                    (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLQTY").Cells.Item(pVal.Row).Specific;
-
-                // Quantity Lost Focus
-                if (pVal.ColUID == "CLQTY")
-                {
-                    string qtyValue = oQty.Value.Trim();
-
-                    if (string.IsNullOrWhiteSpace(routeStage) &&
-                        !string.IsNullOrWhiteSpace(qtyValue) &&
-                        qtyValue != "0" && qtyValue != "0.00")
-                    {
-                        _isAmtQtyClearRunning = true;
-
-                        oQty.Value = "";
-                        oAmt.Value = "";
-
-                        UpdateTotalAmountBothMatrices(oForm);
-                    }
-
+                if (pVal.Row <= 0 || (pVal.ColUID != "CLQTY" && pVal.ColUID != "CLAMT"))
                     return;
+
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                SAPbouiCOM.EditText oEditText = (SAPbouiCOM.EditText)oMatrix.Columns.Item(pVal.ColUID).Cells.Item(pVal.Row).Specific;
+
+                double value = GetEditTextDouble(oEditText);
+
+                if (value < 0)
+                {
+                    oEditText.Value = "0.00";
+
+                    Global.GFunc.ShowError(pVal.ColUID == "CLQTY" ? "Other Cost Quantity cannot be negative." : "Other Cost Amount cannot be negative.");
                 }
 
-                // Amount Lost Focus
                 if (pVal.ColUID == "CLAMT")
                 {
-                    string amtValue = oAmt.Value.Trim();
-
-                    if (string.IsNullOrWhiteSpace(routeStage) &&
-                        !string.IsNullOrWhiteSpace(amtValue) &&
-                        amtValue != "0" && amtValue != "0.00")
-                    {
-                        _isAmtQtyClearRunning = true;
-
-                        oAmt.Value = "";
-                        oQty.Value = "";
-
-                        UpdateTotalAmountBothMatrices(oForm);
-                    }
-
-                    return;
+                    oMatrix.FlushToDataSource();
+                    UpdateAllCostTotals(oForm);
                 }
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Other Cost Validation Error: " + ex.Message);
+            }
+        }
+        //private void MTXOTCST_LostFocusAfter(object sboObject,SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        if (pVal.Row <= 0)
+        //            return;
+
+        //        if (pVal.ColUID != "CLAMT")
+        //            return;
+
+        //        SAPbouiCOM.Form oForm =
+        //            Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        UpdateAllCostTotals(oForm);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Other Cost Amount Calculation Error: " + ex);
+        //    }
+        //}
+
+        private bool _isAmtQtyClearRunning = false;
+
+        private void MTXCMPNT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            if (_isAmtQtyClearRunning)
+                return;
+
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                if (pVal.Row <= 0 || (pVal.ColUID != "CLQTY" && pVal.ColUID != "CLAMT"))
+                    return;
+
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
+                string routeStage = ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("CLRSTGCD").Cells.Item(pVal.Row).Specific).Value.Trim();
+                SAPbouiCOM.EditText oQty = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLQTY").Cells.Item(pVal.Row).Specific;
+                SAPbouiCOM.EditText oAmt = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(pVal.Row).Specific;
+
+                SAPbouiCOM.EditText currentEditText = pVal.ColUID == "CLQTY" ? oQty : oAmt;
+                double currentValue = GetEditTextDouble(currentEditText);
+
+                if (currentValue < 0)
+                {
+                    _isAmtQtyClearRunning = true;
+                    currentEditText.Value = "0.00";
+
+                    Global.GFunc.ShowError(pVal.ColUID == "CLQTY" ? "Quantity cannot be negative." : "Component Amount cannot be negative.");
+
+                    if (pVal.ColUID == "CLAMT")
+                        UpdateAllCostTotals(oForm);
+
+                    return;
+                }
+
+                if (pVal.ColUID == "CLQTY")
+                {
+                    if (string.IsNullOrWhiteSpace(routeStage) && HasNonZeroValue(oQty.Value))
+                    {
+                        _isAmtQtyClearRunning = true;
+                        oQty.Value = "";
+                        oAmt.Value = "";
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(routeStage) && HasNonZeroValue(oAmt.Value))
+                    {
+                        _isAmtQtyClearRunning = true;
+                        oAmt.Value = "";
+                        oQty.Value = "";
+                    }
+
+                    UpdateAllCostTotals(oForm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Component Amount Calculation Error: " + ex.Message);
             }
             finally
             {
@@ -1152,15 +1430,70 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
 
-        private void UpdateTotalAmountBothMatrices(SAPbouiCOM.Form oForm)
+
+
+        private void UpdateAllCostTotals(SAPbouiCOM.Form oForm)
         {
-            double total = 0;
+            bool isFrozen = false;
 
-            total += GetMatrixColumnSum(oForm, "MTXCMPNT", "CLAMT");
-            total += GetMatrixColumnSum(oForm, "MTXOTCST", "CLAMT");
+            try
+            {
+                oForm.Freeze(true);
+                isFrozen = true;
 
-            ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value =
-                total.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                double componentTotal = GetMatrixColumnSum(oForm, "MTXCMPNT", "CLAMT");
+                double otherCostTotal = GetMatrixColumnSum(oForm, "MTXOTCST", "CLAMT");
+                double grandTotal = componentTotal + otherCostTotal;
+
+                string componentValue = componentTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string otherCostValue = otherCostTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string grandTotalValue = grandTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+                SAPbouiCOM.DBDataSource headerDB = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+
+                headerDB.SetValue("U_TOTCAMNT", 0, componentValue);
+                headerDB.SetValue("U_TOTOAMNT", 0, otherCostValue);
+                headerDB.SetValue("U_TOTCONAMT", 0, grandTotalValue);
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = componentValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = otherCostValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = grandTotalValue;
+
+                CalculateProfitFields(oForm, _lastProfitInput, false);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Cost Total Calculation Error: " + ex.Message);
+            }
+            finally
+            {
+                if (isFrozen)
+                {
+                    try
+                    {
+                        oForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        private bool HasNonZeroValue(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            value = value.Trim().Replace(",", "");
+
+            if (double.TryParse(value,System.Globalization.NumberStyles.Any,System.Globalization.CultureInfo.InvariantCulture,
+                out double amount))
+            {
+                return amount != 0;
+            }
+
+            return double.TryParse(value, out amount) && amount != 0;
         }
 
         //private double GetMatrixColumnSum(SAPbouiCOM.Form oForm, string matrixId, string colId)
@@ -1275,16 +1608,17 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             string Code = dt.GetValue("Code", 0).ToString().Trim();
             string Name = dt.GetValue("Name", 0).ToString().Trim();
             string upmApl = dt.GetValue("U_UOMAPPLY", 0).ToString().Trim();
+
             if (upmApl.Equals("Y"))
             {
                 string uom = dt.GetValue("U_UOM", 0).ToString().Trim();
-                oMatrix.SetCellWithoutValidation(row, "CLUOM", Code);
+                oMatrix.SetCellWithoutValidation(row, "CLUOM", uom);
             }
 
             oMatrix.SetCellWithoutValidation(row, "CLCSTGCD", Code);
             oMatrix.SetCellWithoutValidation(row, "CLCSTGNM", Name);
 
-            AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_COMPSTAG");
+            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_COMPSTAG");
 
         }
 
@@ -1312,8 +1646,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     ETBUYER.Value = buyCode;
                     ETBYRNM.Value = buyName;
 
-                    EnsureLine(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP");
-                    EnsureLine(oForm, "MTXOTCST", "@FIL_DR_PRECOSTOTHR");
+                    Global.GFunc.EnsureLine(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP");
+                    Global.GFunc.EnsureLine(oForm, "MTXOTCST", "@FIL_DR_PRECOSTOTHR");
                     LoadRouteWiseComboToMatrixColumn(oForm, "MTXCMPNT", "CLRSTGCD", route);
 
                     SAPbouiCOM.Item ETCUSCOD = oForm.Items.Item("ETBUYER");
@@ -1326,7 +1660,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                //Application.SBO_Application.MessageBox("Error: " + ex.Message);
+               // Application.SBO_Application.MessageBox("Error: " + ex.Message);
             }
         }
 
@@ -1348,7 +1682,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVERSN").Cells.Item(row).Specific).Value = version;
                     oMatrix.FlushToDataSource();
 
-                    AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
+                    Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
                 }
             }
             catch (Exception ex)
@@ -1357,36 +1691,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        public static void AddLineIfLastRowHasValue(
-           SAPbouiCOM.Form oForm,
-           string matrixID,
-           string dbTable,
-           string columnName
-           )
-        {
-            try
-            {
-                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
-                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
-                matrix.FlushToDataSource();
-                int dbRowCount = db.Size;
-                if (dbRowCount == 0)
-                {
-                    Global.GFunc.SetNewLine(matrix, db, 1, "");
-                    return;
-                }
-                int lastDbRow = dbRowCount - 1;
-                string lastValue = db.GetValue(columnName, lastDbRow).Trim();
-                if (!string.IsNullOrEmpty(lastValue) && !lastValue.Equals("0.0"))
-                {
-                    Global.GFunc.SetNewLine(matrix, db, dbRowCount + 1, "");
-                }
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.MessageBox("AddLineIfLastRowHasValue Error: " + ex.Message);
-            }
-        }
+       
 
         private void ETCURR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -1469,16 +1774,316 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return false;
         }
 
-
-        public static void EnsureLine(SAPbouiCOM.Form oForm, string matrixID, string dbTable)
+        private void CalculateProfitFields(SAPbouiCOM.Form oForm, string changedField, bool useFreeze = true)
         {
-            SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
-            SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
+            if (_isProfitCalculationRunning) return;
 
-            if (matrix.RowCount == 0)
+            try
             {
-                Global.GFunc.SetNewLine(matrix, db, 1, "");
+                _isProfitCalculationRunning = true;
+                if (useFreeze) oForm.Freeze(true);
+
+                SAPbouiCOM.EditText etTotalCost = (SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific;
+                SAPbouiCOM.EditText etProfitPercent = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific;
+                SAPbouiCOM.EditText etProfitAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific;
+                SAPbouiCOM.EditText etFobAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific;
+
+                double totalCost = GetEditTextDouble(etTotalCost);
+                double profitPercent = GetEditTextDouble(etProfitPercent);
+                double profitAmount = GetEditTextDouble(etProfitAmount);
+                double fobAmount = GetEditTextDouble(etFobAmount);
+
+                _hasInvalidProfitValue = false;
+
+                switch (changedField)
+                {
+                    case "PERCENT":
+                        if (profitPercent < 0)
+                        {
+                            _hasInvalidProfitValue = true;
+                            //Global.GFunc.ShowError("Profit Percentage cannot be negative.");
+                            profitPercent = 0;
+                        }
+                        profitAmount = totalCost * profitPercent / 100;
+                        fobAmount = totalCost + profitAmount;
+                        break;
+
+                    case "AMOUNT":
+                        if (profitAmount < 0)
+                        {
+                            _hasInvalidProfitValue = true;
+                            //Global.GFunc.ShowError("Profit Amount cannot be negative.");
+                            profitAmount = 0;
+                        }
+                        profitPercent = totalCost == 0 ? 0 : (profitAmount / totalCost) * 100;
+                        fobAmount = totalCost + profitAmount;
+                        break;
+
+                    case "FOB":
+                        if (fobAmount < totalCost)
+                        {
+                            _hasInvalidProfitValue = true;
+                            //Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
+                            profitAmount = 0;
+                            profitPercent = 0;
+                        }
+                        else
+                        {
+                            profitAmount = fobAmount - totalCost;
+                            profitPercent = totalCost == 0 ? 0 : (profitAmount / totalCost) * 100;
+                        }
+                        break;
+                }
+
+                etProfitPercent.Value = profitPercent.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+                etProfitAmount.Value = profitAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+                if (!_hasInvalidProfitValue || changedField != "FOB") etFobAmount.Value = fobAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+                db.SetValue("U_PROFITPC", 0, etProfitPercent.Value);
+                db.SetValue("U_PROFITAM", 0, etProfitAmount.Value);
+                db.SetValue("U_FOBAMUNT", 0, etFobAmount.Value);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE) oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                _hasInvalidProfitValue = true;
+                Global.GFunc.ShowError("Profit Calculation Error: " + ex.Message);
+            }
+            finally
+            {
+                if (useFreeze)
+                {
+                    try { oForm.Freeze(false); } catch { }
+                }
+                _isProfitCalculationRunning = false;
             }
         }
+
+
+        private bool ValidateProfitFields(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                double totalCost = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific);
+                double profitPercent = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific);
+                double profitAmount = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific);
+                double fobAmount = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific);
+
+                if (_hasInvalidProfitValue)
+                {
+                    Global.GFunc.ShowError("Correct the invalid Profit or FOB value before saving.");
+                    oForm.ActiveItem = _lastProfitInput == "PERCENT" ? "ETPRFPER" : _lastProfitInput == "AMOUNT" ? "ETPRFAMT" : "ETFOBAMT";
+                    return false;
+                }
+
+                if (profitPercent < 0)
+                {
+                    Global.GFunc.ShowError("Profit Percentage cannot be negative.");
+                    oForm.ActiveItem = "ETPRFPER";
+                    return false;
+                }
+
+                if (profitAmount < 0)
+                {
+                    Global.GFunc.ShowError("Profit Amount cannot be negative.");
+                    oForm.ActiveItem = "ETPRFAMT";
+                    return false;
+                }
+
+                if (fobAmount < totalCost)
+                {
+                    Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
+                    oForm.ActiveItem = "ETFOBAMT";
+                    return false;
+                }
+
+                double expectedFob = totalCost + profitAmount;
+                if (Math.Abs(fobAmount - expectedFob) > 0.01)
+                {
+                    Global.GFunc.ShowError("FOB Amount must equal Total Cost plus Profit Amount.");
+                    oForm.ActiveItem = "ETFOBAMT";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Validation Error: " + ex.Message);
+                return false;
+            }
+        }
+
+
+        private double GetEditTextDouble(SAPbouiCOM.EditText editText)
+        {
+            if (editText == null || string.IsNullOrWhiteSpace(editText.Value))
+                return 0;
+
+            string value = editText.Value.Trim().Replace(",", "");
+
+            if (double.TryParse(value,System.Globalization.NumberStyles.Any,System.Globalization.CultureInfo.InvariantCulture,
+                out double result))
+            {
+                return result;
+            }
+
+            if (double.TryParse(value, out result))
+                return result;
+
+            return 0;
+        }
+
+        private void LoadVersionGrid(SAPbouiCOM.Form oForm)
+        {
+            if (oForm == null)
+                return;
+
+            try
+            {
+                string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+                string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
+                string versionValue = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+                SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDVERSN").Specific;
+                SAPbouiCOM.DataTable oDT = oForm.DataSources.DataTables.Item("DT_VERSN");
+
+                if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum))
+                {
+                    oDT.Clear();
+                    return;
+                }
+
+                if (!int.TryParse(versionValue, out int version) || version <= 1)
+                {
+                    oDT.Clear();
+
+                    Application.SBO_Application.StatusBar.SetText(
+                        "Version must be greater than 1.",
+                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                        SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                    return;
+                }
+
+                string safeDocEntry = docEntry.Replace("'", "''");
+                string safeDocNum = docNum.Replace("'", "''");
+
+                string sQuery = $@"
+                                SELECT
+                                    T.""DocEntry"",
+                                    T.""DocNum"",
+                                    T.""Creator"",
+                                    T.""CreateDate"",
+                                    T.""UpdateDate"",
+                                    T.""U_VERSION"" AS ""Version"",
+                                    T.""LogInst"" AS ""MAX_LOGINST""
+                                FROM ""@AFIL_DH_PRECOSTING"" T
+                                INNER JOIN
+                                (
+                                    SELECT
+                                        ""DocEntry"",
+                                        ""DocNum"",
+                                        ""U_VERSION"",
+                                        MAX(""LogInst"") AS ""MAX_LOGINST""
+                                    FROM ""@AFIL_DH_PRECOSTING""
+                                    WHERE ""DocEntry"" = '{safeDocEntry}'
+                                      AND ""DocNum"" = '{safeDocNum}'
+                                    GROUP BY
+                                        ""DocEntry"",
+                                        ""DocNum"",
+                                        ""U_VERSION""
+                                ) M
+                                    ON T.""DocEntry"" = M.""DocEntry""
+                                   AND T.""DocNum"" = M.""DocNum""
+                                   AND T.""U_VERSION"" = M.""U_VERSION""
+                                   AND T.""LogInst"" = M.""MAX_LOGINST""
+                                WHERE T.""DocEntry"" = '{safeDocEntry}'
+                                  AND T.""DocNum"" = '{safeDocNum}'
+                                ORDER BY T.""U_VERSION""";
+
+                oForm.Freeze(true);
+
+                oDT.ExecuteQuery(sQuery);
+                oGrid.DataTable = oDT;
+                oGrid.AutoResizeColumns();
+                oGrid.Columns.Item("MAX_LOGINST").Visible = false;
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "Load Version Grid Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Long,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                try
+                {
+                    oForm.Freeze(false);
+                }
+                catch
+                {
+                }
+            }
+        }
+        private void HideGridColumn(SAPbouiCOM.Grid oGrid, string columnId)
+        {
+            try
+            {
+                if (oGrid != null && oGrid.Columns.Count > 0)
+                    oGrid.Columns.Item(columnId).Visible = false;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Hide Grid Column Error: " + ex.Message);
+            }
+        }
+        private bool ValidateCostTotals(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.EditText etComponentTotal = (SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific;
+                SAPbouiCOM.EditText etOtherCostTotal = (SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific;
+                SAPbouiCOM.EditText etTotalCost = (SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific;
+
+                double componentTotal = GetEditTextDouble(etComponentTotal);
+                double otherCostTotal = GetEditTextDouble(etOtherCostTotal);
+                double totalCost = GetEditTextDouble(etTotalCost);
+                double expectedTotal = componentTotal + otherCostTotal;
+
+                if (componentTotal < 0 || otherCostTotal < 0 || totalCost < 0)
+                {
+                    Global.GFunc.ShowError("Component Total, Other Cost Total and Total Cost cannot be negative.");
+                    return false;
+                }
+
+                if (Math.Abs(expectedTotal - totalCost) > 0.01)
+                {
+                    Global.GFunc.ShowError(
+                        "Total Cost mismatch." +
+                        "\nComponent Total: " + componentTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+                        "\nOther Cost Total: " + otherCostTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+                        "\nExpected Total Cost: " + expectedTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+                        "\nCurrent Total Cost: " + totalCost.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
+
+                    oForm.ActiveItem = "ETTCNAMT";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Cost Total Validation Error: " + ex.Message);
+                return false;
+            }
+        }
+
+      
+
     }
 }

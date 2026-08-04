@@ -715,7 +715,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                     if (string.IsNullOrWhiteSpace(txtCode.Value))
                     {
-                        txtCode.Value = "Sam Range 1";
+                        txtCode.Value = "SAM Range 1";
                     }
                 }
 

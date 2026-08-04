@@ -664,6 +664,11 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_SAM");
                         SAPbouiCOM.Matrix MTXSAM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
                         MTXSAM.AutoResizeColumns();
+
+                        //oForm.Freeze(true);
+                        //oForm.Settings.MatrixUID = "MTXSAM";
+                        //oForm.Settings.Enabled = true;
+                        //oForm.Freeze(false);
                     }
                     catch (Exception ex)
                     {
@@ -689,15 +694,10 @@ namespace Apparel_Dynamic_1._0
                     {
                         //Component Matrix
                         SAPbouiCOM.Matrix oMTXCMP = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
-                        SAPbouiCOM.Column oAmtCMP = oMTXCMP.Columns.Item("CLAMT");
-                        oAmtCMP.ColumnSetting.SumType = SAPbouiCOM.BoColumnSumType.bst_Auto;
+                        oMTXCMP.AutoResizeColumns();
 
                         //Other Cost Matrix
                         SAPbouiCOM.Matrix oMTXOTCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
-                        SAPbouiCOM.Column oAmtOTCST = oMTXOTCST.Columns.Item("CLAMT");
-                        oAmtOTCST.ColumnSetting.SumType = SAPbouiCOM.BoColumnSumType.bst_Auto;
-
-                        oMTXCMP.AutoResizeColumns();
                         oMTXOTCST.AutoResizeColumns();
 
                         // Series Initialization
@@ -977,9 +977,9 @@ namespace Apparel_Dynamic_1._0
                                 // Series Initialization
                                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                 {
-                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
-                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETVERSON");
-
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLCD", "CBSERIES", "ETDOCDAT");
+                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETTCNAMT", "ETDOCNUM", "ETVERSON");
+                                    Global.GFunc.ReEnableChooseFromList(oForm, "ETSMPLCD", "CFL_SMPL", "U_SMPLCODE");
                                     string today = DateTime.Now.ToString("yyyyMMdd");
                                     SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
                                     oDBH.SetValue("U_DOCDATE", 0, today);
@@ -1379,6 +1379,11 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_SAM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETDESC");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1413,7 +1418,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_SMPLPCST":
                             {
                                 //Enable off
-                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", 
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETSMPLNM", "ETBUYER", "ETBYRNM", "ETDOCNUM", "ETSMPLCD",
                                                                           "ETVERSON", "ETTCNAMT", "ETDOCDAT");
                                 Global.GFunc.SetItemsEnabled(oForm, false,"CBSERIES");
 
@@ -1564,6 +1569,11 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_INCOTRMS":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_SAM":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDESC");
                                 break;
                             }
                     }

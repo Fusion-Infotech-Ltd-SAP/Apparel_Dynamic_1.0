@@ -119,7 +119,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         public override void OnInitializeFormEvents()
         {
             this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
-            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
+            this.DataUpdateAfter += new SAPbouiCOM.Framework.FormBase.DataUpdateAfterHandler(this.Form_DataUpdateAfter);
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
 
         }
 
@@ -585,6 +586,20 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+            try
+            {
+                if (eventInfo.ItemUID != "MTXCMPNT" || eventInfo.Row <= 0)
+                    return;
+
+                oForm.EnableMenu("1293", true);
+            }
+            catch { }
+        }
+
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
@@ -861,63 +876,64 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             oMatrix.FlushToDataSource();
         }
 
-
-
         private void BTNLCSTH_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            SAPbouiCOM.Form oForm = null;
+            SAPbobsCOM.Recordset rs = null;
+            bool isFrozen = false;
 
             try
             {
-                // Confirmation
-                int ret = Application.SBO_Application.MessageBox(
-                    "Are you sure you want to refresh Other Cost Head list?",
-                    1, "OK", "Cancel");
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-                if (ret != 1) // 1 = OK
+                int ret = Application.SBO_Application.MessageBox("Are you sure you want to refresh the Other Cost Head list?", 1, "OK", "Cancel");
+
+                if (ret != 1)
+                {
+                    Global.GFunc.ShowWarning("Cost Head refresh cancelled.");
                     return;
+                }
 
                 SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
 
-                //Backup existing user inputs 
                 Dictionary<string, string> amtByCode = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                 for (int i = 1; i <= oMatrix.RowCount; i++)
                 {
                     string code = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHCD").Cells.Item(i).Specific).Value.Trim();
-                    if (string.IsNullOrWhiteSpace(code)) continue;
 
-                    string amt = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(i).Specific).Value.Trim();
+                    if (string.IsNullOrWhiteSpace(code))
+                        continue;
 
-                    //duplicate filter
+                    string amount = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(i).Specific).Value.Trim();
+
                     if (!amtByCode.ContainsKey(code))
-                        amtByCode.Add(code, amt);
-                    else if (!string.IsNullOrWhiteSpace(amt))
-                        amtByCode[code] = amt;
+                        amtByCode.Add(code, amount);
+                    else if (!string.IsNullOrWhiteSpace(amount))
+                        amtByCode[code] = amount;
                 }
 
-                string sql = @"Select ""AlcCode"",""AlcName"" from ""OALC""";
-                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                string sql = @"SELECT ""AlcCode"", ""AlcName"" FROM ""OALC"" ORDER BY ""AlcCode""";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rs.DoQuery(sql);
 
                 if (rs.RecordCount == 0)
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "No active cost head found.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                    Global.GFunc.ShowWarning("No Cost Head was found.");
                     return;
                 }
 
                 oForm.Freeze(true);
+                isFrozen = true;
 
-                // 4) Clear matrix rows (we will rebuild from query) BUT restore CLAMT from backup
-                // Safer clear:
                 while (oMatrix.RowCount > 0)
                     oMatrix.DeleteRow(1);
 
                 int row = 1;
                 rs.MoveFirst();
+
                 while (!rs.EoF)
                 {
                     oMatrix.AddRow();
@@ -928,29 +944,142 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("#").Cells.Item(row).Specific).Value = row.ToString();
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHCD").Cells.Item(row).Specific).Value = code;
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHNM").Cells.Item(row).Specific).Value = name;
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVERSN").Cells.Item(row).Specific).Value = version;
 
-                    // 5) Restore amount if user already entered earlier
-                    if (amtByCode.TryGetValue(code, out string oldAmt) && !string.IsNullOrWhiteSpace(oldAmt))
-                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(row).Specific).Value = oldAmt;
+                    if (amtByCode.TryGetValue(code, out string oldAmount) && !string.IsNullOrWhiteSpace(oldAmount))
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(row).Specific).Value = oldAmount;
+                    else
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(row).Specific).Value = "0.00";
 
                     row++;
                     rs.MoveNext();
                 }
 
+                oMatrix.FlushToDataSource();
                 oMatrix.AutoResizeColumns();
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                Global.GFunc.ShowSuccess("Cost Head list refreshed successfully.");
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "BTNLCSTH_PressedAfter Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Cost Head refresh failed: " + ex.Message);
             }
             finally
             {
-                try { oForm.Freeze(false); } catch { }
+                if (isFrozen && oForm != null)
+                {
+                    try
+                    {
+                        oForm.Freeze(false);
+                    }
+                    catch { }
+                }
+
+                if (rs != null)
+                {
+                    try
+                    {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                        rs = null;
+                    }
+                    catch { }
+                }
             }
         }
+
+        //private void BTNLCSTH_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //    try
+        //    {
+        //        // Confirmation
+        //        int ret = Application.SBO_Application.MessageBox(
+        //            "Are you sure you want to refresh Other Cost Head list?",
+        //            1, "OK", "Cancel");
+
+        //        if (ret != 1) // 1 = OK
+        //            return;
+
+        //        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+        //        string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+        //        //Backup existing user inputs 
+        //        Dictionary<string, string> amtByCode = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        //        for (int i = 1; i <= oMatrix.RowCount; i++)
+        //        {
+        //            string code = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHCD").Cells.Item(i).Specific).Value.Trim();
+        //            if (string.IsNullOrWhiteSpace(code)) continue;
+
+        //            string amt = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(i).Specific).Value.Trim();
+
+        //            //duplicate filter
+        //            if (!amtByCode.ContainsKey(code))
+        //                amtByCode.Add(code, amt);
+        //            else if (!string.IsNullOrWhiteSpace(amt))
+        //                amtByCode[code] = amt;
+        //        }
+
+        //        string sql = @"Select ""AlcCode"",""AlcName"" from ""OALC""";
+        //        SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //        rs.DoQuery(sql);
+
+        //        if (rs.RecordCount == 0)
+        //        {
+        //            Application.SBO_Application.StatusBar.SetText(
+        //                "No active cost head found.",
+        //                SAPbouiCOM.BoMessageTime.bmt_Short,
+        //                SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+        //            return;
+        //        }
+
+        //        oForm.Freeze(true);
+
+        //        // 4) Clear matrix rows (we will rebuild from query) BUT restore CLAMT from backup
+        //        // Safer clear:
+        //        while (oMatrix.RowCount > 0)
+        //            oMatrix.DeleteRow(1);
+
+        //        int row = 1;
+        //        rs.MoveFirst();
+        //        while (!rs.EoF)
+        //        {
+        //            oMatrix.AddRow();
+
+        //            string code = Convert.ToString(rs.Fields.Item("AlcCode").Value).Trim();
+        //            string name = Convert.ToString(rs.Fields.Item("AlcName").Value).Trim();
+
+        //            ((SAPbouiCOM.EditText)oMatrix.Columns.Item("#").Cells.Item(row).Specific).Value = row.ToString();
+        //            ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHCD").Cells.Item(row).Specific).Value = code;
+        //            ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLCSTHNM").Cells.Item(row).Specific).Value = name;
+        //            ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVERSN").Cells.Item(row).Specific).Value = version;
+        //            // 5) Restore amount if user already entered earlier
+        //            if (amtByCode.TryGetValue(code, out string oldAmt) && !string.IsNullOrWhiteSpace(oldAmt))
+        //                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLAMT").Cells.Item(row).Specific).Value = oldAmt;
+
+        //            row++;
+        //            rs.MoveNext();
+        //        }
+
+        //        oMatrix.AutoResizeColumns();
+        //        Global.GFunc.ShowSuccess("Cost Head Load Successfully")
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "BTNLCSTH_PressedAfter Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //    finally
+        //    {
+        //        try { oForm.Freeze(false); } catch { }
+        //    }
+        //}
 
 
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -1168,7 +1297,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (!isEmpty)
                     return;
                 string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
-                string sql = @"Select ""AlcCode"",""AlcName"" from ""OALC""";
+                string sql = @"Select ""AlcCode"",""AlcName"" from ""OALC"" ORDER BY ""AlcCode"" ";
                 SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rs.DoQuery(sql);
 

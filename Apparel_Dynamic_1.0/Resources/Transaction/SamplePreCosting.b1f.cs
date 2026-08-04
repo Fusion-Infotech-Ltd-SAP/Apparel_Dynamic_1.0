@@ -70,7 +70,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.FOLCMPNT = ((SAPbouiCOM.Folder)(this.GetItem("FOLCMPNT").Specific));
             this.FOLOTCST = ((SAPbouiCOM.Folder)(this.GetItem("FOLOTCST").Specific));
             this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
-            // this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
+            //  this.FOLOTCST.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLOTCST_ClickAfter);
             this.FOLVERSN = ((SAPbouiCOM.Folder)(this.GetItem("FOLVERSN").Specific));
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -100,11 +100,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STPRFAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STPRFAMT").Specific));
             this.STFOBAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STFOBAMT").Specific));
             this.ETPRFPER = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFPER").Specific));
+            this.ETPRFPER.ValidateAfter += new SAPbouiCOM._IEditTextEvents_ValidateAfterEventHandler(this.ETPRFPER_ValidateAfter);
             this.ETPRFPER.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETPRFPER_LostFocusAfter);
             this.ETPRFAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETPRFAMT").Specific));
+            this.ETPRFAMT.ValidateAfter += new SAPbouiCOM._IEditTextEvents_ValidateAfterEventHandler(this.ETPRFAMT_ValidateAfter);
             this.ETPRFAMT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETPRFAMT_LostFocusAfter);
             this.ETFOBAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETFOBAMT").Specific));
-            this.ETFOBAMT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETFOBAMT_LostFocusAfter);
             this.STCMTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STCMTAMT").Specific));
             this.ETCMTAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETCMTAMT").Specific));
             this.STOCTAMT = ((SAPbouiCOM.StaticText)(this.GetItem("STOCTAMT").Specific));
@@ -544,6 +545,46 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             LoadVersionGrid(oForm);
         }
 
+        private void ETPRFPER_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (_isProfitCalculationRunning || !pVal.ItemChanged)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                CalculateProfitFromPercentage(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Percentage Calculation Error: " + ex.Message);
+            }
+        }
+
+        private void ETPRFAMT_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (_isProfitCalculationRunning || !pVal.ItemChanged)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                CalculateProfitFromAmount(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Amount Calculation Error: " + ex.Message);
+            }
+        }
+
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
@@ -765,68 +806,42 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void ETPRFPER_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            try
-            {
-                if (_isProfitCalculationRunning)
-                    return;
+            //try
+            //{
+            //    if (_isProfitCalculationRunning)
+            //        return;
 
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
-                    return;
+            //    if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            //        return;
 
-                _lastProfitInput = "PERCENT";
-                CalculateProfitFields(oForm, "PERCENT");
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Profit Percentage Calculation Error: " + ex.Message);
-            }
+            //    CalculateProfitFromPercentage(oForm);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Global.GFunc.ShowError("Profit Percentage Calculation Error: " + ex.Message);
+            //}
         }
 
         private void ETPRFAMT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            try
-            {
-                if (_isProfitCalculationRunning)
-                    return;
+            //try
+            //{
+            //    if (_isProfitCalculationRunning)
+            //        return;
 
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE )
-                    return;
+            //    if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            //        return;
 
-                _lastProfitInput = "AMOUNT";
-                CalculateProfitFields(oForm, "AMOUNT");
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Profit Amount Calculation Error: " + ex.Message);
-            }
-        }
-
-        private void ETFOBAMT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            try
-            {
-                if (_isProfitCalculationRunning)
-                    return;
-
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
-                    oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
-                    return;
-
-                _lastProfitInput = "FOB";
-                CalculateProfitFields(oForm, "FOB");
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("FOB Amount Calculation Error: " + ex.Message);
-            }
+            //    CalculateProfitFromAmount(oForm);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Global.GFunc.ShowError("Profit Amount Calculation Error: " + ex.Message);
+            //}
         }
 
         private void UpdateMatrixVersion(SAPbouiCOM.Matrix oMatrix, string colId, int version)
@@ -1459,7 +1474,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = otherCostValue;
                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = grandTotalValue;
 
-                CalculateProfitFields(oForm, _lastProfitInput, false);
+                CalculateProfitFromPercentage(oForm, false);
             }
             catch (Exception ex)
             {
@@ -1774,14 +1789,17 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return false;
         }
 
-        private void CalculateProfitFields(SAPbouiCOM.Form oForm, string changedField, bool useFreeze = true)
+        private void CalculateProfitFromPercentage(SAPbouiCOM.Form oForm, bool useFreeze = true)
         {
-            if (_isProfitCalculationRunning) return;
+            if (_isProfitCalculationRunning)
+                return;
 
             try
             {
                 _isProfitCalculationRunning = true;
-                if (useFreeze) oForm.Freeze(true);
+
+                if (useFreeze)
+                    oForm.Freeze(true);
 
                 SAPbouiCOM.EditText etTotalCost = (SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific;
                 SAPbouiCOM.EditText etProfitPercent = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific;
@@ -1790,67 +1808,29 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 double totalCost = GetEditTextDouble(etTotalCost);
                 double profitPercent = GetEditTextDouble(etProfitPercent);
-                double profitAmount = GetEditTextDouble(etProfitAmount);
-                double fobAmount = GetEditTextDouble(etFobAmount);
 
-                _hasInvalidProfitValue = false;
-
-                switch (changedField)
+                if (profitPercent < 0)
                 {
-                    case "PERCENT":
-                        if (profitPercent < 0)
-                        {
-                            _hasInvalidProfitValue = true;
-                            //Global.GFunc.ShowError("Profit Percentage cannot be negative.");
-                            profitPercent = 0;
-                        }
-                        profitAmount = totalCost * profitPercent / 100;
-                        fobAmount = totalCost + profitAmount;
-                        break;
-
-                    case "AMOUNT":
-                        if (profitAmount < 0)
-                        {
-                            _hasInvalidProfitValue = true;
-                            //Global.GFunc.ShowError("Profit Amount cannot be negative.");
-                            profitAmount = 0;
-                        }
-                        profitPercent = totalCost == 0 ? 0 : (profitAmount / totalCost) * 100;
-                        fobAmount = totalCost + profitAmount;
-                        break;
-
-                    case "FOB":
-                        if (fobAmount < totalCost)
-                        {
-                            _hasInvalidProfitValue = true;
-                            //Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
-                            profitAmount = 0;
-                            profitPercent = 0;
-                        }
-                        else
-                        {
-                            profitAmount = fobAmount - totalCost;
-                            profitPercent = totalCost == 0 ? 0 : (profitAmount / totalCost) * 100;
-                        }
-                        break;
+                    profitPercent = 0;
+                    etProfitPercent.Value = "0.0000";
+                    Global.GFunc.ShowWarning("Profit Percentage cannot be negative.");
                 }
+
+                double profitAmount = totalCost * profitPercent / 100;
+                double fobAmount = totalCost + profitAmount;
 
                 etProfitPercent.Value = profitPercent.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
                 etProfitAmount.Value = profitAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                etFobAmount.Value = fobAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
 
-                if (!_hasInvalidProfitValue || changedField != "FOB") etFobAmount.Value = fobAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                UpdateProfitDataSource(oForm);
 
-                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
-                db.SetValue("U_PROFITPC", 0, etProfitPercent.Value);
-                db.SetValue("U_PROFITAM", 0, etProfitAmount.Value);
-                db.SetValue("U_FOBAMUNT", 0, etFobAmount.Value);
-
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE) oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
             }
             catch (Exception ex)
             {
-                _hasInvalidProfitValue = true;
-                Global.GFunc.ShowError("Profit Calculation Error: " + ex.Message);
+                Global.GFunc.ShowError("Profit Percentage Calculation Error: " + ex.Message);
             }
             finally
             {
@@ -1858,10 +1838,77 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 {
                     try { oForm.Freeze(false); } catch { }
                 }
+
                 _isProfitCalculationRunning = false;
             }
         }
 
+        private void CalculateProfitFromAmount(SAPbouiCOM.Form oForm, bool useFreeze = true)
+        {
+            if (_isProfitCalculationRunning)
+                return;
+
+            try
+            {
+                _isProfitCalculationRunning = true;
+
+                if (useFreeze)
+                    oForm.Freeze(true);
+
+                SAPbouiCOM.EditText etTotalCost = (SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific;
+                SAPbouiCOM.EditText etProfitPercent = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific;
+                SAPbouiCOM.EditText etProfitAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific;
+                SAPbouiCOM.EditText etFobAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific;
+
+                double totalCost = GetEditTextDouble(etTotalCost);
+                double profitAmount = GetEditTextDouble(etProfitAmount);
+
+                if (profitAmount < 0)
+                {
+                    profitAmount = 0;
+                    etProfitAmount.Value = "0.00";
+                    Global.GFunc.ShowWarning("Profit Amount cannot be negative.");
+                }
+
+                double profitPercent = totalCost == 0 ? 0 : profitAmount / totalCost * 100;
+                double fobAmount = totalCost + profitAmount;
+
+                etProfitPercent.Value = profitPercent.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+                etProfitAmount.Value = profitAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                etFobAmount.Value = fobAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+                UpdateProfitDataSource(oForm);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Profit Amount Calculation Error: " + ex.Message);
+            }
+            finally
+            {
+                if (useFreeze)
+                {
+                    try { oForm.Freeze(false); } catch { }
+                }
+
+                _isProfitCalculationRunning = false;
+            }
+        }
+
+        private void UpdateProfitDataSource(SAPbouiCOM.Form oForm)
+        {
+            SAPbouiCOM.EditText etProfitPercent = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific;
+            SAPbouiCOM.EditText etProfitAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific;
+            SAPbouiCOM.EditText etFobAmount = (SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific;
+
+            SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+
+            db.SetValue("U_PROFITPC", 0, etProfitPercent.Value);
+            db.SetValue("U_PROFITAM", 0, etProfitAmount.Value);
+            db.SetValue("U_FOBAMUNT", 0, etFobAmount.Value);
+        }
 
         private bool ValidateProfitFields(SAPbouiCOM.Form oForm)
         {
@@ -1871,13 +1918,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 double profitPercent = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific);
                 double profitAmount = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific);
                 double fobAmount = GetEditTextDouble((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific);
-
-                if (_hasInvalidProfitValue)
-                {
-                    Global.GFunc.ShowError("Correct the invalid Profit or FOB value before saving.");
-                    oForm.ActiveItem = _lastProfitInput == "PERCENT" ? "ETPRFPER" : _lastProfitInput == "AMOUNT" ? "ETPRFAMT" : "ETFOBAMT";
-                    return false;
-                }
 
                 if (profitPercent < 0)
                 {
@@ -1893,18 +1933,20 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return false;
                 }
 
-                if (fobAmount < totalCost)
+                double expectedProfitAmount = totalCost * profitPercent / 100;
+
+                if (Math.Abs(profitAmount - expectedProfitAmount) > 0.01)
                 {
-                    Global.GFunc.ShowError("FOB Amount cannot be less than Total Cost.");
-                    oForm.ActiveItem = "ETFOBAMT";
+                    Global.GFunc.ShowError("Profit Amount does not match Total Cost and Profit Percentage.");
+                    oForm.ActiveItem = "ETPRFAMT";
                     return false;
                 }
 
-                double expectedFob = totalCost + profitAmount;
-                if (Math.Abs(fobAmount - expectedFob) > 0.01)
+                double expectedFobAmount = totalCost + profitAmount;
+
+                if (Math.Abs(fobAmount - expectedFobAmount) > 0.01)
                 {
                     Global.GFunc.ShowError("FOB Amount must equal Total Cost plus Profit Amount.");
-                    oForm.ActiveItem = "ETFOBAMT";
                     return false;
                 }
 
@@ -2003,7 +2045,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                                    AND T.""LogInst"" = M.""MAX_LOGINST""
                                 WHERE T.""DocEntry"" = '{safeDocEntry}'
                                   AND T.""DocNum"" = '{safeDocNum}'
-                                ORDER BY T.""U_VERSION""";
+                                ORDER BY T.""U_VERSION"" DESC ";
 
                 oForm.Freeze(true);
 

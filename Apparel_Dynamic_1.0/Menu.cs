@@ -1968,8 +1968,31 @@ namespace Apparel_Dynamic_1._0
 
                                     break;
                                 }
+                            case "FIL_FRM_SMPLPCST":
+                                {
+                                    try
+                                    {
+                                        oForm.Freeze(true);
 
+                                        HandleSamplePreCostingDeleteAfter(oForm);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Global.GFunc.ShowError("Sample PreCosting Delete Error: " + ex.Message);
+                                    }
+                                    finally
+                                    {
+                                        try
+                                        {
+                                            oForm.Freeze(false);
+                                        }
+                                        catch
+                                        {
+                                        }
+                                    }
 
+                                    break;
+                                }
                         }
                     }
                     catch (Exception ex)
@@ -2000,7 +2023,133 @@ namespace Apparel_Dynamic_1._0
         }
 
         //_____________________________________________________ Method for Working Purpose________________________________________
+        private void HandleSamplePreCostingDeleteAfter(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
 
+                SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCMPNT").Specific;
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DR_PRECOSTCOMP");
+
+                matrix.FlushToDataSource();
+
+                for (int i = db.Size - 1; i >= 0; i--)
+                {
+                    string routeStage = db.GetValue("U_ROUTSTAG", i).Trim();
+                    string componentStage = db.GetValue("U_COMPSTAG", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(routeStage) && string.IsNullOrWhiteSpace(componentStage))
+                        db.RemoveRecord(i);
+                }
+
+                for (int i = 0; i < db.Size; i++)
+                    db.SetValue("LineId", i, (i + 1).ToString());
+
+                matrix.LoadFromDataSource();
+
+                for (int i = 1; i <= matrix.VisualRowCount; i++)
+                    ((SAPbouiCOM.EditText)matrix.Columns.Item("#").Cells.Item(i).Specific).Value = i.ToString();
+
+                matrix.FlushToDataSource();
+
+                UpdateSamplePreCostingTotalsAfterDelete(oForm);
+
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCMPNT", "@FIL_DR_PRECOSTCOMP", "U_ROUTSTAG");
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                matrix.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sample PreCosting Row Delete Error: " + ex.Message);
+            }
+        }
+        private void UpdateSamplePreCostingTotalsAfterDelete(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                double componentTotal = GetSamplePreCostingMatrixSum(oForm, "MTXCMPNT", true);
+                double otherCostTotal = GetSamplePreCostingMatrixSum(oForm, "MTXOTCST", false);
+                double totalCost = componentTotal + otherCostTotal;
+
+                SAPbouiCOM.EditText etProfitPercent = (SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific;
+
+                double profitPercent = GetSamplePreCostingValue(etProfitPercent.Value);
+
+                if (profitPercent < 0)
+                    profitPercent = 0;
+
+                double profitAmount = totalCost * profitPercent / 100;
+                double fobAmount = totalCost + profitAmount;
+
+                string componentValue = componentTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string otherCostValue = otherCostTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string totalCostValue = totalCost.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string profitPercentValue = profitPercent.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+                string profitAmountValue = profitAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                string fobAmountValue = fobAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+                SAPbouiCOM.DBDataSource headerDB = oForm.DataSources.DBDataSources.Item("@FIL_DH_PRECOSTING");
+
+                headerDB.SetValue("U_TOTCAMNT", 0, componentValue);
+                headerDB.SetValue("U_TOTOAMNT", 0, otherCostValue);
+                headerDB.SetValue("U_TOTCONAMT", 0, totalCostValue);
+                headerDB.SetValue("U_PROFITPC", 0, profitPercentValue);
+                headerDB.SetValue("U_PROFITAM", 0, profitAmountValue);
+                headerDB.SetValue("U_FOBAMUNT", 0, fobAmountValue);
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCMTAMT").Specific).Value = componentValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETOCTAMT").Specific).Value = otherCostValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETTCNAMT").Specific).Value = totalCostValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFPER").Specific).Value = profitPercentValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETPRFAMT").Specific).Value = profitAmountValue;
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETFOBAMT").Specific).Value = fobAmountValue;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sample PreCosting Total Calculation Error: " + ex.Message);
+            }
+        }
+        private double GetSamplePreCostingMatrixSum(SAPbouiCOM.Form oForm, string matrixId, bool checkRouteStage)
+        {
+            double total = 0;
+
+            SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixId).Specific;
+
+            for (int i = 1; i <= matrix.VisualRowCount; i++)
+            {
+                if (checkRouteStage)
+                {
+                    string routeStage = ((SAPbouiCOM.ComboBox)matrix.Columns.Item("CLRSTGCD").Cells.Item(i).Specific).Value.Trim();
+
+                    if (string.IsNullOrWhiteSpace(routeStage))
+                        continue;
+                }
+
+                string amountText = ((SAPbouiCOM.EditText)matrix.Columns.Item("CLAMT").Cells.Item(i).Specific).Value;
+
+                total += GetSamplePreCostingValue(amountText);
+            }
+
+            return total;
+        }
+        private double GetSamplePreCostingValue(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return 0;
+
+            value = value.Trim().Replace(",", "");
+
+            if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result))
+                return result;
+
+            if (double.TryParse(value, out result))
+                return result;
+
+            return 0;
+        }
         private void UpdateSeriesAndDocNumByDate(
              SAPbouiCOM.Form oForm,
              SAPbouiCOM.DBDataSource oDBH,

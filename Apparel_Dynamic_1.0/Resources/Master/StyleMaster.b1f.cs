@@ -455,12 +455,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 for (int i = 1; i <= oMtxColor.VisualRowCount; i++)
                 {
-                    string colorCode = ((SAPbouiCOM.EditText)oMtxColor.Columns.Item("CLCLRCOD").Cells.Item(i).Specific).Value;
-                    colorCode = (colorCode ?? "").Replace("\0", "").Trim();
+                    string coloraname = ((SAPbouiCOM.EditText)oMtxColor.Columns.Item("CLCLRNAM").Cells.Item(i).Specific).Value;
+                    coloraname = (coloraname ?? "").Replace("\0", "").Trim();
 
-                    if (!string.IsNullOrWhiteSpace(colorCode))
+                    if (!string.IsNullOrWhiteSpace(coloraname))
                     {
-                        colorCodes.Add(colorCode);
+                        colorCodes.Add(coloraname);
                     }
                 }
 
@@ -1001,6 +1001,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                                 JOIN ""@FIL_DR_PSMST"" S ON S.""DocEntry"" = M.""DocEntry""
                                 WHERE
                                     M.""DocEntry"" = '{docEntry}'
+                                    AND S.""U_SIZEAPPL"" = 'Y'
                                 ORDER BY
                                     C.""U_COLORCODE"", S.""U_SIZECODE""";
 
@@ -1257,7 +1258,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (dt == null || dt.Rows.Count == 0)
                         return;
 
-                    string Code = dt.GetValue("Code", 0).ToString().Trim();
+                    string Code = dt.GetValue("Name", 0).ToString().Trim();
                     int row = pVal.Row;
                     //Set Values
                     oMatrix.SetCellWithoutValidation(row, "CLBSCLR", Code);
@@ -1622,7 +1623,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     oDBDS.SetValue("LineId", row, oRS.Fields.Item("LineId").Value.ToString().Trim());
                     oDBDS.SetValue("U_SIZECODE", row, oRS.Fields.Item("U_SIZECODE").Value.ToString().Trim());
                     oDBDS.SetValue("U_SIZENAME", row, oRS.Fields.Item("U_SIZENAME").Value.ToString().Trim());
-
+                    //oDBDS.SetValue("U_SIZEAPPL", row, "Y");
                     row++;
                     oRS.MoveNext();
                 }

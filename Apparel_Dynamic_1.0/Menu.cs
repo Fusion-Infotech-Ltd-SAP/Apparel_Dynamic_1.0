@@ -1087,7 +1087,7 @@ namespace Apparel_Dynamic_1._0
                                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                     {
                                         Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
-                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "ETSLCODE", "CBSERIES", "ETDOCDAT");
 
                                         string today = DateTime.Now.ToString("yyyyMMdd");
                                         SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");

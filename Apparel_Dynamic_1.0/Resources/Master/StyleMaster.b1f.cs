@@ -1671,11 +1671,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 }
                 else if (value == "N")
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                       "Style is build on Scratch",
-                       SAPbouiCOM.BoMessageTime.bmt_Short,
-                       SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
-
+                    Global.GFunc.ShowWarning("Style is build on Scratch");
                     SetItemsEnabled(oForm, false, "ETSMPLCD");
                     oESMPLCD.Value = "";
                     oESMPLNM.Value = "";

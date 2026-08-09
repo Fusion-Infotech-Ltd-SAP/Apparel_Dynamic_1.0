@@ -642,10 +642,10 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
-                //SAM
+                //SAM  //APP_MST_SAM
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_SAM")
                 {
-                    string formUID = "APP_MST_SAM";
+                    string formUID = "FIL_FRM_SAM";
 
                     if (IsFormOpen(formUID))
                     {

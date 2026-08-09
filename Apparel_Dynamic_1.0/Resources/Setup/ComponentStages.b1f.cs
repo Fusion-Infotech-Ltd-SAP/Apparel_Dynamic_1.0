@@ -39,10 +39,13 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.CBUOMAPL.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBUOMAPL_ComboSelectAfter);
             this.STUOM = ((SAPbouiCOM.StaticText)(this.GetItem("STUOM").Specific));
             this.ETUOM = ((SAPbouiCOM.EditText)(this.GetItem("ETUOM").Specific));
+            this.ETUOM.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETUOM_ChooseFromListAfter);
             this.CKACTIVE = ((SAPbouiCOM.CheckBox)(this.GetItem("CKACTIVE").Specific));
             this.OnCustomInitialize();
 
         }
+
+
 
         public override void OnInitializeFormEvents()
         {
@@ -74,6 +77,8 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                     SAPbouiCOM.StaticText oLabel = (SAPbouiCOM.StaticText)oForm.Items.Item("STUOM").Specific;
                     oLabel.Caption = "UoM*";
+
+                    Global.GFunc.ReEnableChooseFromList(oForm, "ETUOM","CFL_UOM","UomCode");
                 }
                 else
                 {
@@ -89,6 +94,29 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
 
         }
+
+        private void ETUOM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
+
+            SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBUOMAPL").Specific;
+            string selectedValue = oCombo.Selected.Value;
+            if (selectedValue == "Y")
+            {
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
+
+                string uomCode = dt.GetValue("UomCode", 0).ToString();
+                SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETUOM").Specific;
+                ETCD.Value = uomCode;
+            }
+        }
+
+
         private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
         {
             foreach (string itemId in itemIds)
@@ -120,6 +148,8 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                 SAPbouiCOM.StaticText oLabel =(SAPbouiCOM.StaticText)oForm.Items.Item("STUOM").Specific;
                 oLabel.Caption = "UoM*";
+
+                Global.GFunc.ReEnableChooseFromList(oForm, "ETUOM", "CFL_UOM", "UomCode");
             }
             else
             {

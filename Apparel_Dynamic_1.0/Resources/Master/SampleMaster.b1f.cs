@@ -33,6 +33,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private SAPbouiCOM.Button ADDButton, CancelButton, BTNITMTX, BTNITMCR, BRWSBTN, DISPBTN, DELBTN;
 
 
+
         private SAPbouiCOM.ComboBox CBSERIES;
         private string sampleCode = "";
 
@@ -72,6 +73,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETRUTSTG.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETRUTSTG_ChooseFromListBefore);
             this.ETRUTSTG.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETRUTSTG_ChooseFromListAfter);
             this.ETUOM = ((SAPbouiCOM.EditText)(this.GetItem("ETUOM").Specific));
+            this.ETUOM.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETUOM_ChooseFromListAfter);
             this.ETCRDCOD = ((SAPbouiCOM.EditText)(this.GetItem("ETCRDCOD").Specific));
             this.ETCRDCOD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETCRDCOD_ChooseFromListAfter);
             this.ETMERNAM = ((SAPbouiCOM.EditText)(this.GetItem("ETMERNAM").Specific));
@@ -137,6 +139,23 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         }
 
+        private void ETUOM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
+
+            SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+            SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+            if (dt == null || dt.Rows.Count == 0)
+                 return;
+
+             string uomCode = dt.GetValue("UomCode", 0).ToString();
+             SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETUOM").Specific;
+             ETCD.Value = uomCode;
+            
+
+        }
 
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {

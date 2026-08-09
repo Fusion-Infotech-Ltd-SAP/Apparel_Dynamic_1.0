@@ -642,10 +642,10 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
-                //SAM
+                //SAM  //APP_MST_SAM
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_SAM")
                 {
-                    string formUID = "APP_MST_SAM";
+                    string formUID = "FIL_FRM_SAM";
 
                     if (IsFormOpen(formUID))
                     {
@@ -1087,7 +1087,7 @@ namespace Apparel_Dynamic_1._0
                                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                     {
                                         Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
-                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "ETSLCODE", "CBSERIES", "ETDOCDAT");
 
                                         string today = DateTime.Now.ToString("yyyyMMdd");
                                         SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPSM");

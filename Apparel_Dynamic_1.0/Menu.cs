@@ -99,7 +99,6 @@ namespace Apparel_Dynamic_1._0
                 //Apparel -> Transaction -> Merchandising -> Material requirements planning  - FHR
                 CreateMainMenu("APP_TRN_MRD", "APP_TRN_MRD_MRP", "MRP", 7, 1, false);
 
-
             }
 
         }
@@ -107,7 +106,6 @@ namespace Apparel_Dynamic_1._0
         public void SBO_Application_MenuEvent(ref SAPbouiCOM.MenuEvent pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
-
             try
             {
                 //___________________________________________________________Setup_______________________________________________
@@ -386,7 +384,7 @@ namespace Apparel_Dynamic_1._0
                     ParameterMaster activeForm = new ParameterMaster();
                     activeForm.Show();
                 }
-                //APP_STP_INCOTRMS
+                //INCOTRMS
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_INCOTRMS")
                 {
                     string formUID = "FIL_FRM_INCOTRMS";

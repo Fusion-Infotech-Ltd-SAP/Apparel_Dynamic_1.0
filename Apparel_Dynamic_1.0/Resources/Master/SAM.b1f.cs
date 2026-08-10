@@ -22,8 +22,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private SAPbouiCOM.Matrix MTXSAM;
         private SAPbouiCOM.Grid GRDCPM;
 
-        private bool _formSettingsInitialized = false;
-
         public override void OnInitializeComponent()
         {
             this.STCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCODE").Specific));
@@ -50,7 +48,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         }
         public override void OnInitializeFormEvents()
         {
-            this.ActivateAfter += new SAPbouiCOM.Framework.FormBase.ActivateAfterHandler(this.Form_ActivateAfter);
             this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
             this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
@@ -62,32 +59,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         //}
 
-        private void Form_ActivateAfter(SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-            try
-            {
-                oForm.Freeze(true);
-
-                if (_formSettingsInitialized)
-                    return;
-
-                oForm.Settings.MatrixUID = "MTXSAM";
-                oForm.Settings.EnableRowFormat = true;
-                oForm.Settings.Enabled = true;
-
-                _formSettingsInitialized = true;
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Failed to enable Form Settings: " + ex.Message);
-            }
-            finally
-            {
-                oForm.Freeze(false);
-            }
-        }
+      
 
 
         private void OnCustomInitialize()
@@ -382,39 +354,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void FOLSAM_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            Tab_ClickAfter(sboObject, pVal);
-
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            oForm.PaneLevel = 1;
+            FormSettingsHelper.Enable(oForm, "MTXSAM");
+            
         }
 
-        private void Tab_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            try
-            {
-                SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-                switch (pVal.ItemUID)
-                {
-                    case "FOLSAM":
-                        SetFormSettingsMatrix(oForm, "MTXSAM");
-                        break;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Failed to change Form Settings Matrix: " + ex.Message);
-            }
-        }
-
-
-        private void SetFormSettingsMatrix(SAPbouiCOM.Form oForm, string matrixUID)
-        {
-            if (!_formSettingsInitialized)
-                return;
-
-            if (oForm.Settings.MatrixUID != matrixUID)
-                oForm.Settings.MatrixUID = matrixUID;
-        }
 
 
         private void RefreshSAMRowColors(string formUID)

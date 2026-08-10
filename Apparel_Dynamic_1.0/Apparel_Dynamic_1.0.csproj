@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\FileDialogHelper.cs" />
+    <Compile Include="Helper\FormSettingsHelper.cs" />
     <Compile Include="Helper\Global.cs" />
     <Compile Include="Helper\GlobalFunction.cs" />
     <Compile Include="Helper\NetworkShareHelper.cs" />

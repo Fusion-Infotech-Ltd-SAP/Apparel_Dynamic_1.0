@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Apparel_Dynamic_1._0.Modules;
+using Apparel_Dynamic_1._0.Helper;
 
 namespace Apparel_Dynamic_1._0
 {
@@ -34,6 +35,8 @@ namespace Apparel_Dynamic_1._0
 
                 SalesQuotation objSalQuote;
                 objSalQuote = new SalesQuotation();
+
+                FormSettingsHelper.Initialize();
 
                 oApp.RegisterMenuEventHandler(MyMenu.SBO_Application_MenuEvent);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);

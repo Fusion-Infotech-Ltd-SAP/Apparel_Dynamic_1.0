@@ -7,7 +7,7 @@ using Apparel_Dynamic_1._0.Helper;
 
 namespace Apparel_Dynamic_1._0.Resources.Setup
 {
-    [FormAttribute("Apparel_Dynamic_1._0.Resources.Setup.Colour", "Resources/Setup/Colour.b1f")]
+    [FormAttribute("FIL_FRM_CLR_MSTR", "Resources/Setup/Colour.b1f")]
     class Colour : UserFormBase
     {
         public Colour()
@@ -58,7 +58,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             oForm.Freeze(true);
             try
             {
-                SetItemsEnabled(oForm, false, "ETCODE");
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETCODE");
             }
             finally
             {
@@ -66,21 +66,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             }
 
         }
-        private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
-        {
-            foreach (string itemId in itemIds)
-            {
-                try
-                {
-                    oForm.Items.Item(itemId).Enabled = enabled;
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
+      
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;

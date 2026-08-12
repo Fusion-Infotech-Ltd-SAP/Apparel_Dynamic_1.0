@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Apparel_Dynamic_1._0.Helper;
+using System.IO;
 
 namespace Apparel_Dynamic_1._0.Resources.Master
 {
-    [FormAttribute("Apparel_Dynamic_1._0.Resources.Master.StyleMaster", "Resources/Master/StyleMaster.b1f")]
+    [FormAttribute("FIL_FRM_STYLMSTR", "Resources/Master/StyleMaster.b1f")]
     class StyleMaster : UserFormBase
     {
         public StyleMaster()
@@ -47,12 +48,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         // -------- ComboBox --------
         private SAPbouiCOM.ComboBox CBSERIES, CBSMPBSE;
 
-        
-
-
-
         // -------- Folder --------
         private SAPbouiCOM.Folder FOLSIZE, FOLCOLOR, FOLITEM, FOLATTAC;
+
+       
+
+
+
+
 
         // -------- Matrix --------
         private SAPbouiCOM.Matrix MTXSIZE, MTXCOLOR, MTXSBCLR, MTXITEM, MTXATTCH;
@@ -64,7 +67,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private string styleCode = "";
         public override void OnInitializeComponent()
         {
-            //                      -------- Static Text --------
+            //                              -------- Static Text --------
             this.STSLCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCODE").Specific));
             this.STCSCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCSCODE").Specific));
             this.STCSDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STCSDESC").Specific));
@@ -89,7 +92,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STSZTPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSZTPCD").Specific));
             this.STSUBCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSUBCLR").Specific));
             this.STSLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STSLDESC").Specific));
-            //                      -------- Edit Text --------
+            //                              -------- Edit Text --------
             this.ETSLCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCODE").Specific));
             this.ETSLCODE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSLCODE_LostFocusAfter);
             this.ETCSCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCSCODE").Specific));
@@ -144,29 +147,34 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETSZTPCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSZTPCD_ChooseFromListBefore);
             this.ETSLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETSLDESC").Specific));
             this.ETGENAME = ((SAPbouiCOM.EditText)(this.GetItem("ETGENAME").Specific));
-            //                      -------- ComboBox --------
+            //                              -------- ComboBox --------
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSMPBSE = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSMPBSE").Specific));
             this.CBSMPBSE.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSMPBSE_ComboSelectAfter);
-            //                      -------- Folder --------
+            //                              -------- Folder --------
             this.FOLSIZE = ((SAPbouiCOM.Folder)(this.GetItem("FOLSIZE").Specific));
+            this.FOLSIZE.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLSIZE_ClickAfter);
             this.FOLCOLOR = ((SAPbouiCOM.Folder)(this.GetItem("FOLCOLOR").Specific));
             this.FOLITEM = ((SAPbouiCOM.Folder)(this.GetItem("FOLITEM").Specific));
+            this.FOLITEM.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLITEM_ClickAfter);
             this.FOLATTAC = ((SAPbouiCOM.Folder)(this.GetItem("FOLATTAC").Specific));
-            //                      -------- Matrix --------
+            this.FOLATTAC.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLATTAC_ClickAfter);
+            //                              -------- Matrix --------
             this.MTXSIZE = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSIZE").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
+            this.MTXCOLOR.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXCOLOR_ClickAfter);
             this.MTXCOLOR.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXCOLOR_ValidateAfter);
             this.MTXCOLOR.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXCOLOR_ChooseFromListAfter);
             this.MTXCOLOR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXCOLOR_ChooseFromListBefore);
             this.MTXSBCLR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSBCLR").Specific));
+            this.MTXSBCLR.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXSBCLR_ClickAfter);
             this.MTXSBCLR.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXSBCLR_ValidateAfter);
             this.MTXSBCLR.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXSBCLR_ChooseFromListAfter);
             this.MTXSBCLR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSBCLR_ChooseFromListBefore);
             this.MTXITEM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXITEM").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-            //                      -------- Button --------
+            //                              -------- Button --------
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -207,6 +215,58 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         {
 
         }
+
+        private void MTXCOLOR_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            oForm.PaneLevel = 2;
+            FormSettingsHelper.Enable(oForm, "MTXCOLOR");
+
+        }
+
+        private void MTXSBCLR_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            oForm.PaneLevel = 2;
+            FormSettingsHelper.Enable(oForm, "MTXSBCLR");
+
+        }
+
+        private void FOLITEM_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            try
+            {
+                oForm.Freeze(true);
+
+                oForm.PaneLevel = 3;
+                FormSettingsHelper.Enable(oForm, "MTXITEM");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Failed to load Item tab: " + ex.Message);
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
+        }
+
+        private void FOLATTAC_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            oForm.PaneLevel = 4;
+            FormSettingsHelper.Enable(oForm, "MTXATTCH");
+        }
+        private void FOLSIZE_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            oForm.PaneLevel = 1;
+            FormSettingsHelper.Enable(oForm, "MTXSIZE");
+
+        }
+
         private void ETUOM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
@@ -1519,96 +1579,292 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        //private void DELBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //    SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
+        //    SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+
+        //    MTXATTCH.FlushToDataSource();
+        //    for (int i = 1; i <= MTXATTCH.RowCount; i++)
+        //    {
+        //        if (MTXATTCH.IsRowSelected(i))
+        //        {
+        //            int rowIndex = i - 1;
+
+        //            if (rowIndex >= 0 && rowIndex < DBDataSourceLine.Size)
+        //            {
+        //                DBDataSourceLine.RemoveRecord(rowIndex);
+        //                for (int j = 0; j < DBDataSourceLine.Size; j++)
+        //                {
+        //                    DBDataSourceLine.Offset = j;
+        //                    DBDataSourceLine.SetValue("LineId", j, (j + 1).ToString());
+        //                }
+        //                MTXATTCH.LoadFromDataSource();
+        //                Application.SBO_Application.MessageBox("Selected row deleted.");
+        //                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //                {
+        //                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                Application.SBO_Application.MessageBox("Invalid row index.");
+        //            }
+
+        //            break;
+        //        }
+        //    }
+
+        //}
+
+        //private void DISPBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //    SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+        //    for (int i = 1; i <= MTXATTCH.RowCount; i++)
+        //    {
+        //        if (MTXATTCH.IsRowSelected(i))
+        //        {
+        //            string filePath = ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(i).Specific).Value;
+        //            if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+        //            {
+        //                System.Diagnostics.Process.Start(filePath);
+        //            }
+        //            else
+        //            {
+        //                Application.SBO_Application.MessageBox("File does not exist or path is empty.");
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
+
+        //private void BRWSBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //    SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
+        //    SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+        //    string filePath = FileDialogHelper.ShowFileDialog();
+        //    if (!string.IsNullOrEmpty(filePath))
+        //    {
+        //        int lastRow = MTXATTCH.VisualRowCount;
+        //        bool needNewRow = (lastRow == 0) ||
+        //                          !string.IsNullOrEmpty(((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value);
+        //        if (needNewRow)
+        //        {
+        //            Global.GFunc.SetNewLine(MTXATTCH, DBDataSourceLine, 1, "");
+        //            lastRow = MTXATTCH.VisualRowCount;
+        //        }
+
+        //        ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = filePath;
+        //        MTXATTCH.FlushToDataSource();
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //        {
+        //            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+        //        }
+        //    }
+
+        //}
+
         private void DELBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
-            SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+            SAPbouiCOM.Form oForm = null;
 
-
-            MTXATTCH.FlushToDataSource();
-            for (int i = 1; i <= MTXATTCH.RowCount; i++)
+            try
             {
-                if (MTXATTCH.IsRowSelected(i))
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+
+                SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
+                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+                MTXATTCH.FlushToDataSource();
+
+                for (int i = 1; i <= MTXATTCH.RowCount; i++)
                 {
+                    if (!MTXATTCH.IsRowSelected(i))
+                        continue;
+
                     int rowIndex = i - 1;
 
-                    if (rowIndex >= 0 && rowIndex < DBDataSourceLine.Size)
-                    {
-                        DBDataSourceLine.RemoveRecord(rowIndex);
-                        for (int j = 0; j < DBDataSourceLine.Size; j++)
-                        {
-                            DBDataSourceLine.Offset = j;
-                            DBDataSourceLine.SetValue("LineId", j, (j + 1).ToString());
-                        }
-                        MTXATTCH.LoadFromDataSource();
-                        Application.SBO_Application.MessageBox("Selected row deleted.");
-                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                        {
-                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-                        }
-                    }
-                    else
+                    if (rowIndex < 0 || rowIndex >= DBDataSourceLine.Size)
                     {
                         Application.SBO_Application.MessageBox("Invalid row index.");
+                        return;
                     }
+
+                    string filePath = ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(i).Specific).Value.Trim();
+
+                    int result = Application.SBO_Application.MessageBox(
+                        "Are you sure you want to delete this attachment?",
+                        1,
+                        "Yes",
+                        "No"
+                    );
+
+                    if (result != 1)
+                        return;
+
+                    string rootPath = @"\\192.168.162.227\Attachment";
+                    string username = @"192.168.162.227\Administrator";
+                    string password = "Fu1@#sion";
+
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        NetworkShareHelper.DeleteFile(
+                            filePath,
+                            rootPath,
+                            username,
+                            password
+                        );
+                    }
+
+                    DBDataSourceLine.RemoveRecord(rowIndex);
+
+                    for (int j = 0; j < DBDataSourceLine.Size; j++)
+                    {
+                        DBDataSourceLine.Offset = j;
+                        DBDataSourceLine.SetValue("LineId", j, (j + 1).ToString());
+                    }
+
+                    MTXATTCH.LoadFromDataSource();
+
+                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                        oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                    Global.GFunc.ShowSuccess("Attachment deleted successfully.");
 
                     break;
                 }
             }
-
-        }
-
-        private void DISPBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
-
-            for (int i = 1; i <= MTXATTCH.RowCount; i++)
+            catch (Exception ex)
             {
-                if (MTXATTCH.IsRowSelected(i))
-                {
-                    string filePath = ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(i).Specific).Value;
-                    if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
-                    {
-                        System.Diagnostics.Process.Start(filePath);
-                    }
-                    else
-                    {
-                        Application.SBO_Application.MessageBox("File does not exist or path is empty.");
-                    }
-                    break;
-                }
+                Global.GFunc.ShowError("Attachment Delete Error: " + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
             }
         }
+
+        public static void DeleteFile(string filePath, string rootPath, string username, string password)
+        {
+            NetworkShareHelper.ConnectToShare(rootPath, username, password);
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return;
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+
+
 
         private void BRWSBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
-            SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
 
-            string filePath = FileDialogHelper.ShowFileDialog();
-            if (!string.IsNullOrEmpty(filePath))
+            try
             {
+                oForm.Freeze(true);
+
+                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(styleCode))
+                {
+                    Global.GFunc.ShowError("Enter Style Code first.");
+                    return;
+                }
+
+                string sourceFile = FileDialogHelper.ShowFileDialog();
+
+                if (string.IsNullOrWhiteSpace(sourceFile))
+                    return;
+
+                SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
+                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
                 int lastRow = MTXATTCH.VisualRowCount;
-                bool needNewRow = (lastRow == 0) ||
-                                  !string.IsNullOrEmpty(((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value);
+
+                bool needNewRow = lastRow == 0 ||
+                                  !string.IsNullOrWhiteSpace(((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value);
+
                 if (needNewRow)
                 {
                     Global.GFunc.SetNewLine(MTXATTCH, DBDataSourceLine, 1, "");
                     lastRow = MTXATTCH.VisualRowCount;
                 }
 
-                ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = filePath;
+                string rootPath = @"\\192.168.162.227\Attachment";
+                string username = @"192.168.162.227\Administrator";
+                string password = "Fu1@#sion";
+
+                string formTitle = oForm.Title;
+                string documentCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
+                string serverFile = NetworkShareHelper.CopyFile(sourceFile, rootPath, username, password, formTitle, documentCode,lastRow);
+
+                ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = serverFile;
+
                 MTXATTCH.FlushToDataSource();
 
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                {
                     oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-                }
-            }
 
+                Global.GFunc.ShowSuccess("Attachment copied successfully.");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Attachment Error: " + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
+            }
+        }
+
+        private void DISPBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            try
+            {
+                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+                for (int i = 1; i <= MTXATTCH.RowCount; i++)
+                {
+                    if (!MTXATTCH.IsRowSelected(i))
+                        continue;
+
+                    string filePath = ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(i).Specific).Value.Trim();
+
+                    if (string.IsNullOrWhiteSpace(filePath))
+                    {
+                        Global.GFunc.ShowError("Attachment path is empty.");
+                        return;
+                    }
+
+                    string rootPath = @"\\192.168.162.227\Attachment";
+                    string username = @"192.168.162.227\Administrator";
+                    string password = "Fu1@#sion";
+
+                    NetworkShareHelper.OpenFile(filePath, rootPath, username, password);
+
+                    return;
+                }
+
+                Global.GFunc.ShowWarning("Select an attachment row first.");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Unable to open attachment: " + ex.Message);
+            }
         }
 
 

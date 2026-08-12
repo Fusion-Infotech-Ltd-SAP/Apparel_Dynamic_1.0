@@ -99,7 +99,6 @@ namespace Apparel_Dynamic_1._0
                 //Apparel -> Transaction -> Merchandising -> Material requirements planning  - FHR
                 CreateMainMenu("APP_TRN_MRD", "APP_TRN_MRD_MRP", "MRP", 7, 1, false);
 
-
             }
 
         }
@@ -107,7 +106,6 @@ namespace Apparel_Dynamic_1._0
         public void SBO_Application_MenuEvent(ref SAPbouiCOM.MenuEvent pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
-
             try
             {
                 //___________________________________________________________Setup_______________________________________________
@@ -386,7 +384,7 @@ namespace Apparel_Dynamic_1._0
                     ParameterMaster activeForm = new ParameterMaster();
                     activeForm.Show();
                 }
-                //APP_STP_INCOTRMS
+                //INCOTRMS
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_INCOTRMS")
                 {
                     string formUID = "FIL_FRM_INCOTRMS";
@@ -532,6 +530,8 @@ namespace Apparel_Dynamic_1._0
                         EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
                         EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
 
+                        FormSettingsHelper.Enable(oForm, "MTXSIZE");
+
                         // Series Initialization
                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
@@ -642,7 +642,7 @@ namespace Apparel_Dynamic_1._0
                     }
 
                 }
-                //SAM  //APP_MST_SAM
+                //SAM
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_MST_SAM")
                 {
                     string formUID = "FIL_FRM_SAM";
@@ -665,10 +665,8 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Matrix MTXSAM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAM").Specific;
                         MTXSAM.AutoResizeColumns();
 
-                        //oForm.Freeze(true);
-                        //oForm.Settings.MatrixUID = "MTXSAM";
-                        //oForm.Settings.Enabled = true;
-                        //oForm.Freeze(false);
+                        FormSettingsHelper.Enable(oForm, "MTXSAM");
+
                     }
                     catch (Exception ex)
                     {

@@ -8,7 +8,7 @@ using Apparel_Dynamic_1._0.Helper;
 
 namespace Apparel_Dynamic_1._0.Resources.Setup
 {
-    [FormAttribute("Apparel_Dynamic_1._0.Resources.Setup.SampleType", "Resources/Setup/SampleType.b1f")]
+    [FormAttribute("FIL_FRM_SMPLTYPE", "Resources/Setup/SampleType.b1f")]
     class SampleType : UserFormBase
     {
         public SampleType()
@@ -18,9 +18,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         private SAPbouiCOM.EditText ETCODE, ETNAME, ETDOCTRY;
         private SAPbouiCOM.Button ADDButton, CancelButton;
         private SAPbouiCOM.CheckBox CKACTIVE;
-        /// <summary>
-        /// Initialize components. Called by framework after form created.
-        /// </summary>
+
         public override void OnInitializeComponent()
         {
             this.STCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCODE").Specific));
@@ -57,27 +55,13 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             oForm.Freeze(true);
             try
             {
-                SetItemsEnabled(oForm, false, "ETCODE");
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETCODE");
             }
             finally
             {
                 oForm.Freeze(false);
             }
 
-        }
-        private void SetItemsEnabled(SAPbouiCOM.Form oForm, bool enabled, params string[] itemIds)
-        {
-            foreach (string itemId in itemIds)
-            {
-                try
-                {
-                    oForm.Items.Item(itemId).Enabled = enabled;
-                }
-                catch
-                {
-
-                }
-            }
         }
         
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -121,10 +105,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
                         if (!oRS.EoF)
                         {
-                            Application.SBO_Application.StatusBar.SetText("Code already exists!",
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                            Global.GFunc.ShowError("Code already exists!");
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = "";
                         }
                     }

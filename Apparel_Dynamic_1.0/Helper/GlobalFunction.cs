@@ -47,6 +47,52 @@ namespace Apparel_Dynamic_1._0.Helper
         }
 
 
+        public void ResetMatrixCellsEditable(SAPbouiCOM.Matrix matrix, string codeColumnId)
+        {
+            int colIndex = GetColumnIndex(matrix, codeColumnId);
+
+            for (int r = 1; r <= matrix.RowCount; r++)
+            {
+                matrix.CommonSetting.SetCellEditable(r, colIndex, true);
+            }
+        }
+
+        public void DisableCellsByCode(SAPbouiCOM.Matrix matrix, string codeColumnId, HashSet<string> codesToDisable)
+        {
+            int colIndex = GetColumnIndex(matrix, codeColumnId);
+
+            for (int r = 1; r <= matrix.RowCount; r++)
+            {
+                string code = GetMatrixEditValue(matrix, codeColumnId, r);
+
+                if (string.IsNullOrWhiteSpace(code))
+                    continue;
+
+                if (codesToDisable.Contains(code.Trim()))
+                {
+                    matrix.CommonSetting.SetCellEditable(r, colIndex, false);
+                }
+            }
+        }
+
+        private string GetMatrixEditValue(SAPbouiCOM.Matrix matrix, string colId, int row)
+        {
+            // In your size/color matrices these columns should be EditText
+            return (((SAPbouiCOM.EditText)matrix.Columns.Item(colId).Cells.Item(row).Specific).Value ?? "").Trim();
+        }
+
+        private int GetColumnIndex(SAPbouiCOM.Matrix matrix, string columnId)
+        {
+            for (int i = 1; i <= matrix.Columns.Count; i++)
+            {
+                if (matrix.Columns.Item(i).UniqueID == columnId)
+                    return i;
+            }
+            throw new Exception("Column not found: " + columnId);
+        }
+
+
+
         public void UpdateSeriesAndDocNumByDate(
         SAPbouiCOM.Form oForm,
         SAPbouiCOM.DBDataSource oDBH,

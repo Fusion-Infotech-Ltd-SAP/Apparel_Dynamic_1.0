@@ -51,10 +51,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         // -------- Folder --------
         private SAPbouiCOM.Folder FOLSIZE, FOLCOLOR, FOLITEM, FOLATTAC;
 
-       
 
-
-
+        private Dictionary<int, bool> prevSztTypeCheckboxStates = new Dictionary<int, bool>();
 
 
         // -------- Matrix --------
@@ -630,9 +628,89 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 // Enable/disable other buttons based on matrix
                 SampleEnableButtons(ref oForm);
 
+                // --- Only check for changes if we already had previous states ---CLAPPL
+                bool newCheckedInSztType = false;
+
+                if (prevSztTypeCheckboxStates.Count > 0)
+                    newCheckedInSztType = HasCheckboxChanges(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);
+
+              
+
+                if (newCheckedInSztType)
+                {
+                    SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
+                    oBtnItmTx.Enabled = true;
+
+                    Application.SBO_Application.StatusBar.SetText(
+                        "Detected new checked rows in matrix — BTNITMTX enabled.",
+                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                        SAPbouiCOM.BoStatusBarMessageType.smt_Success
+                    );
+                }
+                else
+                {
+                    //Disable if no new checks
+                    SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
+                    oBtnItmTx.Enabled = false;
+                }
+                // --- Always refresh states AFTER processing ---
+                CaptureCheckboxStates(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);
+               
             }
 
         }
+
+        // --- Generic reusable method to store checkbox states ---
+        private void CaptureCheckboxStates(SAPbouiCOM.Form oForm, string matrixId, string columnId, Dictionary<int, bool> targetDict)
+        {
+            try
+            {
+                targetDict.Clear();
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixId).Specific;
+
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    SAPbouiCOM.CheckBox chk = (SAPbouiCOM.CheckBox)oMatrix.Columns.Item(columnId).Cells.Item(i).Specific;
+                    targetDict[i] = chk.Checked;
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText($"Error capturing states for {matrixId}: {ex.Message}",
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
+
+        private bool HasCheckboxChanges(SAPbouiCOM.Form oForm, string matrixId, string columnId, Dictionary<int, bool> prevStates)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixId).Specific;
+
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    SAPbouiCOM.CheckBox chk = (SAPbouiCOM.CheckBox)oMatrix.Columns.Item(columnId).Cells.Item(i).Specific;
+                    bool prevState = prevStates.ContainsKey(i) ? prevStates[i] : false;
+
+                    // Detect any change: checked → unchecked OR unchecked → checked
+                    if (chk.Checked != prevState)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    $"Error checking checkbox changes for {matrixId}: {ex.Message}",
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+
+            return false;
+        }
+
 
         private void SampleEnableButtons(ref SAPbouiCOM.Form oForm)
         {
@@ -719,19 +797,19 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 // --- Case 2: Matrix has data ---
                 bool enableBtnItmCr = false;
 
-                // 1️⃣ Check size mismatch
-                bool sizeMismatch = IsSizeMismatch(oForm);
+                //// 1️⃣ Check size mismatch
+                //bool sizeMismatch = IsSizeMismatch(oForm);
 
-                if (sizeMismatch)
-                {
-                    // Enable item matrix button
-                    oBtnItmTx.Enabled = true;
+                //if (sizeMismatch)
+                //{
+                //    // Enable item matrix button
+                //    oBtnItmTx.Enabled = true;
 
-                    // Disable item create button
-                    oBtnItmCr.Enabled = false;
+                //    // Disable item create button
+                //    oBtnItmCr.Enabled = false;
 
-                    return;
-                }
+                //    return;
+                //}
 
                 // If no mismatch continue normal logic
                 oBtnItmTx.Enabled = false;

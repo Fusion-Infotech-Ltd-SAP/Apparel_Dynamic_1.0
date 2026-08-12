@@ -1732,11 +1732,54 @@ namespace Apparel_Dynamic_1._0
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1287")
                 {
                     SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.ActiveForm;
-                    string formtype = oForm.UniqueID.ToString();
-                    switch (formtype)
+                    string formUID = oForm.UniqueID.ToString();
+
+                    switch (formUID)
                     {
+                        case "FIL_FRM_SMPLMSTR":
+                            try
+                            {
+                                oForm.Freeze(true);
 
+                                SAPbouiCOM.EditText ETSLCODE = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific;
+                                SAPbouiCOM.EditText ETSLDESC = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLDESC").Specific;
+                                SAPbouiCOM.EditText ETDOCDAT = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific;
 
+                                SAPbouiCOM.Matrix MTXITEM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXITEM").Specific;
+                                SAPbouiCOM.Matrix mtxSize = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSIZE").Specific;
+                                SAPbouiCOM.Matrix mtxColor = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
+
+                                Global.GFunc.SetItemsEnabled(oForm,true,"ETSLCODE","ETDOCDAT","CBSERIES");
+
+                                ETSLCODE.Value = "";
+                                ETSLDESC.Value = "";
+
+                                MTXITEM.Clear();
+
+                                Global.GFunc.ResetMatrixCellsEditable(mtxSize, "CLSZCODE");
+                                Global.GFunc.ResetMatrixCellsEditable(mtxColor, "CLCLRCOD");
+
+                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                {
+                                    Global.GFunc.SetItemsEnabled(oForm,true,"CBSERIES","ETDOCDAT");
+
+                                    string today = DateTime.Now.ToString("yyyyMMdd");
+                                    SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");
+                                    oDBH.SetValue("U_DOCDATE", 0, today);
+                                    ETDOCDAT.Value = today;
+
+                                    UpdateSeriesAndDocNumByDate(oForm,oDBH,today,"FIL_D_SMPLMAST");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Global.GFunc.ShowError($"Sample master Duplicate Error: {ex.Message}");
+                            }
+                            finally
+                            {
+                                oForm.Freeze(false);
+                            }
+                            break;
                     }
                 }
                 else if (pVal.BeforeAction && pVal.MenuUID == "FIL_DUPL")

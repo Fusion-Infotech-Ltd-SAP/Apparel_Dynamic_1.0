@@ -32,7 +32,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private SAPbouiCOM.Button ADDButton, CancelButton, BTNITMTX, BTNITMCR, BRWSBTN, DISPBTN, DELBTN;
 
-
+       
 
         private SAPbouiCOM.ComboBox CBSERIES;
         private string sampleCode = "";
@@ -128,7 +128,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         /// </summary>
         public override void OnInitializeFormEvents()
         {
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
 
         }
 
@@ -137,6 +138,32 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void OnCustomInitialize()
         {
 
+        }
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+
+                bool isBTNITMTXEnabled = oForm.Items.Item("BTNITMTX").Enabled;
+                bool isBTNITMCREnabled = oForm.Items.Item("BTNITMCR").Enabled;
+
+                if (!isBTNITMTXEnabled && !isBTNITMCREnabled)
+                {
+                    oForm.EnableMenu("1287", true);
+                }
+                else
+                {
+                    oForm.EnableMenu("1287", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_RightClickBefore Error: {ex.Message}");
+                BubbleEvent = false;
+            }
         }
 
         private void ETUOM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

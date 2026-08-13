@@ -58,7 +58,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         // -------- Matrix --------
         private SAPbouiCOM.Matrix MTXSIZE, MTXCOLOR, MTXSBCLR, MTXITEM, MTXATTCH;
 
-       
+        
+
+
 
         // -------- Button --------
         private SAPbouiCOM.Button ADDButton, CancelButton, BTNITMTX, BTNITMCR,
@@ -67,7 +69,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private string styleCode = "";
         public override void OnInitializeComponent()
         {
-            //                               -------- Static Text --------
+            //                                -------- Static Text --------
             this.STSLCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCODE").Specific));
             this.STCSCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCSCODE").Specific));
             this.STCSDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STCSDESC").Specific));
@@ -92,7 +94,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STSZTPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSZTPCD").Specific));
             this.STSUBCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSUBCLR").Specific));
             this.STSLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STSLDESC").Specific));
-            //                               -------- Edit Text --------
+            //                                -------- Edit Text --------
             this.ETSLCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCODE").Specific));
             this.ETSLCODE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSLCODE_LostFocusAfter);
             this.ETCSCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCSCODE").Specific));
@@ -147,12 +149,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETSZTPCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSZTPCD_ChooseFromListBefore);
             this.ETSLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETSLDESC").Specific));
             this.ETGENAME = ((SAPbouiCOM.EditText)(this.GetItem("ETGENAME").Specific));
-            //                               -------- ComboBox --------
+            //                                -------- ComboBox --------
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSMPBSE = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSMPBSE").Specific));
             this.CBSMPBSE.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSMPBSE_ComboSelectAfter);
-            //                               -------- Folder --------
+            //                                -------- Folder --------
             this.FOLSIZE = ((SAPbouiCOM.Folder)(this.GetItem("FOLSIZE").Specific));
             this.FOLSIZE.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLSIZE_ClickAfter);
             this.FOLCOLOR = ((SAPbouiCOM.Folder)(this.GetItem("FOLCOLOR").Specific));
@@ -160,7 +162,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.FOLITEM.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLITEM_ClickAfter);
             this.FOLATTAC = ((SAPbouiCOM.Folder)(this.GetItem("FOLATTAC").Specific));
             this.FOLATTAC.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLATTAC_ClickAfter);
-            //                               -------- Matrix --------
+            //                                -------- Matrix --------
             this.MTXSIZE = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSIZE").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXCOLOR.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXCOLOR_ClickAfter);
@@ -174,7 +176,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.MTXSBCLR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSBCLR_ChooseFromListBefore);
             this.MTXITEM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXITEM").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-            //                               -------- Button --------
+            //                                -------- Button --------
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -196,6 +198,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
             this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
             this.ETDOCDAT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETDOCDAT_LostFocusAfter);
+            this.LinkedButton1 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSMSTCD").Specific));
+            this.LinkedButton1.PressedAfter += new SAPbouiCOM._ILinkedButtonEvents_PressedAfterEventHandler(this.LinkedButton1_PressedAfter);
             this.OnCustomInitialize();
 
         }
@@ -213,6 +217,33 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         private void OnCustomInitialize()
         {
+
+        }
+
+        private void LinkedButton1_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            SAPbouiCOM.EditText ETSMPLCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSMPLCD").Specific;
+            string sampleCode = ETSMPLCD.Value.Trim();
+            SampleMaster sampleMaster = new SampleMaster();
+            sampleMaster.Show();
+            //styleMaster. = Global.G_UI_Application.Forms.ActiveForm;
+            SAPbouiCOM.Form cForm = Application.SBO_Application.Forms.Item("FIL_FRM_SMPLMSTR");
+            try
+            {
+                cForm.Freeze(true);
+                cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                cForm.Items.Item("ETSLCODE").Enabled = true;
+                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSLCODE").Specific;
+                cETSLCODE.Value = sampleCode;
+                cForm.Items.Item("1").Click();
+                cForm.Items.Item("FOLSIZE").Click();
+                cForm.Freeze(false);
+            }
+            catch (Exception ex)
+            {
+                cForm.Freeze(false);
+            }
 
         }
 
@@ -2758,5 +2789,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private SAPbouiCOM.LinkedButton LinkedButton0;
         private SAPbouiCOM.StaticText StaticText0;
         private SAPbouiCOM.EditText EditText1;
+        private SAPbouiCOM.LinkedButton LinkedButton1;
     }
 }

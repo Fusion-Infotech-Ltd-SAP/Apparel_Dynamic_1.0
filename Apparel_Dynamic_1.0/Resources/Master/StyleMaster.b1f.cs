@@ -58,6 +58,8 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         // -------- Matrix --------
         private SAPbouiCOM.Matrix MTXSIZE, MTXCOLOR, MTXSBCLR, MTXITEM, MTXATTCH;
 
+       
+
         // -------- Button --------
         private SAPbouiCOM.Button ADDButton, CancelButton, BTNITMTX, BTNITMCR,
                                   BTNLODSZ, BRWSBTN, DISPBTN, DELBTN;
@@ -65,7 +67,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private string styleCode = "";
         public override void OnInitializeComponent()
         {
-            //                              -------- Static Text --------
+            //                               -------- Static Text --------
             this.STSLCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCODE").Specific));
             this.STCSCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCSCODE").Specific));
             this.STCSDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STCSDESC").Specific));
@@ -90,7 +92,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STSZTPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSZTPCD").Specific));
             this.STSUBCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSUBCLR").Specific));
             this.STSLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STSLDESC").Specific));
-            //                              -------- Edit Text --------
+            //                               -------- Edit Text --------
             this.ETSLCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCODE").Specific));
             this.ETSLCODE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSLCODE_LostFocusAfter);
             this.ETCSCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCSCODE").Specific));
@@ -145,12 +147,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETSZTPCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSZTPCD_ChooseFromListBefore);
             this.ETSLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETSLDESC").Specific));
             this.ETGENAME = ((SAPbouiCOM.EditText)(this.GetItem("ETGENAME").Specific));
-            //                              -------- ComboBox --------
+            //                               -------- ComboBox --------
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSMPBSE = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSMPBSE").Specific));
             this.CBSMPBSE.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSMPBSE_ComboSelectAfter);
-            //                              -------- Folder --------
+            //                               -------- Folder --------
             this.FOLSIZE = ((SAPbouiCOM.Folder)(this.GetItem("FOLSIZE").Specific));
             this.FOLSIZE.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLSIZE_ClickAfter);
             this.FOLCOLOR = ((SAPbouiCOM.Folder)(this.GetItem("FOLCOLOR").Specific));
@@ -158,7 +160,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.FOLITEM.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLITEM_ClickAfter);
             this.FOLATTAC = ((SAPbouiCOM.Folder)(this.GetItem("FOLATTAC").Specific));
             this.FOLATTAC.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLATTAC_ClickAfter);
-            //                              -------- Matrix --------
+            //                               -------- Matrix --------
             this.MTXSIZE = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSIZE").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXCOLOR.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXCOLOR_ClickAfter);
@@ -172,7 +174,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.MTXSBCLR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSBCLR_ChooseFromListBefore);
             this.MTXITEM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXITEM").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-            //                              -------- Button --------
+            //                               -------- Button --------
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -185,11 +187,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.BTNLODSZ = ((SAPbouiCOM.Button)(this.GetItem("BTNLODSZ").Specific));
             this.BTNLODSZ.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNLODSZ_PressedAfter);
             this.BRWSBTN = ((SAPbouiCOM.Button)(this.GetItem("BRWSBTN").Specific));
-            this.BRWSBTN.ClickAfter += new SAPbouiCOM._IButtonEvents_ClickAfterEventHandler(this.BRWSBTN_ClickAfter);
+            this.BRWSBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BRWSBTN_PressedAfter);
             this.DISPBTN = ((SAPbouiCOM.Button)(this.GetItem("DISPBTN").Specific));
-            this.DISPBTN.ClickAfter += new SAPbouiCOM._IButtonEvents_ClickAfterEventHandler(this.DISPBTN_ClickAfter);
+            this.DISPBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.DISPBTN_PressedAfter);
             this.DELBTN = ((SAPbouiCOM.Button)(this.GetItem("DELBTN").Specific));
-            this.DELBTN.ClickAfter += new SAPbouiCOM._IButtonEvents_ClickAfterEventHandler(this.DELBTN_ClickAfter);
+            this.DELBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.DELBTN_PressedAfter);
             this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_0").Specific));
             this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
             this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
@@ -641,11 +643,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
                     oBtnItmTx.Enabled = true;
 
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Detected new checked rows in matrix — BTNITMTX enabled.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Success
-                    );
+                    SAPbouiCOM.Item oBtnItmCr = oForm.Items.Item("BTNITMCR");
+                    oBtnItmCr.Enabled = false;
+
+                    Global.GFunc.ShowWarning("Detected new checked rows in  Size matrix");
+                    
                 }
                 else
                 {
@@ -1749,7 +1751,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         //}
 
-        private void DELBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        private void DELBTN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
 
@@ -1829,85 +1831,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 if (oForm != null)
                     oForm.Freeze(false);
             }
+
         }
 
-        public static void DeleteFile(string filePath, string rootPath, string username, string password)
-        {
-            NetworkShareHelper.ConnectToShare(rootPath, username, password);
-
-            if (string.IsNullOrWhiteSpace(filePath))
-                return;
-
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-        }
-
-
-
-        private void BRWSBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
-            try
-            {
-                oForm.Freeze(true);
-
-                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
-
-                if (string.IsNullOrWhiteSpace(styleCode))
-                {
-                    Global.GFunc.ShowError("Enter Style Code first.");
-                    return;
-                }
-
-                string sourceFile = FileDialogHelper.ShowFileDialog();
-
-                if (string.IsNullOrWhiteSpace(sourceFile))
-                    return;
-
-                SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
-                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
-
-                int lastRow = MTXATTCH.VisualRowCount;
-
-                bool needNewRow = lastRow == 0 ||
-                                  !string.IsNullOrWhiteSpace(((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value);
-
-                if (needNewRow)
-                {
-                    Global.GFunc.SetNewLine(MTXATTCH, DBDataSourceLine, 1, "");
-                    lastRow = MTXATTCH.VisualRowCount;
-                }
-
-                string rootPath = @"\\192.168.162.227\Attachment";
-                string username = @"192.168.162.227\Administrator";
-                string password = "Fu1@#sion";
-
-                string formTitle = oForm.Title;
-                string documentCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
-                string serverFile = NetworkShareHelper.CopyFile(sourceFile, rootPath, username, password, formTitle, documentCode,lastRow);
-
-                ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = serverFile;
-
-                MTXATTCH.FlushToDataSource();
-
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-
-                Global.GFunc.ShowSuccess("Attachment copied successfully.");
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Attachment Error: " + ex.Message);
-            }
-            finally
-            {
-                if (oForm != null)
-                    oForm.Freeze(false);
-            }
-        }
-
-        private void DISPBTN_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        private void DISPBTN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
@@ -1943,8 +1870,86 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 Global.GFunc.ShowError("Unable to open attachment: " + ex.Message);
             }
+
         }
 
+        private void BRWSBTN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            try
+            {
+                
+                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(styleCode))
+                {
+                    Global.GFunc.ShowError("Enter Style Code first.");
+                    return;
+                }
+
+                string sourceFile = FileDialogHelper.ShowFileDialog();
+
+                if (string.IsNullOrWhiteSpace(sourceFile))
+                    return;
+
+                oForm.Freeze(true);
+
+                SAPbouiCOM.DBDataSource DBDataSourceLine = oForm.DataSources.DBDataSources.Item("@FIL_DR_PSMATCH");
+                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+                int lastRow = MTXATTCH.VisualRowCount;
+
+                bool needNewRow = lastRow == 0 ||
+                                  !string.IsNullOrWhiteSpace(((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value);
+
+                if (needNewRow)
+                {
+                    Global.GFunc.SetNewLine(MTXATTCH, DBDataSourceLine, 1, "");
+                    lastRow = MTXATTCH.VisualRowCount;
+                }
+
+                string rootPath = @"\\192.168.162.227\Attachment";
+                string username = @"192.168.162.227\Administrator";
+                string password = "Fu1@#sion";
+
+                string formTitle = oForm.Title;
+                string documentCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific).Value.Trim();
+                string serverFile = NetworkShareHelper.CopyFile(sourceFile, rootPath, username, password, formTitle, documentCode, lastRow);
+
+                ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = serverFile;
+
+                MTXATTCH.FlushToDataSource();
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                Global.GFunc.ShowSuccess("Attachment copied successfully.");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Attachment Error: " + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
+            }
+
+        }
+
+       
+
+        public static void DeleteFile(string filePath, string rootPath, string username, string password)
+        {
+            NetworkShareHelper.ConnectToShare(rootPath, username, password);
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                return;
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
 
         private void BTNLODSZ_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -2067,8 +2072,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         }
 
         
-       
-
         private void ETSMPLCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try

@@ -645,14 +645,16 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
             else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
             {
-
                 oForm.Mode = SAPbouiCOM.BoFormMode.fm_OK_MODE;
+
                 // Disable StyleId field
                 SAPbouiCOM.Item oSampleCode = oForm.Items.Item("ETSLCODE");
                 if (oSampleCode.Enabled)
                     oSampleCode.Enabled = false;
+
                 EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
                 EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
+
                 // Add new row if last row has data
                 AddLineIfLastRowHasValue(oForm, "MTXCOLOR", "@FIL_DR_PSMCO", "U_COLORCODE");
                 AddLineIfLastRowHasValue(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR", "U_BASECLR");
@@ -664,9 +666,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 bool newCheckedInSztType = false;
 
                 if (prevSztTypeCheckboxStates.Count > 0)
-                    newCheckedInSztType = HasCheckboxChanges(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);
-
-              
+                    newCheckedInSztType = HasCheckboxChanges(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);             
 
                 if (newCheckedInSztType)
                 {
@@ -678,12 +678,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                     Global.GFunc.ShowWarning("Detected new checked rows in  Size matrix");
                     
-                }
-                else
-                {
-                    //Disable if no new checks
-                    SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
-                    oBtnItmTx.Enabled = false;
                 }
                 // --- Always refresh states AFTER processing ---
                 CaptureCheckboxStates(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);

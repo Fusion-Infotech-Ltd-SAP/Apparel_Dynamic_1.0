@@ -1234,9 +1234,9 @@ namespace Apparel_Dynamic_1._0.Modules
                     qStr = @"
                             SELECT A.""U_SIZECODE""
                             FROM ""@FIL_DR_PSMST"" A
-                            INNER JOIN ""@FIL_MR_STM1"" B
-                                ON B.""U_SIZECODE"" = A.""U_SIZECODE""
+                            INNER JOIN ""@FIL_MR_STM1"" B ON B.""U_SIZECODE"" = A.""U_SIZECODE""
                             WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+                            AND A.""U_SIZEAPPL"" = 'Y'
                             GROUP BY A.""U_SIZECODE""
                             ORDER BY A.""U_SIZECODE""";
 

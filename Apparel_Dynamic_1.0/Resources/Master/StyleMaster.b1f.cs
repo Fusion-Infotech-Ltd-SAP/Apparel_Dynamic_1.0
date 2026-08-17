@@ -224,7 +224,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             SAPbouiCOM.EditText ETSMPLCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSMPLCD").Specific;
-            string sampleCode = ETSMPLCD.Value.Trim();
+            string sampledoc = ETSMPLCD.Value.Trim();
             SampleMaster sampleMaster = new SampleMaster();
             sampleMaster.Show();
             //styleMaster. = Global.G_UI_Application.Forms.ActiveForm;
@@ -233,9 +233,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 cForm.Freeze(true);
                 cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                cForm.Items.Item("ETSLCODE").Enabled = true;
-                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSLCODE").Specific;
-                cETSLCODE.Value = sampleCode;
+                cForm.Items.Item("ETDOCNUM").Enabled = true;
+                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETDOCNUM").Specific;
+                cETSLCODE.Value = sampledoc;
                 cForm.Items.Item("1").Click();
                 cForm.Items.Item("FOLSIZE").Click();
                 cForm.Freeze(false);
@@ -244,7 +244,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 cForm.Freeze(false);
             }
-
         }
 
         private void MTXCOLOR_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

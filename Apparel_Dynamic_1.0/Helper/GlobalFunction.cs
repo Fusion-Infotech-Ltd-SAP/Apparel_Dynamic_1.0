@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -91,7 +92,16 @@ namespace Apparel_Dynamic_1._0.Helper
             throw new Exception("Column not found: " + columnId);
         }
 
+        public void DeleteFile(string filePath, string rootPath, string username, string password)
+        {
+            NetworkShareHelper.ConnectToShare(rootPath, username, password);
 
+            if (string.IsNullOrWhiteSpace(filePath))
+                return;
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
 
         public void UpdateSeriesAndDocNumByDate(
         SAPbouiCOM.Form oForm,

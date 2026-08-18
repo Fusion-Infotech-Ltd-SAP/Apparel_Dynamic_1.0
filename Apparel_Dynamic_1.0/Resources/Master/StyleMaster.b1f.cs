@@ -2017,18 +2017,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         }
 
-       
-
-        public static void DeleteFile(string filePath, string rootPath, string username, string password)
-        {
-            NetworkShareHelper.ConnectToShare(rootPath, username, password);
-
-            if (string.IsNullOrWhiteSpace(filePath))
-                return;
-
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-        }
+      
 
         private void BTNLODSZ_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {

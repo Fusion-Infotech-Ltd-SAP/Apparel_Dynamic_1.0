@@ -53,12 +53,14 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
 
         private Dictionary<int, bool> prevSztTypeCheckboxStates = new Dictionary<int, bool>();
-
+        private bool _sizeApplicationChanged = false;
 
         // -------- Matrix --------
         private SAPbouiCOM.Matrix MTXSIZE, MTXCOLOR, MTXSBCLR, MTXITEM, MTXATTCH;
 
         
+
+
 
 
 
@@ -69,7 +71,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private string styleCode = "";
         public override void OnInitializeComponent()
         {
-            //                                -------- Static Text --------
+            //                                 -------- Static Text --------
             this.STSLCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCODE").Specific));
             this.STCSCODE = ((SAPbouiCOM.StaticText)(this.GetItem("STCSCODE").Specific));
             this.STCSDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STCSDESC").Specific));
@@ -94,7 +96,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.STSZTPCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSZTPCD").Specific));
             this.STSUBCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSUBCLR").Specific));
             this.STSLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STSLDESC").Specific));
-            //                                -------- Edit Text --------
+            //                                 -------- Edit Text --------
             this.ETSLCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCODE").Specific));
             this.ETSLCODE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSLCODE_LostFocusAfter);
             this.ETCSCODE = ((SAPbouiCOM.EditText)(this.GetItem("ETCSCODE").Specific));
@@ -149,12 +151,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.ETSZTPCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSZTPCD_ChooseFromListBefore);
             this.ETSLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETSLDESC").Specific));
             this.ETGENAME = ((SAPbouiCOM.EditText)(this.GetItem("ETGENAME").Specific));
-            //                                -------- ComboBox --------
+            //                                 -------- ComboBox --------
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSMPBSE = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSMPBSE").Specific));
             this.CBSMPBSE.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSMPBSE_ComboSelectAfter);
-            //                                -------- Folder --------
+            //                                 -------- Folder --------
             this.FOLSIZE = ((SAPbouiCOM.Folder)(this.GetItem("FOLSIZE").Specific));
             this.FOLSIZE.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLSIZE_ClickAfter);
             this.FOLCOLOR = ((SAPbouiCOM.Folder)(this.GetItem("FOLCOLOR").Specific));
@@ -162,8 +164,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.FOLITEM.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLITEM_ClickAfter);
             this.FOLATTAC = ((SAPbouiCOM.Folder)(this.GetItem("FOLATTAC").Specific));
             this.FOLATTAC.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.FOLATTAC_ClickAfter);
-            //                                -------- Matrix --------
+            //                                 -------- Matrix --------
             this.MTXSIZE = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSIZE").Specific));
+            this.MTXSIZE.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXSIZE_ClickAfter);
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXCOLOR.ClickAfter += new SAPbouiCOM._IMatrixEvents_ClickAfterEventHandler(this.MTXCOLOR_ClickAfter);
             this.MTXCOLOR.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXCOLOR_ValidateAfter);
@@ -176,7 +179,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             this.MTXSBCLR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSBCLR_ChooseFromListBefore);
             this.MTXITEM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXITEM").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-            //                                -------- Button --------
+            //                                 -------- Button --------
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
@@ -220,6 +223,31 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
         }
 
+        private void MTXSIZE_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.ColUID != "CLAPPL" || pVal.Row <= 0)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                _sizeApplicationChanged = true;
+
+                SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
+                SAPbouiCOM.Item oBtnItmCr = oForm.Items.Item("BTNITMCR");
+
+                oBtnItmTx.Enabled = false;
+                oBtnItmCr.Enabled = false;
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Size Applicable Change Error: " + ex.Message);
+            }
+        }
         private void LinkedButton1_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
@@ -643,11 +671,51 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                 oForm.Freeze(false);
             }
+            //Prev Working but uncheck not working
+            //else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+            //{
+            //    oForm.Mode = SAPbouiCOM.BoFormMode.fm_OK_MODE;
+
+            //    // Disable StyleId field
+            //    SAPbouiCOM.Item oSampleCode = oForm.Items.Item("ETSLCODE");
+            //    if (oSampleCode.Enabled)
+            //        oSampleCode.Enabled = false;
+
+            //    EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
+            //    EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
+
+            //    // Add new row if last row has data
+            //    AddLineIfLastRowHasValue(oForm, "MTXCOLOR", "@FIL_DR_PSMCO", "U_COLORCODE");
+            //    AddLineIfLastRowHasValue(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR", "U_BASECLR");
+
+            //    // Enable/disable other buttons based on matrix
+            //    SampleEnableButtons(ref oForm);
+
+            //    // --- Only check for changes if we already had previous states ---CLAPPL
+            //    bool newCheckedInSztType = false;
+
+            //    if (prevSztTypeCheckboxStates.Count > 0)
+            //        newCheckedInSztType = HasCheckboxChanges(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);             
+
+            //    if (newCheckedInSztType)
+            //    {
+            //        SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
+            //        oBtnItmTx.Enabled = true;
+
+            //        SAPbouiCOM.Item oBtnItmCr = oForm.Items.Item("BTNITMCR");
+            //        oBtnItmCr.Enabled = false;
+
+            //        Global.GFunc.ShowWarning("Detected new checked rows in  Size matrix");
+
+            //    }
+            //    // --- Always refresh states AFTER processing ---
+            //    CaptureCheckboxStates(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);
+
+            //}
             else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
             {
                 oForm.Mode = SAPbouiCOM.BoFormMode.fm_OK_MODE;
 
-                // Disable StyleId field
                 SAPbouiCOM.Item oSampleCode = oForm.Items.Item("ETSLCODE");
                 if (oSampleCode.Enabled)
                     oSampleCode.Enabled = false;
@@ -655,35 +723,22 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 EnsureLine(oForm, "MTXCOLOR", "@FIL_DR_PSMCO");
                 EnsureLine(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR");
 
-                // Add new row if last row has data
                 AddLineIfLastRowHasValue(oForm, "MTXCOLOR", "@FIL_DR_PSMCO", "U_COLORCODE");
                 AddLineIfLastRowHasValue(oForm, "MTXSBCLR", "@FIL_DR_SUBCLR", "U_BASECLR");
 
-                // Enable/disable other buttons based on matrix
                 SampleEnableButtons(ref oForm);
 
-                // --- Only check for changes if we already had previous states ---CLAPPL
-                bool newCheckedInSztType = false;
-
-                if (prevSztTypeCheckboxStates.Count > 0)
-                    newCheckedInSztType = HasCheckboxChanges(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);             
-
-                if (newCheckedInSztType)
+                if (_sizeApplicationChanged)
                 {
                     SAPbouiCOM.Item oBtnItmTx = oForm.Items.Item("BTNITMTX");
-                    oBtnItmTx.Enabled = true;
-
                     SAPbouiCOM.Item oBtnItmCr = oForm.Items.Item("BTNITMCR");
+
+                    oBtnItmTx.Enabled = true;
                     oBtnItmCr.Enabled = false;
 
-                    Global.GFunc.ShowWarning("Detected new checked rows in  Size matrix");
-                    
+                    _sizeApplicationChanged = false;
                 }
-                // --- Always refresh states AFTER processing ---
-                CaptureCheckboxStates(oForm, "MTXSIZE", "CLAPPL", prevSztTypeCheckboxStates);
-               
             }
-
         }
 
         // --- Generic reusable method to store checkbox states ---

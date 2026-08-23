@@ -111,7 +111,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         public override void OnInitializeFormEvents()
         {
             this.ResizeAfter += new SAPbouiCOM.Framework.FormBase.ResizeAfterHandler(this.Form_ResizeAfter);
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
 
         }
 
@@ -190,6 +191,30 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 Global.GFunc.ShowError("Doc Date Series Error: " + ex.Message);
             }
 
+        }
+
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo,out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+
+            try
+            {
+                if (eventInfo.ItemUID == "MTXMRCON" )
+                {
+                    oForm.EnableMenu("1293", true);
+                }
+                else
+                {
+                    oForm.EnableMenu("1287", true);
+                }
+
+                
+            }
+            catch
+            {
+            }
         }
 
         private void LoadCADConsumptionDetails(string formUID)

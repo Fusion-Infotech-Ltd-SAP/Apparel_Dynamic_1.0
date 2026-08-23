@@ -127,6 +127,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             LoadCADConsumptionDetails(pVal.FormUID);
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM","CBSERIES","ETDOCDAT", "ETMERCNM", "ETSTYLDS");
+            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXMRCON", "@FIL_DR_CADMFAB", "U_ITEMCODE");
             
         }
 
@@ -1868,7 +1869,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 grdCdCon.Height = Math.Max(70, contentBottom - gridTop - buttonHeightSpace);
 
                 btnLoadCad.Top = contentBottom - 18;
-                btnLoadCad.Left = grdCdCon.Left+ 100;
+                btnLoadCad.Left = grdCdCon.Left+ 800;
                 btnLoadCad.Width = 65;
                 
 

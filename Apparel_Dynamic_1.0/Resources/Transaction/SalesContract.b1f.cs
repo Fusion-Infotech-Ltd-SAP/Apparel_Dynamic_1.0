@@ -1623,10 +1623,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private void BRWSBTN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
             try
             {
-
                 string scCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
 
                 if (string.IsNullOrWhiteSpace(scCode))

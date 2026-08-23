@@ -1307,6 +1307,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPOS")
                         .Cells.Item(pVal.Row).Specific).Value = selectedCode;
                 }
+                else if (pVal.ColUID == "CLUOM")
+                {
+                    // From CFL_POS table
+                    selectedCode = dt.GetValue("UomCode", 0).ToString().Trim();
+
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM")
+                        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
+                }
                 else if(pVal.ColUID == "CLITMCOD")
                 {
                     string itemCode = dt.GetValue("ItemCode", 0).ToString().Trim();

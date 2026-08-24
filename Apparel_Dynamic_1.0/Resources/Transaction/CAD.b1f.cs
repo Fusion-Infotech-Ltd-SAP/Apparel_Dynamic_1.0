@@ -41,7 +41,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //                    Static text
+            //                     Static text
             this.STSTATUS = ((SAPbouiCOM.StaticText)(this.GetItem("STSTATUS").Specific));
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STSTYLDS = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLDS").Specific));
@@ -51,7 +51,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STDRFTNO = ((SAPbouiCOM.StaticText)(this.GetItem("STDRFTNO").Specific));
             this.STSLCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCLR").Specific));
             this.STCDCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STCDCLR").Specific));
-            //                    Edittext
+            //                     Edittext
             this.ETSLCLR = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCLR").Specific));
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
@@ -64,15 +64,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETDRFTNO.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETDRFTNO_ChooseFromListBefore);
             this.ETCDCLR = ((SAPbouiCOM.EditText)(this.GetItem("ETCDCLR").Specific));
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
-            //                    Combo box
+            //                     Combo box
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSTATUS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATUS").Specific));
-            //                    Folder
+            //                     Folder
             this.FOLMERCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLMERCON").Specific));
             this.FOLCANCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLCANCN").Specific));
             this.FOLTEMP = ((SAPbouiCOM.Folder)(this.GetItem("FOLTEMP").Specific));
-            //                    Matrix
+            //                     Matrix
             this.MTXMRCON = ((SAPbouiCOM.Matrix)(this.GetItem("MTXMRCON").Specific));
             this.MTXMRCON.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXMRCON_LostFocusAfter);
             this.MTXMRCON.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXMRCON_ChooseFromListAfter);
@@ -80,13 +80,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXCDCLR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCDCLR").Specific));
             this.MTXCDCLR.DoubleClickAfter += new SAPbouiCOM._IMatrixEvents_DoubleClickAfterEventHandler(this.MTXCDCLR_DoubleClickAfter);
             this.MTXCDCON = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCDCON").Specific));
-            //                    Grid
+            //                     Grid
             this.GRDCDCON = ((SAPbouiCOM.Grid)(this.GetItem("GRDCDCON").Specific));
-            this.GRDCDCON.LostFocusAfter += new SAPbouiCOM._IGridEvents_LostFocusAfterEventHandler(this.GRDCDCON_LostFocusAfter);
+            this.GRDCDCON.ValidateAfter += new SAPbouiCOM._IGridEvents_ValidateAfterEventHandler(this.GRDCDCON_ValidateAfter);
             this.GRDCDCON.ChooseFromListBefore += new SAPbouiCOM._IGridEvents_ChooseFromListBeforeEventHandler(this.GRDCDCON_ChooseFromListBefore);
             this.GRDCDCON.ChooseFromListAfter += new SAPbouiCOM._IGridEvents_ChooseFromListAfterEventHandler(this.GRDCDCON_ChooseFromListAfter);
             this.GRDSIZE = ((SAPbouiCOM.Grid)(this.GetItem("GRDSIZE").Specific));
-            //                    Button
+            //                     Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -112,7 +112,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             this.ResizeAfter += new SAPbouiCOM.Framework.FormBase.ResizeAfterHandler(this.Form_ResizeAfter);
             this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
-            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.RightClickBefore += new SAPbouiCOM.Framework.FormBase.RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
         }
 
@@ -215,6 +216,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             catch
             {
             }
+        }
+
+        private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            LoadCADConsumptionDetails(pVal.FormUID);
+
         }
 
         private void LoadCADConsumptionDetails(string formUID)
@@ -492,7 +499,322 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        private void GRDCDCON_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //private void GRDCDCON_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+
+        //    try
+        //    {
+        //        if (pVal.Row < 0)
+        //            return;
+
+        //        if (pVal.ColUID != "Cut WD Inch" &&
+        //            pVal.ColUID != "Cut WD CM" &&
+        //            pVal.ColUID != "Consumption" &&
+        //            pVal.ColUID != "Shrinkage" &&
+        //            pVal.ColUID != "Wastage")
+        //            return;
+
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        oForm.Freeze(true);
+
+        //        SAPbouiCOM.Grid oGrid =
+        //            (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+
+        //        SAPbouiCOM.DataTable dtCAD =
+        //            oForm.DataSources.DataTables.Item("DT_CADCN");
+
+        //        int dtRow = oGrid.GetDataTableRowIndex(pVal.Row);
+
+        //        if (dtRow < 0)
+        //            return;
+
+        //        // =========================
+        //        // Negative value protection
+        //        // =========================
+        //        double enteredValue;
+
+        //        if (double.TryParse(
+        //            dtCAD.GetValue(pVal.ColUID, dtRow).ToString().Trim(),
+        //            out enteredValue))
+        //        {
+        //            if (enteredValue < 0)
+        //            {
+        //                dtCAD.SetValue(pVal.ColUID, dtRow, "0");
+        //            }
+        //        }
+
+        //        // =========================
+        //        // Inch / CM conversion
+        //        // =========================
+        //        if (pVal.ColUID == "Cut WD Inch")
+        //        {
+        //            double inch;
+
+        //            if (double.TryParse(
+        //                dtCAD.GetValue("Cut WD Inch", dtRow).ToString().Trim(),
+        //                out inch))
+        //            {
+        //                if (inch < 0)
+        //                {
+        //                    inch = 0;
+        //                    dtCAD.SetValue("Cut WD Inch", dtRow, "0");
+        //                }
+
+        //                dtCAD.SetValue(
+        //                    "Cut WD CM",
+        //                    dtRow,
+        //                    (inch * 2.54).ToString("0.##")
+        //                );
+        //            }
+        //            else
+        //            {
+        //                dtCAD.SetValue("Cut WD CM", dtRow, "");
+        //            }
+        //        }
+        //        else if (pVal.ColUID == "Cut WD CM")
+        //        {
+        //            double cm;
+
+        //            if (double.TryParse(
+        //                dtCAD.GetValue("Cut WD CM", dtRow).ToString().Trim(),
+        //                out cm))
+        //            {
+        //                if (cm < 0)
+        //                {
+        //                    cm = 0;
+        //                    dtCAD.SetValue("Cut WD CM", dtRow, "0");
+        //                }
+
+        //                dtCAD.SetValue(
+        //                    "Cut WD Inch",
+        //                    dtRow,
+        //                    (cm / 2.54).ToString("0.##")
+        //                );
+        //            }
+        //            else
+        //            {
+        //                dtCAD.SetValue("Cut WD Inch", dtRow, "");
+        //            }
+        //        }
+
+        //        // =========================
+        //        // Total Consumption
+        //        // =========================
+        //        double consumption = 0;
+        //        double shrinkage = 0;
+        //        double wastage = 0;
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Consumption", dtRow).ToString().Trim(),
+        //            out consumption);
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Shrinkage", dtRow).ToString().Trim(),
+        //            out shrinkage);
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Wastage", dtRow).ToString().Trim(),
+        //            out wastage);
+
+        //        if (consumption < 0)
+        //        {
+        //            consumption = 0;
+        //            dtCAD.SetValue("Consumption", dtRow, "0");
+        //        }
+
+        //        if (shrinkage < 0)
+        //        {
+        //            shrinkage = 0;
+        //            dtCAD.SetValue("Shrinkage", dtRow, "0");
+        //        }
+
+        //        if (wastage < 0)
+        //        {
+        //            wastage = 0;
+        //            dtCAD.SetValue("Wastage", dtRow, "0");
+        //        }
+
+        //        double totalConsumption =
+        //            consumption +
+        //            (consumption * shrinkage) +
+        //            (consumption * wastage);
+
+        //        dtCAD.SetValue(
+        //            "Total Consumption",
+        //            dtRow,
+        //            totalConsumption.ToString("0.######")
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Grid calculation error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error
+        //        );
+        //    }
+        //    finally
+        //    {
+        //        if (oForm != null)
+        //            oForm.Freeze(false);
+        //    }
+        //}
+
+        //private void GRDCDCON_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+
+        //    try
+        //    {
+        //        if (pVal.Row < 0)
+        //            return;
+
+        //        if (pVal.ColUID != "Cut WD Inch" &&
+        //            pVal.ColUID != "Cut WD CM" &&
+        //            pVal.ColUID != "Consumption" &&
+        //            pVal.ColUID != "Shrinkage" &&
+        //            pVal.ColUID != "Wastage")
+        //            return;
+
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        SAPbouiCOM.Grid oGrid =
+        //            (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+
+        //        SAPbouiCOM.DataTable dtCAD =
+        //            oForm.DataSources.DataTables.Item("DT_CADCN");
+
+        //        if (oGrid.Rows.Count == 0)
+        //            return;
+
+        //        if (pVal.Row >= oGrid.Rows.Count)
+        //            return;
+
+        //        int dtRow = oGrid.GetDataTableRowIndex(pVal.Row);
+
+        //        if (dtRow < 0 || dtRow >= dtCAD.Rows.Count)
+        //            return;
+
+        //        oForm.Freeze(true);
+
+        //        // =========================
+        //        // Inch / CM conversion
+        //        // =========================
+        //        if (pVal.ColUID == "Cut WD Inch")
+        //        {
+        //            double inch = 0;
+
+        //            if (double.TryParse(
+        //                dtCAD.GetValue("Cut WD Inch", dtRow).ToString().Trim(),
+        //                out inch))
+        //            {
+        //                if (inch < 0)
+        //                {
+        //                    inch = 0;
+        //                    dtCAD.SetValue("Cut WD Inch", dtRow, "0");
+        //                }
+
+        //                dtCAD.SetValue(
+        //                    "Cut WD CM",
+        //                    dtRow,
+        //                    (inch * 2.54).ToString("0.##")
+        //                );
+        //            }
+        //        }
+        //        else if (pVal.ColUID == "Cut WD CM")
+        //        {
+        //            double cm = 0;
+
+        //            if (double.TryParse(
+        //                dtCAD.GetValue("Cut WD CM", dtRow).ToString().Trim(),
+        //                out cm))
+        //            {
+        //                if (cm < 0)
+        //                {
+        //                    cm = 0;
+        //                    dtCAD.SetValue("Cut WD CM", dtRow, "0");
+        //                }
+
+        //                dtCAD.SetValue(
+        //                    "Cut WD Inch",
+        //                    dtRow,
+        //                    (cm / 2.54).ToString("0.##")
+        //                );
+        //            }
+        //        }
+
+        //        // =========================
+        //        // Total Consumption
+        //        // =========================
+        //        double consumption = 0;
+        //        double shrinkage = 0;
+        //        double wastage = 0;
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Consumption", dtRow).ToString().Trim(),
+        //            out consumption);
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Shrinkage", dtRow).ToString().Trim(),
+        //            out shrinkage);
+
+        //        double.TryParse(
+        //            dtCAD.GetValue("Wastage", dtRow).ToString().Trim(),
+        //            out wastage);
+
+        //        if (consumption < 0)
+        //        {
+        //            consumption = 0;
+        //            dtCAD.SetValue("Consumption", dtRow, "0");
+        //        }
+
+        //        if (shrinkage < 0)
+        //        {
+        //            shrinkage = 0;
+        //            dtCAD.SetValue("Shrinkage", dtRow, "0");
+        //        }
+
+        //        if (wastage < 0)
+        //        {
+        //            wastage = 0;
+        //            dtCAD.SetValue("Wastage", dtRow, "0");
+        //        }
+
+        //        double totalConsumption =
+        //            consumption +
+        //            (consumption * shrinkage) +
+        //            (consumption * wastage);
+
+        //        dtCAD.SetValue(
+        //            "Total Consumption",
+        //            dtRow,
+        //            totalConsumption.ToString("0.######")
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Grid calculation error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error
+        //        );
+        //    }
+        //    finally
+        //    {
+        //        if (oForm != null)
+        //        {
+        //            try
+        //            {
+        //                oForm.Freeze(false);
+        //            }
+        //            catch
+        //            {
+        //            }
+        //        }
+        //    }
+        //}
+        private void GRDCDCON_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
 
@@ -509,7 +831,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return;
 
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                oForm.Freeze(true);
 
                 SAPbouiCOM.Grid oGrid =
                     (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
@@ -517,32 +838,22 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.DataTable dtCAD =
                     oForm.DataSources.DataTables.Item("DT_CADCN");
 
-                int dtRow = oGrid.GetDataTableRowIndex(pVal.Row);
-
-                if (dtRow < 0)
+                if (oGrid.Rows.Count == 0)
                     return;
 
-                // =========================
-                // Negative value protection
-                // =========================
-                double enteredValue;
+                if (pVal.Row >= oGrid.Rows.Count)
+                    return;
 
-                if (double.TryParse(
-                    dtCAD.GetValue(pVal.ColUID, dtRow).ToString().Trim(),
-                    out enteredValue))
-                {
-                    if (enteredValue < 0)
-                    {
-                        dtCAD.SetValue(pVal.ColUID, dtRow, "0");
-                    }
-                }
+                int dtRow = oGrid.GetDataTableRowIndex(pVal.Row);
 
-                // =========================
-                // Inch / CM conversion
-                // =========================
+                if (dtRow < 0 || dtRow >= dtCAD.Rows.Count)
+                    return;
+
+                oForm.Freeze(true);
+
                 if (pVal.ColUID == "Cut WD Inch")
                 {
-                    double inch;
+                    double inch = 0;
 
                     if (double.TryParse(
                         dtCAD.GetValue("Cut WD Inch", dtRow).ToString().Trim(),
@@ -560,14 +871,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                             (inch * 2.54).ToString("0.##")
                         );
                     }
-                    else
-                    {
-                        dtCAD.SetValue("Cut WD CM", dtRow, "");
-                    }
                 }
                 else if (pVal.ColUID == "Cut WD CM")
                 {
-                    double cm;
+                    double cm = 0;
 
                     if (double.TryParse(
                         dtCAD.GetValue("Cut WD CM", dtRow).ToString().Trim(),
@@ -585,15 +892,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                             (cm / 2.54).ToString("0.##")
                         );
                     }
-                    else
-                    {
-                        dtCAD.SetValue("Cut WD Inch", dtRow, "");
-                    }
                 }
 
-                // =========================
-                // Total Consumption
-                // =========================
                 double consumption = 0;
                 double shrinkage = 0;
                 double wastage = 0;
@@ -650,10 +950,17 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             finally
             {
                 if (oForm != null)
-                    oForm.Freeze(false);
+                {
+                    try
+                    {
+                        oForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
             }
         }
-
 
         private void GRDCDCON_ChooseFromListBefore(object sboObject,SAPbouiCOM.SBOItemEventArg pVal,out bool BubbleEvent)
         {
@@ -841,6 +1148,28 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     );
                     return;
                 }
+                if (bsClr.Equals("ALL Colour", StringComparison.OrdinalIgnoreCase))
+                {
+                    Application.SBO_Application.StatusBar.SetText(
+                        "Please Double Clicked a specific colour first.",
+                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                        SAPbouiCOM.BoStatusBarMessageType.smt_Warning
+                    );
+                    return;
+                }
+                // =========================
+                // Confirmation
+                // =========================
+                int answer = Application.SBO_Application.MessageBox(
+                    "Are you sure you want to load CAD data?",
+                    1,
+                    "OK",
+                    "Cancel"
+                );
+
+                if (answer != 1)
+                    return;
+
 
                 bsClr = bsClr.Replace("'", "''");
 
@@ -1221,12 +1550,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     dtCAD.SetValue("Remarks", newRow, "");
                     dtCAD.SetValue("BSCLR", newRow, colourCode);
 
-                    btnLoadCAD.Item.Enabled = false;
+                    //btnLoadCAD.Item.Enabled = false;
                 }
-                else
-                {
-                    btnLoadCAD.Item.Enabled = true;
-                }
+                //else
+                //{
+                //    btnLoadCAD.Item.Enabled = true;
+                //}
 
                 oGrid.DataTable = dtCAD;
                 oGrid.AutoResizeColumns();
@@ -1547,6 +1876,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 rs.DoQuery(query);
 
+                if (rs.EoF)
+                {
+                    Application.SBO_Application.MessageBox(
+                        "No Colour and Size data found for the selected Draft Order."
+                    );
+                    return;
+                }
                 // =========================
                 // Clear Grid DataTables
                 // =========================

@@ -498,33 +498,141 @@ namespace Apparel_Dynamic_1._0.Modules
                         Global.G_Form.PaneLevel = 21;
 
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                           && pVal.ItemUID == "LNSTYLNO" && pVal.BeforeAction == true)
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //       && pVal.ItemUID == "LNSTYLNO" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                    //    OpenStyleMaster(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK && pVal.ItemUID == "LNSTYLNO" &&
+                            pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
-                        OpenStyleMaster(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETSTYLNO").Specific;
+                            string styleCode = etStyleNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(styleCode))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select Style No. first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenStyleMaster(styleCode);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening Style Master: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                            && pVal.ItemUID == "LNOTNTRY" && pVal.BeforeAction == true)
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //        && pVal.ItemUID == "LNOTNTRY" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETOTTNO").Specific;
+                    //    OpenOTT(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //        && pVal.ItemUID == "LNSCNTRY" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSCNO").Specific;
+                    //    OpenSalesContract(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK &&
+                        pVal.ItemUID == "LNOTNTRY" &&
+                        pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETOTTNO").Specific;
-                        OpenOTT(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etOttNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETOTTNO").Specific;
+                            string ottDocNo = etOttNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(ottDocNo))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select OTT first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenOTT(ottDocNo);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening OTT: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                            && pVal.ItemUID == "LNSCNTRY" && pVal.BeforeAction == true)
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK &&
+                             pVal.ItemUID == "LNSCNTRY" &&
+                             pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSCNO").Specific;
-                        OpenSalesContract(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etSalesContractNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETSCNO").Specific;
+                            string salesContractNo = etSalesContractNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(salesContractNo))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select Sales Contract first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenSalesContract(salesContractNo);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening Sales Contract: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
+
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE
                        && pVal.ItemUID == "SCGrid"
                        && pVal.BeforeAction == false)
@@ -1141,85 +1249,240 @@ namespace Apparel_Dynamic_1._0.Modules
             oForm.Items.Item(itemId).Enabled = editable;
         }
 
+        //public void OpenStyleMaster(string styleCode)
+        //{
+        //    try
+        //    {
+        //        StyleMaster styleMaster = new StyleMaster();
+        //        styleMaster.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETSLCODE").Enabled = true;
+        //        SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLCODE").Specific;
+        //        cETSLCODE.Value = styleCode;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Items.Item("FOLSIZE").Click();
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
+
+        //        Application.SBO_Application.StatusBar.SetText("Error in open StyleMaster: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
         public void OpenStyleMaster(string styleCode)
         {
+            SAPbouiCOM.Form styleMasterForm = null;
+            bool isFrozen = false;
+
             try
             {
+                if (string.IsNullOrWhiteSpace(styleCode))
+                    return;
+
                 StyleMaster styleMaster = new StyleMaster();
                 styleMaster.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETSLCODE").Enabled = true;
-                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLCODE").Specific;
-                cETSLCODE.Value = styleCode;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Items.Item("FOLSIZE").Click();
-                Global.G_Form.Freeze(false);
+
+                styleMasterForm = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+
+                styleMasterForm.Freeze(true);
+                isFrozen = true;
+
+                styleMasterForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                styleMasterForm.Items.Item("ETSLCODE").Enabled = true;
+
+                SAPbouiCOM.EditText etStyleCode = (SAPbouiCOM.EditText)styleMasterForm.Items.Item("ETSLCODE").Specific;
+                etStyleCode.Value = styleCode.Trim();
+
+                styleMasterForm.Items.Item("1").Click();
+
+                if (styleMasterForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    styleMasterForm.Items.Item("FOLSIZE").Click();
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open StyleMaster: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenStyleMaster: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (styleMasterForm != null && isFrozen)
+                {
+                    try
+                    {
+                        styleMasterForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
 
-        //infuture
-        public void OpenOTT(string OTTDOC)
+
+        ////infuture
+        //public void OpenOTT(string OTTDOC)
+        //{
+        //    try
+        //    {
+        //        OTT oTT = new OTT();
+        //        oTT.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
+        //        SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
+        //        cETOTTID.Value = OTTDOC;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
+
+        //        Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        public void OpenOTT(string ottDocNo)
         {
+            SAPbouiCOM.Form ottForm = null;
+            bool isFrozen = false;
+
             try
             {
-                OTT oTT = new OTT();
-                oTT.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
-                SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
-                cETOTTID.Value = OTTDOC;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
-                Global.G_Form.Freeze(false);
+                if (string.IsNullOrWhiteSpace(ottDocNo))
+                    return;
+
+                OTT ott = new OTT();
+                ott.Show();
+
+                ottForm = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
+
+                ottForm.Freeze(true);
+                isFrozen = true;
+
+                ottForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                ottForm.Items.Item("ETDOCNUM").Enabled = true;
+
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)ottForm.Items.Item("ETDOCNUM").Specific;
+                etDocNum.Value = ottDocNo.Trim();
+
+                ottForm.Items.Item("1").Click();
+
+                if (ottForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    ottForm.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenOTT: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (ottForm != null && isFrozen)
+                {
+                    try
+                    {
+                        ottForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
+        //public void OpenSalesContract(string OTTEntry)
+        //{
+        //    try
+        //    {
+        //        SalesContract sc = new SalesContract();
+        //        sc.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
+        //        SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
+        //        cETOTTID.Value = OTTEntry;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
 
+        //        Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
 
-        public void OpenSalesContract(string OTTEntry)
+        public void OpenSalesContract(string salesContractNo)
         {
+            SAPbouiCOM.Form salesContractForm = null;
+            bool isFrozen = false;
+
             try
             {
-                SalesContract sc = new SalesContract();
-                sc.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
-                SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
-                cETOTTID.Value = OTTEntry;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
-                Global.G_Form.Freeze(false);
+                if (string.IsNullOrWhiteSpace(salesContractNo))
+                    return;
+
+                SalesContract salesContract = new SalesContract();
+                salesContract.Show();
+
+                salesContractForm = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+
+                salesContractForm.Freeze(true);
+                isFrozen = true;
+
+                salesContractForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                salesContractForm.Items.Item("ETSCNO").Enabled = true;
+
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)salesContractForm.Items.Item("ETSCNO").Specific;
+                etDocNum.Value = salesContractNo.Trim();
+
+                salesContractForm.Items.Item("1").Click();
+
+                if (salesContractForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    salesContractForm.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenSalesContract: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (salesContractForm != null && isFrozen)
+                {
+                    try
+                    {
+                        salesContractForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
+
+
+
         private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
         {
             try

@@ -103,6 +103,10 @@ namespace Apparel_Dynamic_1._0
 
         }
 
+        private string _cadDeletedItemCode = "";
+        private string _cadDeletedPosition = "";
+        private bool _cadDeleteRowPending = false;
+
         public void SBO_Application_MenuEvent(ref SAPbouiCOM.MenuEvent pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
@@ -1737,50 +1741,115 @@ namespace Apparel_Dynamic_1._0
                     switch (formUID)
                     {
                         case "FIL_FRM_SMPLMSTR":
-                            try
                             {
-                                oForm.Freeze(true);
-
-                                SAPbouiCOM.EditText ETSLCODE = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific;
-                                SAPbouiCOM.EditText ETSLDESC = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLDESC").Specific;
-                                SAPbouiCOM.EditText ETDOCDAT = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific;
-
-                                SAPbouiCOM.Matrix MTXITEM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXITEM").Specific;
-                                SAPbouiCOM.Matrix mtxSize = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSIZE").Specific;
-                                SAPbouiCOM.Matrix mtxColor = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
-
-                                Global.GFunc.SetItemsEnabled(oForm,true,"ETSLCODE","ETDOCDAT","CBSERIES");
-
-                                ETSLCODE.Value = "";
-                                ETSLDESC.Value = "";
-
-                                MTXITEM.Clear();
-
-                                Global.GFunc.ResetMatrixCellsEditable(mtxSize, "CLSZCODE");
-                                Global.GFunc.ResetMatrixCellsEditable(mtxColor, "CLCLRCOD");
-
-                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                try
                                 {
-                                    Global.GFunc.SetItemsEnabled(oForm,true,"CBSERIES","ETDOCDAT");
+                                    oForm.Freeze(true);
 
-                                    string today = DateTime.Now.ToString("yyyyMMdd");
-                                    SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");
-                                    oDBH.SetValue("U_DOCDATE", 0, today);
-                                    ETDOCDAT.Value = today;
+                                    SAPbouiCOM.EditText ETSLCODE = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLCODE").Specific;
+                                    SAPbouiCOM.EditText ETSLDESC = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLDESC").Specific;
+                                    SAPbouiCOM.EditText ETDOCDAT = (SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific;
 
-                                    UpdateSeriesAndDocNumByDate(oForm,oDBH,today,"FIL_D_SMPLMAST");
+                                    SAPbouiCOM.Matrix MTXITEM = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXITEM").Specific;
+                                    SAPbouiCOM.Matrix mtxSize = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSIZE").Specific;
+                                    SAPbouiCOM.Matrix mtxColor = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
+
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "ETSLCODE", "ETDOCDAT", "CBSERIES");
+
+                                    ETSLCODE.Value = "";
+                                    ETSLDESC.Value = "";
+
+                                    MTXITEM.Clear();
+
+                                    Global.GFunc.ResetMatrixCellsEditable(mtxSize, "CLSZCODE");
+                                    Global.GFunc.ResetMatrixCellsEditable(mtxColor, "CLCLRCOD");
+
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_SMPLMAST");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+                                        ETDOCDAT.Value = today;
+
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_SMPLMAST");
+                                    }
                                 }
+                                catch (Exception ex)
+                                {
+                                    Global.GFunc.ShowError($"Sample master Duplicate Error: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    oForm.Freeze(false);
+                                }
+                                break;
                             }
-                            catch (Exception ex)
+                        case "FIL_FRM_CAD":
                             {
-                                Global.GFunc.ShowError($"Sample master Duplicate Error: {ex.Message}");
+                                try
+                                {
+                                    oForm.Freeze(true);
+
+                                    SAPbouiCOM.EditText ETDRFTNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETDRFTNO").Specific;
+                                    SAPbouiCOM.EditText ETSLCLR = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific;
+                                    SAPbouiCOM.EditText ETCDCLR = (SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific;
+
+                                    SAPbouiCOM.Matrix MTXCDCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
+                                    SAPbouiCOM.Matrix MTXCDCLR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCLR").Specific;
+                                    SAPbouiCOM.Grid GRDSCLR = (SAPbouiCOM.Grid)oForm.Items.Item("GRDSCLR").Specific;
+                                    SAPbouiCOM.Grid GRDSIZE = (SAPbouiCOM.Grid)oForm.Items.Item("GRDSIZE").Specific;
+                                    SAPbouiCOM.Grid GRDCDCON = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+                                    
+                                    ETDRFTNO.Value = "";
+                                    ETSLCLR.Value = "";
+                                    ETCDCLR.Value = "";
+
+                                    MTXCDCON.Clear();
+                                    MTXCDCLR.Clear();
+
+                                    for (int i = GRDSCLR.DataTable.Rows.Count - 1; i >= 0; i--)
+                                    {
+                                        GRDSCLR.DataTable.Rows.Remove(i);
+                                    }
+
+                                    for (int i = GRDSIZE.DataTable.Rows.Count - 1; i >= 0; i--)
+                                    {
+                                        GRDSIZE.DataTable.Rows.Remove(i);
+                                    }
+                                    
+                                    for (int i = GRDCDCON.DataTable.Rows.Count - 1; i >= 0; i--)
+                                    {
+                                        GRDCDCON.DataTable.Rows.Remove(i);
+                                    }
+
+                                    // Series Initialization
+                                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                    {
+                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM");
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                        string today = DateTime.Now.ToString("yyyyMMdd");
+                                        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CADFABCN");
+                                        oDBH.SetValue("U_DOCDATE", 0, today);
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                        UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_CADFABCN");
+
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Global.GFunc.ShowError($"Sample master Duplicate Error: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    oForm.Freeze(false);
+                                }
+                                break;
                             }
-                            finally
-                            {
-                                oForm.Freeze(false);
-                            }
-                            break;
-                    }
+                    }    
                 }
                 else if (pVal.BeforeAction && pVal.MenuUID == "FIL_DUPL")
                 {
@@ -1846,6 +1915,28 @@ namespace Apparel_Dynamic_1._0
 
                                     BubbleEvent = false;
                                     return;
+                                }
+
+                                break;
+                            }
+                        case "FIL_FRM_CAD":
+                            {
+                                try
+                                {
+                                    SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                                    int selectedRow =MTXMRCON.GetNextSelectedRow(0,SAPbouiCOM.BoOrderType.ot_RowOrder);
+
+                                    if (selectedRow <= 0)
+                                        break;
+
+                                    _cadDeletedItemCode =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLITMCOD").Cells.Item(selectedRow).Specific).Value.Trim();
+                                    _cadDeletedPosition =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLPOS").Cells.Item(selectedRow).Specific).Value.Trim();
+                                    _cadDeleteRowPending = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    _cadDeleteRowPending = false;
+                                    Global.GFunc.ShowError( "CAD Delete Row Error: " + ex.Message);
                                 }
 
                                 break;
@@ -2030,6 +2121,88 @@ namespace Apparel_Dynamic_1._0
                                         catch
                                         {
                                         }
+                                    }
+
+                                    break;
+                                }
+                            case "FIL_FRM_CAD":
+                                {
+                                    try
+                                    {
+                                        if (!_cadDeleteRowPending)
+                                            break;
+
+                                        oForm.Freeze(true);
+
+                                        SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                                        SAPbouiCOM.Matrix MTXCDCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
+
+                                        SAPbouiCOM.DBDataSource dbMRCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
+                                        SAPbouiCOM.DBDataSource dbCDCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
+
+                                        // ==========================================
+                                        // MTXMRCON
+                                        // SAP already deleted selected row
+                                        // ==========================================
+                                        MTXMRCON.FlushToDataSource();
+
+                                        for (int i = 0; i < dbMRCON.Size; i++)
+                                        {
+                                            dbMRCON.SetValue("LineId",i,(i + 1).ToString());
+                                        }
+
+                                        MTXMRCON.LoadFromDataSource();
+
+                                        // ==========================================
+                                        // Delete matching rows from MTXCDCON
+                                        // Item Code + Position
+                                        // ==========================================
+                                        MTXCDCON.FlushToDataSource();
+
+                                        for (int i = dbCDCON.Size - 1; i >= 0; i--)
+                                        {
+                                            string itemCode =dbCDCON.GetValue("U_ITEMCODE", i).Trim();
+                                            string position =dbCDCON.GetValue("U_POSITION", i).Trim();
+
+                                            if (itemCode == _cadDeletedItemCode && position == _cadDeletedPosition)
+                                            {
+                                                dbCDCON.RemoveRecord(i);
+                                            }
+                                        }
+
+                                        // ==========================================
+                                        // Re-arrange MTXCDCON LineId
+                                        // ==========================================
+                                        for (int i = 0; i < dbCDCON.Size; i++)
+                                        {
+                                            dbCDCON.SetValue("LineId",i,(i + 1).ToString());
+                                        }
+
+                                        MTXCDCON.LoadFromDataSource();
+
+                                        SAPbouiCOM.Grid GRDCDCON = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+                                        for (int i = GRDCDCON.DataTable.Rows.Count - 1; i >= 0; i--)
+                                        {
+                                            GRDCDCON.DataTable.Rows.Remove(i);
+                                        }
+
+                                        // Form must know there are unsaved changes
+                                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                        {
+                                            oForm.Mode =SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                                        }
+
+                                        _cadDeletedItemCode = "";
+                                        _cadDeletedPosition = "";
+                                        _cadDeleteRowPending = false;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " +ex.Message);
+                                    }
+                                    finally
+                                    {
+                                        oForm.Freeze(false);
                                     }
 
                                     break;

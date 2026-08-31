@@ -39,9 +39,9 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Add("STOTTNO", SAPbouiCOM.BoFormItemTypes.it_STATIC);
                             Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STOTTNO").Specific;
                             Global.oStatic.Caption = "OTT";
-                            Global.G_Form.Items.Item("STOTTNO").Top = Global.G_Form.Items.Item("70").Top + 18;
-                            Global.G_Form.Items.Item("STOTTNO").Left = Global.G_Form.Items.Item("70").Left;
-                            Global.G_Form.Items.Item("STOTTNO").Width = Global.G_Form.Items.Item("70").Width;
+                            Global.G_Form.Items.Item("STOTTNO").Top = Global.G_Form.Items.Item("2002").Top + 16;
+                            Global.G_Form.Items.Item("STOTTNO").Left = Global.G_Form.Items.Item("2002").Left;
+                            Global.G_Form.Items.Item("STOTTNO").Width = Global.G_Form.Items.Item("2002").Width;
                             Global.G_Form.Items.Item("STOTTNO").FromPane = 0;
                             Global.G_Form.Items.Item("STOTTNO").ToPane = 0;
 
@@ -49,8 +49,8 @@ namespace Apparel_Dynamic_1._0.Modules
                             // EditText (ETOTTNTRY)
                             Global.G_Form.Items.Add("ETOTTNO", SAPbouiCOM.BoFormItemTypes.it_EDIT);
                             Global.G_Form.Items.Item("ETOTTNO").Top = Global.G_Form.Items.Item("STOTTNO").Top;
-                            Global.G_Form.Items.Item("ETOTTNO").Left = Global.G_Form.Items.Item("14").Left;
-                            Global.G_Form.Items.Item("ETOTTNO").Width = (Global.G_Form.Items.Item("14").Width / 2) - 5;
+                            Global.G_Form.Items.Item("ETOTTNO").Left = Global.G_Form.Items.Item("2003").Left;
+                            Global.G_Form.Items.Item("ETOTTNO").Width = (Global.G_Form.Items.Item("2003").Width / 2) - 5;
                             Global.G_Form.Items.Item("ETOTTNO").FromPane = 0;
                             Global.G_Form.Items.Item("ETOTTNO").ToPane = 0;
 
@@ -75,7 +75,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Add("ETOTNTRY", SAPbouiCOM.BoFormItemTypes.it_EDIT);
                             Global.G_Form.Items.Item("ETOTNTRY").Top = Global.G_Form.Items.Item("STOTTNO").Top;
                             Global.G_Form.Items.Item("ETOTNTRY").Left = Global.G_Form.Items.Item("ETOTTNO").Left + Global.G_Form.Items.Item("ETOTTNO").Width + 2;
-                            Global.G_Form.Items.Item("ETOTNTRY").Width = (Global.G_Form.Items.Item("14").Width / 2) + 5;
+                            Global.G_Form.Items.Item("ETOTNTRY").Width = (Global.G_Form.Items.Item("2003").Width / 2) + 5;
                             Global.G_Form.Items.Item("ETOTNTRY").FromPane = 0;
                             Global.G_Form.Items.Item("ETOTNTRY").ToPane = 0;
                             Global.G_Form.Items.Item("ETOTNTRY").Enabled = false;
@@ -103,13 +103,14 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.oEdit.ChooseFromListAlias = "DocNum";
 
                             //***** Sales Contract***** 
+                            
                             //Static Text
                             Global.G_Form.Items.Add("STSCNO", SAPbouiCOM.BoFormItemTypes.it_STATIC);
                             Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STSCNO").Specific;
                             Global.oStatic.Caption = "Sales Contract";
-                            Global.G_Form.Items.Item("STSCNO").Top = Global.G_Form.Items.Item("254000012").Top + 20;
-                            Global.G_Form.Items.Item("STSCNO").Left = Global.G_Form.Items.Item("254000012").Left;
-                            Global.G_Form.Items.Item("STSCNO").Width = Global.G_Form.Items.Item("254000012").Width;
+                            Global.G_Form.Items.Item("STSCNO").Top = Global.G_Form.Items.Item("STOTTNO").Top + 16;
+                            Global.G_Form.Items.Item("STSCNO").Left = Global.G_Form.Items.Item("STOTTNO").Left;
+                            Global.G_Form.Items.Item("STSCNO").Width = Global.G_Form.Items.Item("STOTTNO").Width;
                             Global.G_Form.Items.Item("STSCNO").FromPane = 0;
                             Global.G_Form.Items.Item("STSCNO").ToPane = 0;
 
@@ -118,8 +119,8 @@ namespace Apparel_Dynamic_1._0.Modules
 
                             Global.G_Form.Items.Add("ETSCNO", SAPbouiCOM.BoFormItemTypes.it_EDIT);
                             Global.G_Form.Items.Item("ETSCNO").Top = Global.G_Form.Items.Item("STSCNO").Top;
-                            Global.G_Form.Items.Item("ETSCNO").Left = Global.G_Form.Items.Item("254000015").Left;
-                            Global.G_Form.Items.Item("ETSCNO").Width = (Global.G_Form.Items.Item("254000015").Width / 2) - 5;
+                            Global.G_Form.Items.Item("ETSCNO").Left = Global.G_Form.Items.Item("ETOTTNO").Left;
+                            Global.G_Form.Items.Item("ETSCNO").Width = Global.G_Form.Items.Item("ETOTTNO").Width;
                             Global.G_Form.Items.Item("ETSCNO").FromPane = 0;
                             Global.G_Form.Items.Item("ETSCNO").ToPane = 0;
 
@@ -145,7 +146,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Add("ETSCNTRY", SAPbouiCOM.BoFormItemTypes.it_EDIT);
                             Global.G_Form.Items.Item("ETSCNTRY").Top = Global.G_Form.Items.Item("STSCNO").Top;
                             Global.G_Form.Items.Item("ETSCNTRY").Left = Global.G_Form.Items.Item("ETSCNO").Left + Global.G_Form.Items.Item("ETSCNO").Width + 2;
-                            Global.G_Form.Items.Item("ETSCNTRY").Width = (Global.G_Form.Items.Item("254000015").Width / 2) + 5;
+                            Global.G_Form.Items.Item("ETSCNTRY").Width = Global.G_Form.Items.Item("ETOTNTRY").Width;
                             Global.G_Form.Items.Item("ETSCNTRY").FromPane = 0;
                             Global.G_Form.Items.Item("ETSCNTRY").ToPane = 0;
                             Global.G_Form.Items.Item("ETSCNTRY").Enabled = false;
@@ -172,51 +173,126 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.oEdit.ChooseFromListUID = "CFL_SLCN";
                             Global.oEdit.ChooseFromListAlias = "U_SCNO";
 
-                            // ************** Style No. **************
+                            //// ************** Style No. **************
 
+                            //Global.G_Form.Items.Add("STSTYLNO", SAPbouiCOM.BoFormItemTypes.it_STATIC);
+                            //Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STSTYLNO").Specific;
+                            //Global.oStatic.Caption = "Style No.*";
+
+                            //Global.G_Form.Items.Item("STSTYLNO").Top = Global.G_Form.Items.Item("70").Top + 16 ;
+                            //Global.G_Form.Items.Item("STSTYLNO").Left = Global.G_Form.Items.Item("70").Left + 10;
+                            //Global.G_Form.Items.Item("STSTYLNO").Width =Global.G_Form.Items.Item("254000012").Width;
+                            //Global.G_Form.Items.Item("STSTYLNO").Height = Global.G_Form.Items.Item("254000012").Height;
+                            //Global.G_Form.Items.Item("STSTYLNO").FromPane = 0;
+                            //Global.G_Form.Items.Item("STSTYLNO").ToPane = 0;
+
+                            ////// Linked Button
+                            //Global.G_Form.Items.Add("LNSTYLNO", SAPbouiCOM.BoFormItemTypes.it_LINKED_BUTTON);
+
+                            //// EditText (ETStyleNo)
+                            //Global.G_Form.Items.Add("ETSTYLNO", SAPbouiCOM.BoFormItemTypes.it_EDIT);
+                            //Global.G_Form.Items.Item("ETSTYLNO").Top = (Global.G_Form.Items.Item("70").Top) + 15;
+                            //Global.G_Form.Items.Item("ETSTYLNO").Left = Global.G_Form.Items.Item("114").Left + Global.G_Form.Items.Item("114").Width +5;
+                            //Global.G_Form.Items.Item("ETSTYLNO").Width = (Global.G_Form.Items.Item("14").Width / 2) - 5;
+                            //Global.G_Form.Items.Item("ETSTYLNO").Height = Global.G_Form.Items.Item("14").Height;
+                            //Global.G_Form.Items.Item("ETSTYLNO").FromPane = 0;
+                            //Global.G_Form.Items.Item("ETSTYLNO").ToPane = 0;
+
+                            ////Global.G_Form.Items.Item("ETSTYLNO").SetAutoManagedAttribute(
+                            ////    SAPbouiCOM.BoAutoManagedAttr.ama_Editable, 1,
+                            ////    SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+
+                            //Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                            //Global.oEdit.DataBind.SetBound(true, "OQUT", "U_STYLECODE");
+                            //Global.G_Form.Items.Item("STSTYLNO").LinkTo = "ETSTYLNO";
+
+                            //// Linked Button Setup
+                            //Global.oLinkButton = (SAPbouiCOM.LinkedButton)Global.G_Form.Items.Item("LNSTYLNO").Specific;
+                            //// Global.oLinkButton.LinkedObjectType = "ESPL_UDO_DD_GATENTRY"; // Optional
+                            //Global.G_Form.Items.Item("LNSTYLNO").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
+                            //Global.G_Form.Items.Item("LNSTYLNO").Left = Global.G_Form.Items.Item("ETSTYLNO").Left - 19;
+                            //Global.G_Form.Items.Item("LNSTYLNO").Height = Global.G_Form.Items.Item("LNSTYLNO").Height - 1;
+                            //Global.G_Form.Items.Item("LNSTYLNO").LinkTo = "ETSTYLNO";
+
+                            //// Choose From List (CFL)
+                            //Global.oCfls = Global.G_Form.ChooseFromLists;
+                            //Global.oCFLCreationParams = (SAPbouiCOM.ChooseFromListCreationParams)
+                            //    Global.G_UI_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_ChooseFromListCreationParams);
+
+                            //Global.oCFLCreationParams.MultiSelection = false;
+                            //Global.oCFLCreationParams.ObjectType = "FIL_D_OPSM";
+                            //Global.oCFLCreationParams.UniqueID = "CFL_OPSM";
+
+                            //Global.oCfl = Global.oCfls.Add(Global.oCFLCreationParams);
+
+                            //Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                            //Global.oEdit.ChooseFromListUID = "CFL_OPSM";
+                            //Global.oEdit.ChooseFromListAlias = "U_STYLECODE";
+
+                            //// Button (BTNSTYLD)
+                            //Global.G_Form.Items.Add("BTNSTYLD", SAPbouiCOM.BoFormItemTypes.it_BUTTON);
+                            //Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
+                            //Global.G_Form.Items.Item("BTNSTYLD").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
+                            //Global.G_Form.Items.Item("BTNSTYLD").Width = (Global.G_Form.Items.Item("14").Width / 2) - 5;
+                            //Global.G_Form.Items.Item("BTNSTYLD").Height = Global.G_Form.Items.Item("ETSTYLNO").Height;
+                            //Global.G_Form.Items.Item("BTNSTYLD").FromPane = 0;
+                            //Global.G_Form.Items.Item("BTNSTYLD").ToPane = 0;
+
+                            //Global.oButton = (SAPbouiCOM.Button)Global.G_Form.Items.Item("BTNSTYLD").Specific;
+                            //Global.oButton.Caption = "Load Info";
+
+                            ////Global.G_Form.Items.Item("BTNSTYLD").SetAutoManagedAttribute(
+                            ////    SAPbouiCOM.BoAutoManagedAttr.ama_Editable, 1,
+                            ////    SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+                            ///
+                            // ************** STYLE NO **************
+
+                            // Static Text
                             Global.G_Form.Items.Add("STSTYLNO", SAPbouiCOM.BoFormItemTypes.it_STATIC);
                             Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STSTYLNO").Specific;
                             Global.oStatic.Caption = "Style No.*";
 
-                            Global.G_Form.Items.Item("STSTYLNO").Top = Global.G_Form.Items.Item("2002").Top + 18;
-                            Global.G_Form.Items.Item("STSTYLNO").Left = Global.G_Form.Items.Item("2002").Left;
-                            Global.G_Form.Items.Item("STSTYLNO").Width = Global.G_Form.Items.Item("2002").Width;
-                            Global.G_Form.Items.Item("STSTYLNO").Height = Global.G_Form.Items.Item("2002").Height;
+                            Global.G_Form.Items.Item("STSTYLNO").Top = Global.G_Form.Items.Item("70").Top + 17;
+                            Global.G_Form.Items.Item("STSTYLNO").Left = Global.G_Form.Items.Item("70").Left;
+                            Global.G_Form.Items.Item("STSTYLNO").Width = 80;
+                            Global.G_Form.Items.Item("STSTYLNO").Height = Global.G_Form.Items.Item("70").Height;
                             Global.G_Form.Items.Item("STSTYLNO").FromPane = 0;
                             Global.G_Form.Items.Item("STSTYLNO").ToPane = 0;
 
-                            //// Linked Button
-                            Global.G_Form.Items.Add("LNSTYLNO", SAPbouiCOM.BoFormItemTypes.it_LINKED_BUTTON);
 
-                            // EditText (ETStyleNo)
+                            // Style No EditText
                             Global.G_Form.Items.Add("ETSTYLNO", SAPbouiCOM.BoFormItemTypes.it_EDIT);
+
                             Global.G_Form.Items.Item("ETSTYLNO").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
-                            Global.G_Form.Items.Item("ETSTYLNO").Left = Global.G_Form.Items.Item("2003").Left;
-                            Global.G_Form.Items.Item("ETSTYLNO").Width = (Global.G_Form.Items.Item("2003").Width / 2) - 5;
-                            Global.G_Form.Items.Item("ETSTYLNO").Height = Global.G_Form.Items.Item("2003").Height;
+                            Global.G_Form.Items.Item("ETSTYLNO").Left = Global.G_Form.Items.Item("14").Left;
+                            Global.G_Form.Items.Item("ETSTYLNO").Width = 120;
+                            Global.G_Form.Items.Item("ETSTYLNO").Height = Global.G_Form.Items.Item("70").Height;
                             Global.G_Form.Items.Item("ETSTYLNO").FromPane = 0;
                             Global.G_Form.Items.Item("ETSTYLNO").ToPane = 0;
 
-                            //Global.G_Form.Items.Item("ETSTYLNO").SetAutoManagedAttribute(
-                            //    SAPbouiCOM.BoAutoManagedAttr.ama_Editable, 1,
-                            //    SAPbouiCOM.BoModeVisualBehavior.mvb_False);
-
                             Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
                             Global.oEdit.DataBind.SetBound(true, "OQUT", "U_STYLECODE");
+
                             Global.G_Form.Items.Item("STSTYLNO").LinkTo = "ETSTYLNO";
 
-                            // Linked Button Setup
+
+                            // Linked Button
+                            Global.G_Form.Items.Add("LNSTYLNO", SAPbouiCOM.BoFormItemTypes.it_LINKED_BUTTON);
+
                             Global.oLinkButton = (SAPbouiCOM.LinkedButton)Global.G_Form.Items.Item("LNSTYLNO").Specific;
-                            // Global.oLinkButton.LinkedObjectType = "ESPL_UDO_DD_GATENTRY"; // Optional
-                            Global.G_Form.Items.Item("LNSTYLNO").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
+
+                            Global.G_Form.Items.Item("LNSTYLNO").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
                             Global.G_Form.Items.Item("LNSTYLNO").Left = Global.G_Form.Items.Item("ETSTYLNO").Left - 19;
-                            Global.G_Form.Items.Item("LNSTYLNO").Height = Global.G_Form.Items.Item("LNSTYLNO").Height - 1;
+                            Global.G_Form.Items.Item("LNSTYLNO").Height = Global.G_Form.Items.Item("ETSTYLNO").Height;
+                            Global.G_Form.Items.Item("LNSTYLNO").FromPane = 0;
+                            Global.G_Form.Items.Item("LNSTYLNO").ToPane = 0;
                             Global.G_Form.Items.Item("LNSTYLNO").LinkTo = "ETSTYLNO";
 
-                            // Choose From List (CFL)
+
+                            // Choose From List
                             Global.oCfls = Global.G_Form.ChooseFromLists;
-                            Global.oCFLCreationParams = (SAPbouiCOM.ChooseFromListCreationParams)
-                                Global.G_UI_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_ChooseFromListCreationParams);
+
+                            Global.oCFLCreationParams = (SAPbouiCOM.ChooseFromListCreationParams)Global.G_UI_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_ChooseFromListCreationParams);
 
                             Global.oCFLCreationParams.MultiSelection = false;
                             Global.oCFLCreationParams.ObjectType = "FIL_D_OPSM";
@@ -228,11 +304,30 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.oEdit.ChooseFromListUID = "CFL_OPSM";
                             Global.oEdit.ChooseFromListAlias = "U_STYLECODE";
 
-                            // Button (BTNSTYLD)
+
+                            // ************** STYLE ENTRY **************
+
+                            Global.G_Form.Items.Add("ETSLNTRY", SAPbouiCOM.BoFormItemTypes.it_EDIT);
+
+                            Global.G_Form.Items.Item("ETSLNTRY").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
+                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
+                            Global.G_Form.Items.Item("ETSLNTRY").Width = 10;
+                            Global.G_Form.Items.Item("ETSLNTRY").Height = Global.G_Form.Items.Item("ETSTYLNO").Height;
+                            Global.G_Form.Items.Item("ETSLNTRY").FromPane = 0;
+                            Global.G_Form.Items.Item("ETSLNTRY").ToPane = 0;
+                            Global.G_Form.Items.Item("ETSLNTRY").Enabled = false;
+
+                            Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLNTRY").Specific;
+                            Global.oEdit.DataBind.SetBound(true, "OQUT", "U_STYLENTRY");
+
+
+                            // ************** LOAD INFO BUTTON **************
+
                             Global.G_Form.Items.Add("BTNSTYLD", SAPbouiCOM.BoFormItemTypes.it_BUTTON);
-                            Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
-                            Global.G_Form.Items.Item("BTNSTYLD").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
-                            Global.G_Form.Items.Item("BTNSTYLD").Width = (Global.G_Form.Items.Item("2003").Width / 2) - 5;
+
+                            Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
+                            Global.G_Form.Items.Item("BTNSTYLD").Left = Global.G_Form.Items.Item("ETSLNTRY").Left + Global.G_Form.Items.Item("ETSLNTRY").Width + 5;
+                            Global.G_Form.Items.Item("BTNSTYLD").Width = 80;
                             Global.G_Form.Items.Item("BTNSTYLD").Height = Global.G_Form.Items.Item("ETSTYLNO").Height;
                             Global.G_Form.Items.Item("BTNSTYLD").FromPane = 0;
                             Global.G_Form.Items.Item("BTNSTYLD").ToPane = 0;
@@ -240,59 +335,52 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.oButton = (SAPbouiCOM.Button)Global.G_Form.Items.Item("BTNSTYLD").Specific;
                             Global.oButton.Caption = "Load Info";
 
-                            //Global.G_Form.Items.Item("BTNSTYLD").SetAutoManagedAttribute(
-                            //    SAPbouiCOM.BoAutoManagedAttr.ama_Editable, 1,
-                            //    SAPbouiCOM.BoModeVisualBehavior.mvb_False);
 
-                            //// ************ STYLE DESC ************
-                            ///
+                            // ************** STYLE DESCRIPTION **************
+
                             Global.G_Form.Items.Add("STSTYLDS", SAPbouiCOM.BoFormItemTypes.it_STATIC);
+
                             Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STSTYLDS").Specific;
                             Global.oStatic.Caption = "Style Desc.";
 
-                            Global.G_Form.Items.Item("STSTYLDS").Top = Global.G_Form.Items.Item("STSTYLNO").Top + 18; // - 2000 
-                            Global.G_Form.Items.Item("STSTYLDS").Left = Global.G_Form.Items.Item("STSTYLNO").Left;
-                            Global.G_Form.Items.Item("STSTYLDS").Width = Global.G_Form.Items.Item("STSTYLNO").Width;
+                            Global.G_Form.Items.Item("STSTYLDS").Top = Global.G_Form.Items.Item("254000012").Top + 17;
+                            Global.G_Form.Items.Item("STSTYLDS").Left = Global.G_Form.Items.Item("254000012").Left;
+                            Global.G_Form.Items.Item("STSTYLDS").Width = Global.G_Form.Items.Item("254000012").Width;
+                            Global.G_Form.Items.Item("STSTYLDS").Height = Global.G_Form.Items.Item("STSTYLNO").Height;
                             Global.G_Form.Items.Item("STSTYLDS").FromPane = 0;
                             Global.G_Form.Items.Item("STSTYLDS").ToPane = 0;
 
 
-                            // Add EditText for Style Description
+                            // Style Description EditText
                             Global.G_Form.Items.Add("ETSTYLDS", SAPbouiCOM.BoFormItemTypes.it_EDIT);
+
                             Global.G_Form.Items.Item("ETSTYLDS").Top = Global.G_Form.Items.Item("STSTYLDS").Top;
-                            Global.G_Form.Items.Item("ETSTYLDS").Left = Global.G_Form.Items.Item("STSTYLNO").Left + Global.G_Form.Items.Item("STSTYLDS").Width;
+                            Global.G_Form.Items.Item("ETSTYLDS").Left = Global.G_Form.Items.Item("254000015").Left;
                             Global.G_Form.Items.Item("ETSTYLDS").Width = Global.G_Form.Items.Item("ETSTYLNO").Width;
                             Global.G_Form.Items.Item("ETSTYLDS").Height = Global.G_Form.Items.Item("STSTYLNO").Height;
                             Global.G_Form.Items.Item("ETSTYLDS").FromPane = 0;
                             Global.G_Form.Items.Item("ETSTYLDS").ToPane = 0;
                             Global.G_Form.Items.Item("ETSTYLDS").Enabled = false;
 
-                            //Global.G_Form.Items.Item("ETSTYLDS").SetAutoManagedAttribute(
-                            //    SAPbouiCOM.BoAutoManagedAttr.ama_Editable,
-                            //    1,
-                            //    SAPbouiCOM.BoModeVisualBehavior.mvb_False
-                            //);
                             Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLDS").Specific;
                             Global.oEdit.DataBind.SetBound(true, "OQUT", "U_STYLENM");
+
                             Global.G_Form.Items.Item("STSTYLDS").LinkTo = "ETSTYLDS";
 
-                            // Add EditText for Style docentry
-                            Global.G_Form.Items.Add("ETSLNTRY", SAPbouiCOM.BoFormItemTypes.it_EDIT);
-                            Global.G_Form.Items.Item("ETSLNTRY").Top = Global.G_Form.Items.Item("ETSTYLDS").Top;
-                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLDS").Left + Global.G_Form.Items.Item("ETSTYLDS").Width + 5;
-                            Global.G_Form.Items.Item("ETSLNTRY").Width = Global.G_Form.Items.Item("BTNSTYLD").Width;
-                            Global.G_Form.Items.Item("ETSLNTRY").Height = Global.G_Form.Items.Item("BTNSTYLD").Height;
-                            Global.G_Form.Items.Item("ETSLNTRY").FromPane = 0;
-                            Global.G_Form.Items.Item("ETSLNTRY").ToPane = 0;
-                            Global.G_Form.Items.Item("ETSLNTRY").Enabled = false;
-                            //Global.G_Form.Items.Item("ETSLNTRY").SetAutoManagedAttribute(
-                            //    SAPbouiCOM.BoAutoManagedAttr.ama_Editable,
-                            //    1,
-                            //    SAPbouiCOM.BoModeVisualBehavior.mvb_False
-                            //);
-                            Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLNTRY").Specific;
-                            Global.oEdit.DataBind.SetBound(true, "OQUT", "U_STYLENTRY");
-                            Global.G_Form.Items.Item("ETSTYLDS").LinkTo = "ETSLNTRY";
+
+                            // ************** CUSTOMER STYLE NAME **************
+
+                            Global.G_Form.Items.Add("ETCUSLNM", SAPbouiCOM.BoFormItemTypes.it_EDIT);
+
+                            Global.G_Form.Items.Item("ETCUSLNM").Top = Global.G_Form.Items.Item("ETSTYLDS").Top;
+                            Global.G_Form.Items.Item("ETCUSLNM").Left = Global.G_Form.Items.Item("ETSTYLDS").Left + Global.G_Form.Items.Item("ETSTYLDS").Width + 5;
+                            Global.G_Form.Items.Item("ETCUSLNM").Width = 120;
+                            Global.G_Form.Items.Item("ETCUSLNM").Height = Global.G_Form.Items.Item("ETSTYLDS").Height;
+                            Global.G_Form.Items.Item("ETCUSLNM").FromPane = 0;
+                            Global.G_Form.Items.Item("ETCUSLNM").ToPane = 0;
+
+                            Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCUSLNM").Specific;
+                            Global.oEdit.DataBind.SetBound(true, "OQUT", "U_BURSNAME");
                             //// ************ BUYER'S STYLE NO ************
 
                             //// ************* TYPE ********************
@@ -470,11 +558,34 @@ namespace Apparel_Dynamic_1._0.Modules
                             //Global.G_Form.Items.Item("2002").Top = Global.G_Form.Items.Item("STFILENTRY").Top + 18;
                             //Global.G_Form.Items.Item("2003").Top = Global.G_Form.Items.Item("2002").Top;
 
+                            // ************** STYLE RESIZE **************
+
                             // Style No Row
-                            Global.G_Form.Items.Item("STSTYLNO").Top = Global.G_Form.Items.Item("2002").Top + 18;
+                            Global.G_Form.Items.Item("STSTYLNO").Top = Global.G_Form.Items.Item("70").Top + 17;
+                            Global.G_Form.Items.Item("STSTYLNO").Left = Global.G_Form.Items.Item("70").Left;
+
                             Global.G_Form.Items.Item("ETSTYLNO").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
-                            Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
-                            Global.G_Form.Items.Item("LNSTYLNO").Top = Global.G_Form.Items.Item("STSTYLNO").Top;
+                            Global.G_Form.Items.Item("ETSTYLNO").Left = Global.G_Form.Items.Item("14").Left;
+
+                            Global.G_Form.Items.Item("LNSTYLNO").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
+                            Global.G_Form.Items.Item("LNSTYLNO").Left = Global.G_Form.Items.Item("ETSTYLNO").Left - 19;
+
+                            Global.G_Form.Items.Item("ETSLNTRY").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
+                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
+
+                            Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
+                            Global.G_Form.Items.Item("BTNSTYLD").Left = Global.G_Form.Items.Item("ETSLNTRY").Left + Global.G_Form.Items.Item("ETSLNTRY").Width + 5;
+
+
+                            // Style Description Row
+                            Global.G_Form.Items.Item("STSTYLDS").Top = Global.G_Form.Items.Item("254000012").Top + 17;
+                            Global.G_Form.Items.Item("STSTYLDS").Left = Global.G_Form.Items.Item("254000012").Left;
+
+                            Global.G_Form.Items.Item("ETSTYLDS").Top = Global.G_Form.Items.Item("STSTYLDS").Top;
+                            Global.G_Form.Items.Item("ETSTYLDS").Left = Global.G_Form.Items.Item("254000015").Left;
+
+                            Global.G_Form.Items.Item("ETCUSLNM").Top = Global.G_Form.Items.Item("ETSTYLDS").Top;
+                            Global.G_Form.Items.Item("ETCUSLNM").Left = Global.G_Form.Items.Item("ETSTYLDS").Left + Global.G_Form.Items.Item("ETSTYLDS").Width + 5;
 
                             //// Buyer Style No Row
                             //Global.G_Form.Items.Item("STBSTYLENO").Top = Global.G_Form.Items.Item("STStyleNo").Top + 18;
@@ -498,33 +609,141 @@ namespace Apparel_Dynamic_1._0.Modules
                         Global.G_Form.PaneLevel = 21;
 
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                           && pVal.ItemUID == "LNSTYLNO" && pVal.BeforeAction == true)
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //       && pVal.ItemUID == "LNSTYLNO" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                    //    OpenStyleMaster(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK && pVal.ItemUID == "LNSTYLNO" &&
+                            pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
-                        OpenStyleMaster(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETSTYLNO").Specific;
+                            string styleCode = etStyleNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(styleCode))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select Style No. first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenStyleMaster(styleCode);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening Style Master: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                            && pVal.ItemUID == "LNOTNTRY" && pVal.BeforeAction == true)
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //        && pVal.ItemUID == "LNOTNTRY" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETOTTNO").Specific;
+                    //    OpenOTT(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
+                    //        && pVal.ItemUID == "LNSCNTRY" && pVal.BeforeAction == true)
+                    //{
+                    //    Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSCNO").Specific;
+                    //    OpenSalesContract(Global.oEdit.Value);
+                    //    Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //    BubbleEvent = false;
+                    //    return;
+                    //}
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK &&
+                        pVal.ItemUID == "LNOTNTRY" &&
+                        pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETOTTNO").Specific;
-                        OpenOTT(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etOttNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETOTTNO").Specific;
+                            string ottDocNo = etOttNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(ottDocNo))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select OTT first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenOTT(ottDocNo);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening OTT: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK
-                            && pVal.ItemUID == "LNSCNTRY" && pVal.BeforeAction == true)
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CLICK &&
+                             pVal.ItemUID == "LNSCNTRY" &&
+                             pVal.BeforeAction == true)
                     {
-                        Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSCNO").Specific;
-                        OpenSalesContract(Global.oEdit.Value);
-                        Global.G_Form = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                        BubbleEvent = false;
-                        return;
+                        try
+                        {
+                            SAPbouiCOM.Form salesQuotationForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.EditText etSalesContractNo = (SAPbouiCOM.EditText)salesQuotationForm.Items.Item("ETSCNO").Specific;
+                            string salesContractNo = etSalesContractNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(salesContractNo))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please select Sales Contract first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                                BubbleEvent = false;
+                                return;
+                            }
+
+                            OpenSalesContract(salesContractNo);
+                            BubbleEvent = false;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error opening Sales Contract: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+
+                            BubbleEvent = false;
+                            return;
+                        }
                     }
+
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE
                        && pVal.ItemUID == "SCGrid"
                        && pVal.BeforeAction == false)
@@ -1141,85 +1360,240 @@ namespace Apparel_Dynamic_1._0.Modules
             oForm.Items.Item(itemId).Enabled = editable;
         }
 
+        //public void OpenStyleMaster(string styleCode)
+        //{
+        //    try
+        //    {
+        //        StyleMaster styleMaster = new StyleMaster();
+        //        styleMaster.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETSLCODE").Enabled = true;
+        //        SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLCODE").Specific;
+        //        cETSLCODE.Value = styleCode;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Items.Item("FOLSIZE").Click();
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
+
+        //        Application.SBO_Application.StatusBar.SetText("Error in open StyleMaster: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
         public void OpenStyleMaster(string styleCode)
         {
+            SAPbouiCOM.Form styleMasterForm = null;
+            bool isFrozen = false;
+
             try
             {
+                if (string.IsNullOrWhiteSpace(styleCode))
+                    return;
+
                 StyleMaster styleMaster = new StyleMaster();
                 styleMaster.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETSLCODE").Enabled = true;
-                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLCODE").Specific;
-                cETSLCODE.Value = styleCode;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Items.Item("FOLSIZE").Click();
-                Global.G_Form.Freeze(false);
+
+                styleMasterForm = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+
+                styleMasterForm.Freeze(true);
+                isFrozen = true;
+
+                styleMasterForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                styleMasterForm.Items.Item("ETSLCODE").Enabled = true;
+
+                SAPbouiCOM.EditText etStyleCode = (SAPbouiCOM.EditText)styleMasterForm.Items.Item("ETSLCODE").Specific;
+                etStyleCode.Value = styleCode.Trim();
+
+                styleMasterForm.Items.Item("1").Click();
+
+                if (styleMasterForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    styleMasterForm.Items.Item("FOLSIZE").Click();
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open StyleMaster: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenStyleMaster: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (styleMasterForm != null && isFrozen)
+                {
+                    try
+                    {
+                        styleMasterForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
 
-        //infuture
-        public void OpenOTT(string OTTDOC)
+
+        ////infuture
+        //public void OpenOTT(string OTTDOC)
+        //{
+        //    try
+        //    {
+        //        OTT oTT = new OTT();
+        //        oTT.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
+        //        SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
+        //        cETOTTID.Value = OTTDOC;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
+
+        //        Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        public void OpenOTT(string ottDocNo)
         {
+            SAPbouiCOM.Form ottForm = null;
+            bool isFrozen = false;
+
             try
             {
-                OTT oTT = new OTT();
-                oTT.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
-                SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
-                cETOTTID.Value = OTTDOC;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
-                Global.G_Form.Freeze(false);
+                if (string.IsNullOrWhiteSpace(ottDocNo))
+                    return;
+
+                OTT ott = new OTT();
+                ott.Show();
+
+                ottForm = Application.SBO_Application.Forms.Item("FIL_FRM_OTT");
+
+                ottForm.Freeze(true);
+                isFrozen = true;
+
+                ottForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                ottForm.Items.Item("ETDOCNUM").Enabled = true;
+
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)ottForm.Items.Item("ETDOCNUM").Specific;
+                etDocNum.Value = ottDocNo.Trim();
+
+                ottForm.Items.Item("1").Click();
+
+                if (ottForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    ottForm.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenOTT: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (ottForm != null && isFrozen)
+                {
+                    try
+                    {
+                        ottForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
+        //public void OpenSalesContract(string OTTEntry)
+        //{
+        //    try
+        //    {
+        //        SalesContract sc = new SalesContract();
+        //        sc.Show();
+        //        Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+        //        Global.G_Form.Freeze(true);
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+        //        Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
+        //        SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
+        //        cETOTTID.Value = OTTEntry;
+        //        Global.G_Form.Items.Item("1").Click();
+        //        Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
+        //        Global.G_Form.Freeze(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.G_Form.Freeze(false);
 
+        //        Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
 
-        public void OpenSalesContract(string OTTEntry)
+        public void OpenSalesContract(string salesContractNo)
         {
+            SAPbouiCOM.Form salesContractForm = null;
+            bool isFrozen = false;
+
             try
             {
-                SalesContract sc = new SalesContract();
-                sc.Show();
-                Global.G_Form = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
-                Global.G_Form.Freeze(true);
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
-                Global.G_Form.Items.Item("ETDOCNUM").Enabled = true;
-                SAPbouiCOM.EditText cETOTTID = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETDOCNUM").Specific;
-                cETOTTID.Value = OTTEntry;
-                Global.G_Form.Items.Item("1").Click();
-                Global.G_Form.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
-                Global.G_Form.Freeze(false);
+                if (string.IsNullOrWhiteSpace(salesContractNo))
+                    return;
+
+                SalesContract salesContract = new SalesContract();
+                salesContract.Show();
+
+                salesContractForm = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+
+                salesContractForm.Freeze(true);
+                isFrozen = true;
+
+                salesContractForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                salesContractForm.Items.Item("ETSCNO").Enabled = true;
+
+                SAPbouiCOM.EditText etDocNum = (SAPbouiCOM.EditText)salesContractForm.Items.Item("ETSCNO").Specific;
+                etDocNum.Value = salesContractNo.Trim();
+
+                salesContractForm.Items.Item("1").Click();
+
+                if (salesContractForm.Mode != SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    salesContractForm.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
             }
             catch (Exception ex)
             {
-                Global.G_Form.Freeze(false);
-
-                Application.SBO_Application.StatusBar.SetText("Error in open OTT: " + ex.Message,
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in OpenSalesContract: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
+            finally
+            {
+                if (salesContractForm != null && isFrozen)
+                {
+                    try
+                    {
+                        salesContractForm.Freeze(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
+
+
+
         private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
         {
             try

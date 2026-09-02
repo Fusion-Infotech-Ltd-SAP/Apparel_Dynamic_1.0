@@ -2040,9 +2040,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 SAPbobsCOM.Recordset oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                 string query = $@"
-                                SELECT ""LineId"",""U_SIZECODE"", ""U_SIZENAME""
+                                SELECT ""LineId"", ""U_SIZECODE"", ""U_SIZENAME"", ""U_ORDER""
                                 FROM ""@FIL_MR_STM1""
-                                WHERE ""Code"" = '{sizeTemplateCode.Replace("'", "''")}'";
+                                WHERE ""Code"" = '{sizeTemplateCode.Replace("'", "''")}'
+                                ORDER BY ""U_ORDER"" ASC";
 
                 oRS.DoQuery(query);
 

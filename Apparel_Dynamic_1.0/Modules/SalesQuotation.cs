@@ -1177,8 +1177,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     {
                         try
                         {
-                            SAPbouiCOM.EditText oETSTYLNO =
-                                (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                            SAPbouiCOM.EditText oETSTYLNO =(SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
                             SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)Global.G_Form.Items.Item("38").Specific;
                             if (string.IsNullOrWhiteSpace(oETSTYLNO.Value))
                             {
@@ -1240,97 +1239,89 @@ namespace Apparel_Dynamic_1._0.Modules
                                 SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                     }
-                    //             else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true
-                    //&&
-                    //(
-                    //    Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE ||
-                    //    Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
-                    //))
-                    //             {
-                    //                 try
-                    //                 {
-                    //                     // =========================
-                    //                     // 1. Style Code Validation
-                    //                     // =========================
-                    //                     SAPbouiCOM.EditText etStyleNo =
-                    //                         (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true
+       &&
+       (
+           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE ||
+           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
+       ))
+                    {
+                        try
+                        {
+                            // =========================
+                            // 1. Style Code Validation
+                            // =========================
+                            SAPbouiCOM.EditText etStyleNo =
+                                (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
 
-                    //                     if (string.IsNullOrWhiteSpace(etStyleNo.Value))
-                    //                     {
-                    //                         Application.SBO_Application.StatusBar.SetText(
-                    //                             "Please enter the Style Code first.",
-                    //                             SAPbouiCOM.BoMessageTime.bmt_Short,
-                    //                             SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                            if (string.IsNullOrWhiteSpace(etStyleNo.Value))
+                            {
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Please enter the Style Code first.",
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
 
-                    //                         BubbleEvent = false;
-                    //                         return;
-                    //                     }
+                                BubbleEvent = false;
+                                return;
+                            }
 
-                    //                     // =========================
-                    //                     // 2. Matrix 38 Qty vs SCGrid Qty Validation
-                    //                     // =========================
-                    //                     if (!ValidateMatrixAndGridQty(Global.G_Form))
-                    //                     {
-                    //                         BubbleEvent = false;
-                    //                         return;
-                    //                     }
+                          
+                            Global.G_Form.Freeze(true);
 
-                    //                     Global.G_Form.Freeze(true);
+                            // =========================
+                            // 3. Insert / Update Size Details
+                            // =========================
+                            int SizeEntry = 0;
 
-                    //                     // =========================
-                    //                     // 3. Insert / Update Size Details
-                    //                     // =========================
-                    //                     int SizeEntry = 0;
+                            var oItem =
+                                (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific;
 
-                    //                     var oItem =
-                    //                         (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific;
+                            if (!string.IsNullOrWhiteSpace(oItem.Value))
+                                SizeEntry = Convert.ToInt32(oItem.Value);
 
-                    //                     if (!string.IsNullOrWhiteSpace(oItem.Value))
-                    //                         SizeEntry = Convert.ToInt32(oItem.Value);
+                            try
+                            {
+                                if (!Global.oComp.InTransaction)
+                                    Global.oComp.StartTransaction();
 
-                    //                     try
-                    //                     {
-                    //                         if (!Global.oComp.InTransaction)
-                    //                             Global.oComp.StartTransaction();
+                                InsertSizeDetails(Global.G_Form, "", "", SizeEntry);
 
-                    //                         InsertSizeDetails(Global.G_Form, "", "", SizeEntry);
+                                if (Global.oComp.InTransaction)
+                                    Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+                            }
+                            catch (Exception ex)
+                            {
+                                try
+                                {
+                                    if (Global.oComp.InTransaction)
+                                        Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                                }
+                                catch { }
 
-                    //                         if (Global.oComp.InTransaction)
-                    //                             Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
-                    //                     }
-                    //                     catch (Exception ex)
-                    //                     {
-                    //                         try
-                    //                         {
-                    //                             if (Global.oComp.InTransaction)
-                    //                                 Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-                    //                         }
-                    //                         catch { }
+                                Application.SBO_Application.StatusBar.SetText(
+                                    "Error saving Size-Colour details: " + ex.Message,
+                                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
 
-                    //                         Application.SBO_Application.StatusBar.SetText(
-                    //                             "Error saving Size-Colour details: " + ex.Message,
-                    //                             SAPbouiCOM.BoMessageTime.bmt_Short,
-                    //                             SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                BubbleEvent = false;
+                                return;
+                            }
 
-                    //                         BubbleEvent = false;
-                    //                         return;
-                    //                     }
+                            Global.G_Form.Freeze(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            try { Global.G_Form.Freeze(false); } catch { }
 
-                    //                     Global.G_Form.Freeze(false);
-                    //                 }
-                    //                 catch (Exception ex)
-                    //                 {
-                    //                     try { Global.G_Form.Freeze(false); } catch { }
+                            Application.SBO_Application.StatusBar.SetText(
+                                "Error before saving document: " + ex.Message,
+                                SAPbouiCOM.BoMessageTime.bmt_Short,
+                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
 
-                    //                     Application.SBO_Application.StatusBar.SetText(
-                    //                         "Error before saving document: " + ex.Message,
-                    //                         SAPbouiCOM.BoMessageTime.bmt_Short,
-                    //                         SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
-                    //                     BubbleEvent = false;
-                    //                     return;
-                    //                 }
-                    //             }
+                            BubbleEvent = false;
+                            return;
+                        }
+                    }
                     //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true && (Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE))
                     //{
                     //    try
@@ -1402,20 +1393,20 @@ namespace Apparel_Dynamic_1._0.Modules
                     //    }
                     //}
                     //Test
-                  
-                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == false && Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                    //{
-                    //    try
-                    //    {
-                    //        Global.G_Form.Freeze(true);
-                    //        LoadGrid(ref Global.G_Form, false);
-                    //        Global.G_Form.Freeze(false);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        Global.G_Form.Freeze(false);
-                    //    }
-                    //}
+
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == false && Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    {
+                        try
+                        {
+                            Global.G_Form.Freeze(true);
+                            LoadGrid(ref Global.G_Form, false);
+                            Global.G_Form.Freeze(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            Global.G_Form.Freeze(false);
+                        }
+                    }
 
                 }
 
@@ -1425,372 +1416,122 @@ namespace Apparel_Dynamic_1._0.Modules
                 Application.SBO_Application.SetStatusBarMessage("Error in Draft Order for SAP Screen - " + ex.ToString(), SAPbouiCOM.BoMessageTime.bmt_Medium, true);
             }
         }
-        //private void SBO_Application_FormDataEvent(ref SAPbouiCOM.BusinessObjectInfo BusinessObjectInfo, out bool BubbleEvent)
-        //{
-        //    BubbleEvent = true;
-
-        //    try
-        //    {
-        //        if (BusinessObjectInfo.BeforeAction == false &&
-        //            BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
-        //        {
-        //            Global.G_Form = Global.G_UI_Application.Forms.Item(BusinessObjectInfo.FormUID);
-
-        //            switch (BusinessObjectInfo.FormTypeEx)
-        //            {
-        //                case "149":
-        //                    {
-        //                        try
-        //                        {
-        //                            Global.G_Form.Freeze(true);
-
-        //                            LoadGrid(ref Global.G_Form, true);
-
-        //                            SetCustomItemState(Global.G_Form);
-
-        //                            Global.G_Form.Freeze(false);
-        //                        }
-        //                        catch (Exception ex)
-        //                        {
-        //                            Global.G_Form.Freeze(false);
-        //                            Application.SBO_Application.StatusBar.SetText(
-        //                                "Error in FORM_DATA_LOAD: " + ex.Message,
-        //                                SAPbouiCOM.BoMessageTime.bmt_Short,
-        //                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //                        }
-
-        //                        break;
-        //                    }
-        //            }
-        //        }
-        //        else if (BusinessObjectInfo.BeforeAction == true &&
-        //                 BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD)
-        //        {
-        //            Global.G_Form = Global.G_UI_Application.Forms.Item(BusinessObjectInfo.FormUID);
-
-        //            switch (BusinessObjectInfo.FormTypeEx)
-        //            {
-        //                case "149":
-        //                    {
-        //                        try
-        //                        {
-        //                            Global.G_Form.Freeze(true);
-
-        //                            string ObjectType = BusinessObjectInfo.Type;
-
-        //                            int SizeEntry = string.IsNullOrEmpty(((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value)
-        //                                ? 0
-        //                                : Convert.ToInt32(((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value);
-
-        //                            try
-        //                            {
-        //                                if (!Global.oComp.InTransaction)
-        //                                    Global.oComp.StartTransaction();
-
-        //                                if (ObjectType == "112")
-        //                                {
-        //                                    InsertSizeDetails(Global.G_Form, "", "", SizeEntry);
-        //                                }
-
-        //                                if (Global.oComp.InTransaction)
-        //                                    Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
-        //                            }
-        //                            catch (Exception ex)
-        //                            {
-        //                                try
-        //                                {
-        //                                    if (Global.oComp.InTransaction)
-        //                                        Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-        //                                }
-        //                                catch { }
-
-        //                                Application.SBO_Application.StatusBar.SetText(
-        //                                    "Error in FORM_DATA_ADD: " + ex.Message,
-        //                                    SAPbouiCOM.BoMessageTime.bmt_Short,
-        //                                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //                            }
-
-        //                            Global.G_Form.Freeze(false);
-        //                        }
-        //                        catch (Exception ex)
-        //                        {
-        //                            Global.G_Form.Freeze(false);
-        //                            Application.SBO_Application.StatusBar.SetText(
-        //                                "Error in FORM_DATA_ADD Outer: " + ex.Message,
-        //                                SAPbouiCOM.BoMessageTime.bmt_Short,
-        //                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //                        }
-
-        //                        break;
-        //                    }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        try
-        //        {
-        //            Global.G_Form.Freeze(false);
-        //        }
-        //        catch { }
-
-        //        Application.SBO_Application.StatusBar.SetText(
-        //            "Error in SBO_Application_FormDataEvent: " + ex.Message,
-        //            SAPbouiCOM.BoMessageTime.bmt_Short,
-        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //    }
-        //}
         private void SBO_Application_FormDataEvent(ref SAPbouiCOM.BusinessObjectInfo BusinessObjectInfo, out bool BubbleEvent)
         {
             BubbleEvent = true;
 
             try
             {
-                if (BusinessObjectInfo.FormTypeEx != "149")
-                    return;
-
-                Global.G_Form = Global.G_UI_Application.Forms.Item(BusinessObjectInfo.FormUID);
-
-                if (BusinessObjectInfo.BeforeAction == true && (BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD || BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE))
+                if (BusinessObjectInfo.BeforeAction == false &&
+                    BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
                 {
-                    try
+                    Global.G_Form = Global.G_UI_Application.Forms.Item(BusinessObjectInfo.FormUID);
+
+                    switch (BusinessObjectInfo.FormTypeEx)
                     {
-                        SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
-
-                        if (string.IsNullOrWhiteSpace(etStyleNo.Value))
-                        {
-                            Global.GFunc.ShowValidationError("Please enter the Style Code first.");
-                            BubbleEvent = false;
-                            return;
-                        }
-
-                        if (!ValidateMatrixAndGridQty(Global.G_Form))
-                        {
-                            BubbleEvent = false;
-                            return;
-                        }
-
-                        int sizeEntry = 0;
-
-                        SAPbouiCOM.EditText etSizeEntry = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific;
-
-                        if (!string.IsNullOrWhiteSpace(etSizeEntry.Value))
-                        {
-                            int.TryParse(etSizeEntry.Value.Trim(), out sizeEntry);
-                        }
-
-                        try
-                        {
-                            Global.G_Form.Freeze(true);
-
-                            if (!Global.oComp.InTransaction)
-                            {
-                                Global.oComp.StartTransaction();
-                            }
-
-                            InsertSizeDetails(Global.G_Form, BusinessObjectInfo.Type, "", sizeEntry);
-
-                            if (Global.oComp.InTransaction)
-                            {
-                                Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            try
-                            {
-                                if (Global.oComp.InTransaction)
-                                {
-                                    Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-                                }
-                            }
-                            catch
-                            {
-                            }
-
-                            Global.GFunc.ShowValidationError("Error saving Size-Colour details: " + ex.Message);
-                            BubbleEvent = false;
-                            return;
-                        }
-                        finally
-                        {
-                            try
-                            {
-                                Global.G_Form.Freeze(false);
-                            }
-                            catch
-                            {
-                            }
-                        }
-
-                        BubbleEvent = true;
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        try
-                        {
-                            if (Global.oComp.InTransaction)
-                            {
-                                Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-                            }
-                        }
-                        catch
-                        {
-                        }
-
-                        try
-                        {
-                            Global.G_Form.Freeze(false);
-                        }
-                        catch
-                        {
-                        }
-
-                        Global.GFunc.ShowValidationError("Error before saving Sales Quotation: " + ex.Message);
-                        BubbleEvent = false;
-                        return;
-                    }
-                }
-                else if (BusinessObjectInfo.BeforeAction == false && BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD && BusinessObjectInfo.ActionSuccess == true)
-                {
-                    try
-                    {
-                        SetCustomItemState(Global.G_Form);
-
-                        string sizeEntry = "";
-
-                        try
-                        {
-                            sizeEntry = ((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value.Trim();
-                        }
-                        catch
-                        {
-                            sizeEntry = "";
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(sizeEntry))
-                        {
-                            try
-                            {
-                                Global.G_Form.Freeze(true);
-                                LoadGrid(ref Global.G_Form, true);
-                            }
-                            catch
-                            {
-                            }
-                            finally
+                        case "149":
                             {
                                 try
                                 {
+                                    Global.G_Form.Freeze(true);
+
+                                    LoadGrid(ref Global.G_Form, true);
+
+                                    SetCustomItemState(Global.G_Form);
+
                                     Global.G_Form.Freeze(false);
                                 }
-                                catch
+                                catch (Exception ex)
                                 {
+                                    Global.G_Form.Freeze(false);
+                                    Application.SBO_Application.StatusBar.SetText(
+                                        "Error in FORM_DATA_LOAD: " + ex.Message,
+                                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                 }
+
+                                break;
                             }
-                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Global.GFunc.ShowError("Error after adding Sales Quotation: " + ex.Message);
-                    }
-
-                    return;
                 }
-                else if (BusinessObjectInfo.BeforeAction == false && BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE && BusinessObjectInfo.ActionSuccess == true)
+                else if (BusinessObjectInfo.BeforeAction == true &&
+                         BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD)
                 {
-                    try
+                    Global.G_Form = Global.G_UI_Application.Forms.Item(BusinessObjectInfo.FormUID);
+
+                    switch (BusinessObjectInfo.FormTypeEx)
                     {
-                        Global.G_Form.Freeze(true);
+                        case "149":
+                            {
+                                try
+                                {
+                                    Global.G_Form.Freeze(true);
 
-                        LoadGrid(ref Global.G_Form, true);
-                        SetCustomItemState(Global.G_Form);
+                                    string ObjectType = BusinessObjectInfo.Type;
+
+                                    int SizeEntry = string.IsNullOrEmpty(((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value)
+                                        ? 0
+                                        : Convert.ToInt32(((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value);
+
+                                    try
+                                    {
+                                        if (!Global.oComp.InTransaction)
+                                            Global.oComp.StartTransaction();
+
+                                        if (ObjectType == "112")
+                                        {
+                                            InsertSizeDetails(Global.G_Form, "", "", SizeEntry);
+                                        }
+
+                                        if (Global.oComp.InTransaction)
+                                            Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        try
+                                        {
+                                            if (Global.oComp.InTransaction)
+                                                Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                                        }
+                                        catch { }
+
+                                        Application.SBO_Application.StatusBar.SetText(
+                                            "Error in FORM_DATA_ADD: " + ex.Message,
+                                            SAPbouiCOM.BoMessageTime.bmt_Short,
+                                            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                    }
+
+                                    Global.G_Form.Freeze(false);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Global.G_Form.Freeze(false);
+                                    Application.SBO_Application.StatusBar.SetText(
+                                        "Error in FORM_DATA_ADD Outer: " + ex.Message,
+                                        SAPbouiCOM.BoMessageTime.bmt_Short,
+                                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                }
+
+                                break;
+                            }
                     }
-                    catch (Exception ex)
-                    {
-                        Global.GFunc.ShowError("Error after updating Sales Quotation: " + ex.Message);
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            Global.G_Form.Freeze(false);
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                    return;
-                }
-                else if (BusinessObjectInfo.BeforeAction == false && BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD && BusinessObjectInfo.ActionSuccess == true)
-                {
-                    try
-                    {
-                        Global.G_Form.Freeze(true);
-
-                        string sizeEntry = "";
-
-                        try
-                        {
-                            sizeEntry = ((SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific).Value.Trim();
-                        }
-                        catch
-                        {
-                            sizeEntry = "";
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(sizeEntry))
-                        {
-                            LoadGrid(ref Global.G_Form, true);
-                        }
-
-                        SetCustomItemState(Global.G_Form);
-                    }
-                    catch (Exception ex)
-                    {
-                        Global.GFunc.ShowError("Error loading Sales Quotation data: " + ex.Message);
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            Global.G_Form.Freeze(false);
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                    return;
                 }
             }
             catch (Exception ex)
             {
                 try
                 {
-                    if (Global.oComp.InTransaction)
-                    {
-                        Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-                    }
-                }
-                catch
-                {
-                }
-
-                try
-                {
                     Global.G_Form.Freeze(false);
                 }
-                catch
-                {
-                }
+                catch { }
 
-                Global.GFunc.ShowError("Error in Sales Quotation FormDataEvent: " + ex.Message);
-                BubbleEvent = false;
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in SBO_Application_FormDataEvent: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
+
         private void SBO_Application_MenuEvent(ref SAPbouiCOM.MenuEvent pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
@@ -2143,25 +1884,47 @@ namespace Apparel_Dynamic_1._0.Modules
                             SizeString += ",";
                     }
 
+                    //qStr = @"
+                    //        SELECT ""U_COLORNAME"" AS ""Colour Name"",
+                    //               ""U_COLORCODE"" AS ""Colour Code"""
+                    //               + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+                    //               ""Total"" AS ""Total""
+                    //                FROM
+                    //                (
+                    //                        SELECT 0 AS ""LineId"",
+                    //                               B.""LineId"" AS ""RCount"",
+                    //                               B.""U_COLORCODE"",
+                    //                               B.""U_COLORNAME"",
+                    //                               0 AS ""Total""
+                    //                        FROM ""@FIL_DR_PSMST"" A
+                    //                        INNER JOIN ""@FIL_DR_PSMCO"" B
+                    //                            ON A.""DocEntry"" = B.""DocEntry""
+                    //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+                    //                        GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
+                    //                ) V1
+                    //                ORDER BY V1.""RCount""";
                     qStr = @"
                             SELECT ""U_COLORNAME"" AS ""Colour Name"",
                                    ""U_COLORCODE"" AS ""Colour Code"""
                                    + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
                                    ""Total"" AS ""Total""
-                                    FROM
-                                    (
-                                            SELECT 0 AS ""LineId"",
-                                                   B.""LineId"" AS ""RCount"",
-                                                   B.""U_COLORCODE"",
-                                                   B.""U_COLORNAME"",
-                                                   0 AS ""Total""
-                                            FROM ""@FIL_DR_PSMST"" A
-                                            INNER JOIN ""@FIL_DR_PSMCO"" B
-                                                ON A.""DocEntry"" = B.""DocEntry""
-                                            WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                                            GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
-                                    ) V1
-                                    ORDER BY V1.""RCount""";
+                            FROM
+                            (
+                                SELECT 0 AS ""LineId"",
+                                       B.""LineId"" AS ""RCount"",
+                                       B.""U_COLORCODE"",
+                                       B.""U_COLORNAME"",
+                                       0 AS ""Total""
+                                FROM ""@FIL_DR_PSMST"" A
+                                INNER JOIN ""@FIL_DR_PSMCO"" B
+                                    ON A.""DocEntry"" = B.""DocEntry""
+                                WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+                                  AND A.""U_SIZEAPPL"" = 'Y'
+                                GROUP BY B.""LineId"",
+                                         B.""U_COLORCODE"",
+                                         B.""U_COLORNAME""
+                            ) V1
+                            ORDER BY V1.""RCount""";
                 }
                 else
                 {
@@ -2171,9 +1934,18 @@ namespace Apparel_Dynamic_1._0.Modules
                     if (string.IsNullOrWhiteSpace(docEntry))
                         return;
 
+                    string styleEntry = pform.DataSources.DBDataSources.Item("OQUT")
+                     .GetValue("U_STYLENTRY", 0)
+                     .ToString()
+                     .Trim();
+
                     qStr = @"
                             SELECT A.""U_SIZECODE""
                             FROM ""@FIL_DR_OQUT"" A
+                            INNER JOIN ""@FIL_DR_PSMST"" S
+                                ON S.""DocEntry"" = '" + styleEntry + @"'
+                               AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+                               AND S.""U_SIZEAPPL"" = 'Y'
                             WHERE A.""DocEntry"" = '" + docEntry + @"'
                             GROUP BY A.""U_SIZECODE""
                             ORDER BY A.""U_SIZECODE""";
@@ -2205,11 +1977,16 @@ namespace Apparel_Dynamic_1._0.Modules
                     qStr = @"
                             SELECT A.""U_COLORNAME"" AS ""Colour Name"",
                                    A.""U_COLORCODE"" AS ""Colour Code"""
-                                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+                                    + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
                                    SUM(A.""U_QTY"") AS ""Total""
                             FROM ""@FIL_DR_OQUT"" A
+                            INNER JOIN ""@FIL_DR_PSMST"" S
+                                ON S.""DocEntry"" = '" + styleEntry + @"'
+                               AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+                               AND S.""U_SIZEAPPL"" = 'Y'
                             WHERE A.""DocEntry"" = '" + docEntry + @"'
-                            GROUP BY A.""U_COLORNAME"", A.""U_COLORCODE""
+                            GROUP BY A.""U_COLORNAME"",
+                                     A.""U_COLORCODE""
                             ORDER BY A.""U_COLORCODE""";
                 }
 
@@ -2277,6 +2054,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             INNER JOIN ""@FIL_DR_PSMST"" C
                                 ON C.""DocEntry"" = '" + styleEntry + @"'
                                AND C.""U_SIZECODE"" = A.""U_SIZECODE""
+                               AND C.""U_SIZEAPPL"" = 'Y'
                             WHERE A.""U_STYLECODE"" = '" + styleCode + @"'
                               AND A.""U_COLORCODE"" = '" + oDataTable.Columns.Item("Colour Code").Cells.Item(j).Value.ToString().Trim() + @"'
                             ORDER BY B.""LineId"", C.""LineId""";
@@ -2460,6 +2238,7 @@ namespace Apparel_Dynamic_1._0.Modules
                         INNER JOIN ""@FIL_DR_PSMST"" C
                             ON C.""DocEntry"" = '" + styleEntry + @"'
                            AND C.""U_SIZECODE"" = A.""U_SIZECODE""
+                           AND C.""U_SIZEAPPL"" = 'Y'
                         WHERE A.""U_STYLECODE"" = '" + styleCode + @"'
                           AND A.""U_COLORCODE"" = '" + colourCode + @"'
                         ORDER BY B.""LineId"", C.""LineId""";
@@ -2489,7 +2268,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     double dQty = 0;
                     double.TryParse(qty, out dQty);
 
-                    if (dQty > 0)
+                    if (dQty >= 0)
                     {
                         string safeColourCode = colourCode.Replace("'", "''");
                         string safeColourName = colourName.Replace("'", "''");

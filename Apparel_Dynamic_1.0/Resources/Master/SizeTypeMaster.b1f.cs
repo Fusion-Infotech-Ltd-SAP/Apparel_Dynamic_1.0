@@ -471,6 +471,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 return BubbleEvent;
             }
 
+            if (!ValidateSizeOrder(oForm, MTXSIZE, ref BubbleEvent))
+                return BubbleEvent;
+
             return BubbleEvent;
         }
 
@@ -534,6 +537,85 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             if (matrix.RowCount == 0)
             {
                 Global.GFunc.SetNewLine(matrix, db, 1, "");
+            }
+        }
+
+        private bool ValidateSizeOrder(SAPbouiCOM.Form oForm, SAPbouiCOM.Matrix oMatrix, ref bool BubbleEvent)
+        {
+            try
+            {
+                List<int> orderList = new List<int>();
+
+                for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+                {
+                    string sizeCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSZCODE").Cells.Item(i).Specific).Value.Replace("\0", "").Trim();
+
+                    if (string.IsNullOrEmpty(sizeCode))
+                        continue;
+
+                    string orderValue = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLORDER").Cells.Item(i).Specific).Value.Replace("\0", "").Trim();
+
+                    if (string.IsNullOrEmpty(orderValue))
+                    {
+                        Global.GFunc.ShowError("Enter Size Order for Size [" + sizeCode + "].");
+                        oMatrix.Columns.Item("CLORDER").Cells.Item(i).Click();
+                        BubbleEvent = false;
+                        return false;
+                    }
+
+                    int order;
+
+                    if (!int.TryParse(orderValue, out order))
+                    {
+                        Global.GFunc.ShowError("Size Order must be a valid integer for Size [" + sizeCode + "].");
+                        oMatrix.Columns.Item("CLORDER").Cells.Item(i).Click();
+                        BubbleEvent = false;
+                        return false;
+                    }
+
+                    if (order <= 0)
+                    {
+                        Global.GFunc.ShowError("Size Order must start from 1. Zero or negative values are not allowed.");
+                        oMatrix.Columns.Item("CLORDER").Cells.Item(i).Click();
+                        BubbleEvent = false;
+                        return false;
+                    }
+
+                    if (orderList.Contains(order))
+                    {
+                        Global.GFunc.ShowError("Duplicate Size Order [" + order + "] is not allowed.");
+                        oMatrix.Columns.Item("CLORDER").Cells.Item(i).Click();
+                        BubbleEvent = false;
+                        return false;
+                    }
+
+                    orderList.Add(order);
+                }
+
+                if (orderList.Count == 0)
+                    return true;
+
+                orderList.Sort();
+
+                for (int i = 0; i < orderList.Count; i++)
+                {
+                    int expectedOrder = i + 1;
+
+                    if (orderList[i] != expectedOrder)
+                    {
+                        Global.GFunc.ShowError("Size Order must be continuous from 1 to " + orderList.Count + ". Missing Size Order [" + expectedOrder + "].");
+                        BubbleEvent = false;
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Size Order Validation Error: " + ex.Message);
+                BubbleEvent = false;
+                return false;
             }
         }
     }

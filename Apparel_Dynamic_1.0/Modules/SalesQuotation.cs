@@ -1845,149 +1845,274 @@ namespace Apparel_Dynamic_1._0.Modules
 
 
 
+        //private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
+        //{
+        //    try
+        //    {
+        //        string qStr = string.Empty;
+
+        //        if (FromDataEvent == false)
+        //        {
+        //            SAPbouiCOM.EditText oETSLNTRY =
+        //                (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+
+        //            qStr = @"
+        //                    SELECT A.""U_SIZECODE""
+        //                    FROM ""@FIL_DR_PSMST"" A
+        //                    INNER JOIN ""@FIL_MR_STM1"" B ON B.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                    WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //                    AND A.""U_SIZEAPPL"" = 'Y'
+        //                    GROUP BY A.""U_SIZECODE""
+        //                    ORDER BY A.""U_SIZECODE""";
+
+        //            SAPbobsCOM.Recordset SizerSet =
+        //                (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //            SizerSet.DoQuery(qStr);
+
+        //            string SizeString = "";
+
+        //            while (!SizerSet.EoF)
+        //            {
+        //                string sizeCode = SizerSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //                string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+        //                SizeString += @"0 AS """ + safeSizeCodeAlias + @"""";
+
+        //                SizerSet.MoveNext();
+
+        //                if (!SizerSet.EoF)
+        //                    SizeString += ",";
+        //            }
+
+        //            //qStr = @"
+        //            //        SELECT ""U_COLORNAME"" AS ""Colour Name"",
+        //            //               ""U_COLORCODE"" AS ""Colour Code"""
+        //            //               + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //            //               ""Total"" AS ""Total""
+        //            //                FROM
+        //            //                (
+        //            //                        SELECT 0 AS ""LineId"",
+        //            //                               B.""LineId"" AS ""RCount"",
+        //            //                               B.""U_COLORCODE"",
+        //            //                               B.""U_COLORNAME"",
+        //            //                               0 AS ""Total""
+        //            //                        FROM ""@FIL_DR_PSMST"" A
+        //            //                        INNER JOIN ""@FIL_DR_PSMCO"" B
+        //            //                            ON A.""DocEntry"" = B.""DocEntry""
+        //            //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //            //                        GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
+        //            //                ) V1
+        //            //                ORDER BY V1.""RCount""";
+        //            qStr = @"
+        //                    SELECT ""U_COLORNAME"" AS ""Colour Name"",
+        //                           ""U_COLORCODE"" AS ""Colour Code"""
+        //                           + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           ""Total"" AS ""Total""
+        //                    FROM
+        //                    (
+        //                        SELECT 0 AS ""LineId"",
+        //                               B.""LineId"" AS ""RCount"",
+        //                               B.""U_COLORCODE"",
+        //                               B.""U_COLORNAME"",
+        //                               0 AS ""Total""
+        //                        FROM ""@FIL_DR_PSMST"" A
+        //                        INNER JOIN ""@FIL_DR_PSMCO"" B
+        //                            ON A.""DocEntry"" = B.""DocEntry""
+        //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //                          AND A.""U_SIZEAPPL"" = 'Y'
+        //                        GROUP BY B.""LineId"",
+        //                                 B.""U_COLORCODE"",
+        //                                 B.""U_COLORNAME""
+        //                    ) V1
+        //                    ORDER BY V1.""RCount""";
+        //        }
+        //        else
+        //        {
+        //            string docEntry = pform.DataSources.DBDataSources.Item("OQUT")
+        //                              .GetValue("U_CRSZNTRY", 0).ToString().Trim();
+
+        //            if (string.IsNullOrWhiteSpace(docEntry))
+        //                return;
+
+        //            string styleEntry = pform.DataSources.DBDataSources.Item("OQUT")
+        //             .GetValue("U_STYLENTRY", 0)
+        //             .ToString()
+        //             .Trim();
+
+        //            qStr = @"
+        //                    SELECT A.""U_SIZECODE""
+        //                    FROM ""@FIL_DR_OQUT"" A
+        //                    INNER JOIN ""@FIL_DR_PSMST"" S
+        //                        ON S.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                       AND S.""U_SIZEAPPL"" = 'Y'
+        //                    WHERE A.""DocEntry"" = '" + docEntry + @"'
+        //                    GROUP BY A.""U_SIZECODE""
+        //                    ORDER BY A.""U_SIZECODE""";
+
+        //            SAPbobsCOM.Recordset SizerSet1 =
+        //                (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //            SizerSet1.DoQuery(qStr);
+
+        //            string SizeString = "";
+
+        //            while (!SizerSet1.EoF)
+        //            {
+        //                string sizeCode = SizerSet1.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //                string safeSizeCodeValue = sizeCode.Replace("'", "''");
+        //                string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+        //                SizeString += @"SUM(CASE
+        //                    WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"'
+        //                    THEN A.""U_QTY""
+        //                    ELSE 0
+        //                END) AS """ + safeSizeCodeAlias + @"""";
+
+        //                SizerSet1.MoveNext();
+
+        //                if (!SizerSet1.EoF)
+        //                    SizeString += ",";
+        //            }
+
+        //            qStr = @"
+        //                    SELECT A.""U_COLORNAME"" AS ""Colour Name"",
+        //                           A.""U_COLORCODE"" AS ""Colour Code"""
+        //                            + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           SUM(A.""U_QTY"") AS ""Total""
+        //                    FROM ""@FIL_DR_OQUT"" A
+        //                    INNER JOIN ""@FIL_DR_PSMST"" S
+        //                        ON S.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                       AND S.""U_SIZEAPPL"" = 'Y'
+        //                    WHERE A.""DocEntry"" = '" + docEntry + @"'
+        //                    GROUP BY A.""U_COLORNAME"",
+        //                             A.""U_COLORCODE""
+        //                    ORDER BY A.""U_COLORCODE""";
+        //        }
+
+        //        Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
+        //        Global.oDataTable = pform.DataSources.DataTables.Item("DT_0");
+
+        //        Global.oDataTable.ExecuteQuery(qStr);
+        //        Global.oGrid.DataTable = Global.oDataTable;
+
+        //        Global.oGrid.Columns.Item("Colour Name").Editable = false;
+        //        Global.oGrid.Columns.Item("Colour Code").Editable = false;
+        //        Global.oGrid.Columns.Item("Total").Editable = false;
+
+        //        Global.oGrid.AutoResizeColumns();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error in LoadGrid: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
         private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
         {
             try
             {
                 string qStr = string.Empty;
+                string SizeString = string.Empty;
 
-                if (FromDataEvent == false)
+                string styleEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLENTRY", 0).ToString().Trim();
+
+                if (string.IsNullOrWhiteSpace(styleEntry))
                 {
-                    SAPbouiCOM.EditText oETSLNTRY =
-                        (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+                    SAPbouiCOM.EditText oETSLNTRY = (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+                    styleEntry = oETSLNTRY.Value.Trim();
+                }
 
-                    qStr = @"
-                            SELECT A.""U_SIZECODE""
-                            FROM ""@FIL_DR_PSMST"" A
-                            INNER JOIN ""@FIL_MR_STM1"" B ON B.""U_SIZECODE"" = A.""U_SIZECODE""
-                            WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                            AND A.""U_SIZEAPPL"" = 'Y'
-                            GROUP BY A.""U_SIZECODE""
-                            ORDER BY A.""U_SIZECODE""";
+                if (string.IsNullOrWhiteSpace(styleEntry))
+                    return;
 
-                    SAPbobsCOM.Recordset SizerSet =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                    SizerSet.DoQuery(qStr);
+                // ============================================================
+                // SIZE COLUMNS
+                // Always take Size from Style Master.
+                // Always order Size by @FIL_DR_PSMST.LineId.
+                // ============================================================
+                qStr = @"
+                        SELECT A.""U_SIZECODE"", A.""LineId""
+                        FROM ""@FIL_DR_PSMST"" A
+                        WHERE A.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+                          AND A.""U_SIZEAPPL"" = 'Y'
+                        ORDER BY A.""LineId""";
 
-                    string SizeString = "";
+                SAPbobsCOM.Recordset sizeSet = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                sizeSet.DoQuery(qStr);
 
-                    while (!SizerSet.EoF)
+                while (!sizeSet.EoF)
+                {
+                    string sizeCode = sizeSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+                    string safeSizeCodeValue = sizeCode.Replace("'", "''");
+                    string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+                    if (FromDataEvent == false)
                     {
-                        string sizeCode = SizerSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
-                        string safeSizeCodeAlias = sizeCode.Replace("\"", "");
-
                         SizeString += @"0 AS """ + safeSizeCodeAlias + @"""";
-
-                        SizerSet.MoveNext();
-
-                        if (!SizerSet.EoF)
-                            SizeString += ",";
+                    }
+                    else
+                    {
+                        SizeString += @"SUM(CASE WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"' THEN IFNULL(A.""U_QTY"", 0) ELSE 0 END) AS """ + safeSizeCodeAlias + @"""";
                     }
 
-                    //qStr = @"
-                    //        SELECT ""U_COLORNAME"" AS ""Colour Name"",
-                    //               ""U_COLORCODE"" AS ""Colour Code"""
-                    //               + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
-                    //               ""Total"" AS ""Total""
-                    //                FROM
-                    //                (
-                    //                        SELECT 0 AS ""LineId"",
-                    //                               B.""LineId"" AS ""RCount"",
-                    //                               B.""U_COLORCODE"",
-                    //                               B.""U_COLORNAME"",
-                    //                               0 AS ""Total""
-                    //                        FROM ""@FIL_DR_PSMST"" A
-                    //                        INNER JOIN ""@FIL_DR_PSMCO"" B
-                    //                            ON A.""DocEntry"" = B.""DocEntry""
-                    //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                    //                        GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
-                    //                ) V1
-                    //                ORDER BY V1.""RCount""";
+                    sizeSet.MoveNext();
+
+                    if (!sizeSet.EoF)
+                        SizeString += ",";
+                }
+
+                // ============================================================
+                // NEW / LOAD INFO
+                // Color always comes from Style Master.
+                // Color order = @FIL_DR_PSMCO.LineId.
+                // ============================================================
+                if (FromDataEvent == false)
+                {
                     qStr = @"
-                            SELECT ""U_COLORNAME"" AS ""Colour Name"",
-                                   ""U_COLORCODE"" AS ""Colour Code"""
-                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
-                                   ""Total"" AS ""Total""
-                            FROM
-                            (
-                                SELECT 0 AS ""LineId"",
-                                       B.""LineId"" AS ""RCount"",
-                                       B.""U_COLORCODE"",
-                                       B.""U_COLORNAME"",
-                                       0 AS ""Total""
-                                FROM ""@FIL_DR_PSMST"" A
-                                INNER JOIN ""@FIL_DR_PSMCO"" B
-                                    ON A.""DocEntry"" = B.""DocEntry""
-                                WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                                  AND A.""U_SIZEAPPL"" = 'Y'
-                                GROUP BY B.""LineId"",
-                                         B.""U_COLORCODE"",
-                                         B.""U_COLORNAME""
-                            ) V1
-                            ORDER BY V1.""RCount""";
+                            SELECT B.""U_COLORNAME"" AS ""Colour Name"",
+                                   B.""U_COLORCODE"" AS ""Colour Code"""
+                                           + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+                                   0 AS ""Total""
+                            FROM ""@FIL_DR_PSMCO"" B
+                            WHERE B.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+                            ORDER BY B.""LineId""";
                 }
                 else
                 {
-                    string docEntry = pform.DataSources.DBDataSources.Item("OQUT")
-                                      .GetValue("U_CRSZNTRY", 0).ToString().Trim();
+                    // ============================================================
+                    // PREVIOUS SAVED DATA
+                    // Grid structure still comes from Style Master, not OQUT.
+                    // Therefore blank/zero Size columns do not disappear.
+                    // Color rows also remain in Style Master LineId order.
+                    // ============================================================
+                    string sizeEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_CRSZNTRY", 0).ToString().Trim();
 
-                    if (string.IsNullOrWhiteSpace(docEntry))
+                    if (string.IsNullOrWhiteSpace(sizeEntry))
                         return;
 
-                    string styleEntry = pform.DataSources.DBDataSources.Item("OQUT")
-                     .GetValue("U_STYLENTRY", 0)
-                     .ToString()
-                     .Trim();
-
                     qStr = @"
-                            SELECT A.""U_SIZECODE""
-                            FROM ""@FIL_DR_OQUT"" A
-                            INNER JOIN ""@FIL_DR_PSMST"" S
-                                ON S.""DocEntry"" = '" + styleEntry + @"'
-                               AND S.""U_SIZECODE"" = A.""U_SIZECODE""
-                               AND S.""U_SIZEAPPL"" = 'Y'
-                            WHERE A.""DocEntry"" = '" + docEntry + @"'
-                            GROUP BY A.""U_SIZECODE""
-                            ORDER BY A.""U_SIZECODE""";
-
-                    SAPbobsCOM.Recordset SizerSet1 =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                    SizerSet1.DoQuery(qStr);
-
-                    string SizeString = "";
-
-                    while (!SizerSet1.EoF)
-                    {
-                        string sizeCode = SizerSet1.Fields.Item("U_SIZECODE").Value.ToString().Trim();
-                        string safeSizeCodeValue = sizeCode.Replace("'", "''");
-                        string safeSizeCodeAlias = sizeCode.Replace("\"", "");
-
-                        SizeString += @"SUM(CASE
-                            WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"'
-                            THEN A.""U_QTY""
-                            ELSE 0
-                        END) AS """ + safeSizeCodeAlias + @"""";
-
-                        SizerSet1.MoveNext();
-
-                        if (!SizerSet1.EoF)
-                            SizeString += ",";
-                    }
-
-                    qStr = @"
-                            SELECT A.""U_COLORNAME"" AS ""Colour Name"",
-                                   A.""U_COLORCODE"" AS ""Colour Code"""
-                                    + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
-                                   SUM(A.""U_QTY"") AS ""Total""
-                            FROM ""@FIL_DR_OQUT"" A
-                            INNER JOIN ""@FIL_DR_PSMST"" S
-                                ON S.""DocEntry"" = '" + styleEntry + @"'
-                               AND S.""U_SIZECODE"" = A.""U_SIZECODE""
-                               AND S.""U_SIZEAPPL"" = 'Y'
-                            WHERE A.""DocEntry"" = '" + docEntry + @"'
-                            GROUP BY A.""U_COLORNAME"",
-                                     A.""U_COLORCODE""
-                            ORDER BY A.""U_COLORCODE""";
+                            SELECT B.""U_COLORNAME"" AS ""Colour Name"",
+                                   B.""U_COLORCODE"" AS ""Colour Code"""
+                                           + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+                                   SUM(IFNULL(A.""U_QTY"", 0)) AS ""Total""
+                            FROM ""@FIL_DR_PSMCO"" B
+                            LEFT JOIN ""@FIL_DR_OQUT"" A
+                                ON A.""DocEntry"" = '" + sizeEntry.Replace("'", "''") + @"'
+                               AND A.""U_COLORCODE"" = B.""U_COLORCODE""
+                               AND A.""U_SIZECODE"" IN
+                               (
+                                   SELECT S.""U_SIZECODE""
+                                   FROM ""@FIL_DR_PSMST"" S
+                                   WHERE S.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+                                     AND S.""U_SIZEAPPL"" = 'Y'
+                               )
+                            WHERE B.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+                            GROUP BY B.""LineId"", B.""U_COLORNAME"", B.""U_COLORCODE""
+                            ORDER BY B.""LineId""";
                 }
 
                 Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
@@ -2421,6 +2546,7 @@ namespace Apparel_Dynamic_1._0.Modules
 
         //    return true;
         //}
+
         private bool ValidateMatrixAndGridQty(SAPbouiCOM.Form oForm)
         {
             SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;

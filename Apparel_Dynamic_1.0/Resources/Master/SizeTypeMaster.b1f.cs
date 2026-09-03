@@ -168,10 +168,12 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             if (IsSizeTypeCodeUsed(sizeTypeCode))
             {
                 oMatrix.Columns.Item("CLSZCODE").Editable = false;
+                oMatrix.Columns.Item("CLORDER").Editable = false;
             }
             else
             {
                 oMatrix.Columns.Item("CLSZCODE").Editable = true;
+                oMatrix.Columns.Item("CLORDER").Editable = true;
                 AddLineIfLastRowHasValue(oForm, "MTXSIZE", "@FIL_MR_STM1", "U_SIZECODE");
             }
             oMatrix.LoadFromDataSource();

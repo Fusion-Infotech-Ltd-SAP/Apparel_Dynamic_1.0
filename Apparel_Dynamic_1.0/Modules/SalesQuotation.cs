@@ -832,6 +832,17 @@ namespace Apparel_Dynamic_1._0.Modules
                                 SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                     }
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE && pVal.ItemUID == "38" && pVal.ColUID == "11" && pVal.BeforeAction == false)
+                    {
+                        try
+                        {
+                            UpdateTotalQtyFromMatrix(Global.G_Form);
+                        }
+                        catch (Exception ex)
+                        {
+                            Global.GFunc.ShowError("Error updating total quantity: " + ex.Message);
+                        }
+                    }
                     //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction)
                     //{
                     //    try
@@ -1600,21 +1611,63 @@ namespace Apparel_Dynamic_1._0.Modules
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
+        //prev workkable field diable enable except styleno
+        //private void SetCustomItemState(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        bool isFindMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+
+        //        // Editable fields
+        //        oForm.Items.Item("ETSTYLNO").Enabled = true;
+        //        oForm.Items.Item("ETOTTNO").Enabled = true;
+        //        oForm.Items.Item("ETSCNO").Enabled = true;
+        //        oForm.Items.Item("BTNSTYLD").Enabled = true;
+        //        oForm.Items.Item("BTQty").Enabled = true;
+
+        //        // Always disabled except FIND mode
+        //        SetEditable(oForm, "ETOTNTRY", isFindMode);
+        //        SetEditable(oForm, "ETSCNTRY", isFindMode);
+        //        SetEditable(oForm, "ETSTYLDS", isFindMode);
+        //        SetEditable(oForm, "ETSLNTRY", isFindMode);
+        //        SetEditable(oForm, "ETCRSZNTRY", isFindMode);
+        //        SetEditable(oForm, "ETCUSLNM", isFindMode);
+
+        //        // Always disabled
+        //        SetEditable(oForm, "ETQty", false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "SetCustomItemState Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
 
         private void SetCustomItemState(SAPbouiCOM.Form oForm)
         {
             try
             {
                 bool isFindMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                bool isAddMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE;
 
-                // Editable fields
-                oForm.Items.Item("ETSTYLNO").Enabled = true;
+                bool canChangeStyle = isAddMode || isFindMode;
+
+                // ************** STYLE NO **************
+                SetEditable(oForm, "ETSTYLNO", canChangeStyle);
+
+                if (isAddMode)
+                {
+                    Global.GFunc.ReEnableChooseFromList(oForm,"ETSTYLNO","CFL_OPSM","U_STYLECODE");
+                }
+
+                // ************** OTHER CONTROLS **************
                 oForm.Items.Item("ETOTTNO").Enabled = true;
                 oForm.Items.Item("ETSCNO").Enabled = true;
                 oForm.Items.Item("BTNSTYLD").Enabled = true;
                 oForm.Items.Item("BTQty").Enabled = true;
 
-                // Always disabled except FIND mode
                 SetEditable(oForm, "ETOTNTRY", isFindMode);
                 SetEditable(oForm, "ETSCNTRY", isFindMode);
                 SetEditable(oForm, "ETSTYLDS", isFindMode);
@@ -1622,15 +1675,11 @@ namespace Apparel_Dynamic_1._0.Modules
                 SetEditable(oForm, "ETCRSZNTRY", isFindMode);
                 SetEditable(oForm, "ETCUSLNM", isFindMode);
 
-                // Always disabled
                 SetEditable(oForm, "ETQty", false);
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "SetCustomItemState Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("SetCustomItemState Error: " + ex.Message);
             }
         }
 
@@ -2253,6 +2302,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     // ========================================================
                     // Saved Size columns only
                     // ========================================================
+
                     qStr = @"
                     SELECT A.""U_SIZECODE"",
                            MIN(A.""LineId"") AS ""RCount""
@@ -2471,29 +2521,29 @@ namespace Apparel_Dynamic_1._0.Modules
                     }
                 }
 
-                double totalQty = 0;
+                //double totalQty = 0;
 
-                for (int i = 1; i <= oMatrix.RowCount; i++)
-                {
-                    try
-                    {
-                        string itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+                //for (int i = 1; i <= oMatrix.RowCount; i++)
+                //{
+                //    try
+                //    {
+                //        string itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
 
-                        if (string.IsNullOrWhiteSpace(itemCode))
-                            continue;
+                //        if (string.IsNullOrWhiteSpace(itemCode))
+                //            continue;
 
-                        double rowQty = 0;
-                        double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim(), out rowQty);
+                //        double rowQty = 0;
+                //        double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim(), out rowQty);
 
-                        totalQty += rowQty;
-                    }
-                    catch
-                    {
-                    }
-                }
+                //        totalQty += rowQty;
+                //    }
+                //    catch
+                //    {
+                //    }
+                //}
 
-                ((SAPbouiCOM.EditText)pForm.Items.Item("ETQty").Specific).Value = totalQty.ToString();
-
+                //((SAPbouiCOM.EditText)pForm.Items.Item("ETQty").Specific).Value = totalQty.ToString();
+                UpdateTotalQtyFromMatrix(pForm);
                 if (addedCount > 0)
                     Global.GFunc.ShowSuccess(addedCount + " new item(s) added successfully.");
                 else
@@ -3158,6 +3208,46 @@ namespace Apparel_Dynamic_1._0.Modules
             }
             catch
             {
+            }
+        }
+
+        private void UpdateTotalQtyFromMatrix(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+
+                double totalQty = 0;
+
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    string itemCode = "";
+                    double rowQty = 0;
+
+                    try
+                    {
+                        itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+
+                        if (string.IsNullOrWhiteSpace(itemCode))
+                            continue;
+
+                        string qtyText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim();
+
+                        double.TryParse(qtyText, out rowQty);
+                    }
+                    catch
+                    {
+                        rowQty = 0;
+                    }
+
+                    totalQty += rowQty;
+                }
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETQty").Specific).Value = totalQty.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error calculating total quantity: " + ex.Message);
             }
         }
 

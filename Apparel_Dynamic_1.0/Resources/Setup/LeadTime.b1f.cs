@@ -21,6 +21,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
         private SAPbouiCOM.ComboBox CBSERIES;
         private SAPbouiCOM.Matrix MTXLEDTM;
         private SAPbouiCOM.Button ADDButton,CancelButton;
+        private SAPbouiCOM.CheckBox CKACTIVE;
 
         private bool _isAddButtonPressed = false;
 
@@ -47,6 +48,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
             this.ETDOCDAT.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETDOCDAT_LostFocusAfter);
             this.STDOCDAT = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
+            this.CKACTIVE = ((SAPbouiCOM.CheckBox)(this.GetItem("CKACTIVE").Specific));
             this.OnCustomInitialize();
 
         }
@@ -237,6 +239,7 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
             string efFrmDate = db.GetValue("U_EFROMDATE", 0).Trim();
             string efToDate = db.GetValue("U_ETODATE", 0).Trim();
+            string active = db.GetValue("U_ACTIVE", 0).Trim();
 
             if (string.IsNullOrWhiteSpace(efFrmDate))
             {
@@ -252,29 +255,41 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
                 return BubbleEvent = false;
             }
 
-            DateTime fromDate = DateTime.ParseExact(efFrmDate, "yyyyMMdd", null);
-            DateTime toDate = DateTime.ParseExact(efToDate, "yyyyMMdd", null);
+            DateTime fromDate =DateTime.ParseExact(efFrmDate, "yyyyMMdd", null);
+            DateTime toDate =DateTime.ParseExact(efToDate, "yyyyMMdd", null);
 
             if (toDate < fromDate)
             {
-                Global.GFunc.ShowError("Effective To Date cannot be before Effective From Date");
+                Global.GFunc.ShowError(
+                    "Effective To Date cannot be before Effective From Date.");
+
                 oForm.ActiveItem = "ETEFTODT";
                 return BubbleEvent = false;
             }
 
-            string docEntry = db.GetValue("DocEntry", 0).Trim();
-
-            if (IsLeadTimeDateRangeExists(fromDate, toDate, docEntry))
+            if (active == "Y")
             {
-                Global.GFunc.ShowError("This effective date period already exists or overlaps with another period.");
-                oForm.ActiveItem = "ETEFRMDT";
-                return BubbleEvent = false;
+                string docEntry = db.GetValue("DocEntry", 0).Trim();
+                string existingDocNum = string.Empty;
+
+                if (IsLeadTimeDateRangeExists(fromDate,toDate,docEntry,out existingDocNum))
+                {
+                    Global.GFunc.ShowError(
+                        "An active Lead Time already exists for this date range. " +
+                        "Doc No: " + existingDocNum +
+                        ". Please deactivate that document first.");
+
+                    oForm.ActiveItem = "ETEFRMDT";
+                    return BubbleEvent = false;
+                }
             }
 
             if (!ValidateDuplicateLeadTimeRows(oForm))
+            {
                 return BubbleEvent = false;
+            }
 
-            PreventEmptyLastRow(oForm, "@FIL_DR_LEADTMST", MTXLEDTM, "U_CARDCODE");
+            PreventEmptyLastRow(oForm,"@FIL_DR_LEADTMST",MTXLEDTM,"U_CARDCODE");
 
             return BubbleEvent;
         }
@@ -337,48 +352,107 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             db.SetValue("U_LEADDAYS", rowIndex, "");
         }
 
-        private bool IsLeadTimeDateRangeExists(DateTime fromDate, DateTime toDate, string currentDocEntry)
+        //private bool IsLeadTimeDateRangeExists(DateTime fromDate, DateTime toDate, string currentDocEntry)
+        //{
+        //    SAPbobsCOM.Recordset rs = null;
+
+        //    try
+        //    {
+        //        SAPbobsCOM.Company oCompany =(SAPbobsCOM.Company)Application.SBO_Application.Company.GetDICompany();
+        //        rs = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+        //        string fromDateStr = fromDate.ToString("yyyyMMdd");
+        //        string toDateStr = toDate.ToString("yyyyMMdd");
+
+        //        string query = $@"
+        //                        SELECT TOP 1 ""DocEntry""
+        //                        FROM ""@FIL_DH_LEADTMST""
+        //                        WHERE 
+        //                            ""U_EFROMDATE"" <= '{toDateStr}'
+        //                            AND ""U_ETODATE"" >= '{fromDateStr}'";
+        //        // for update mode exclude current one 
+        //        if (!string.IsNullOrWhiteSpace(currentDocEntry))
+        //        {
+        //            query += $@" AND ""DocEntry"" <> '{currentDocEntry}'";
+        //        }
+
+        //        rs.DoQuery(query);
+
+        //        return !rs.EoF;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Date validation error: " + ex.Message);
+        //        return true;
+        //    }
+        //    finally
+        //    {
+        //        if (rs != null)
+        //        {
+        //            System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+        //            rs = null;
+        //        }
+
+        //       // GC.Collect();
+        //    }
+        //}
+
+        private bool IsLeadTimeDateRangeExists(DateTime fromDate,DateTime toDate,string currentDocEntry,out string existingDocNum)
         {
             SAPbobsCOM.Recordset rs = null;
 
+            existingDocNum = string.Empty;
+
             try
             {
-                SAPbobsCOM.Company oCompany =(SAPbobsCOM.Company)Application.SBO_Application.Company.GetDICompany();
-                rs = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                 string fromDateStr = fromDate.ToString("yyyyMMdd");
                 string toDateStr = toDate.ToString("yyyyMMdd");
 
                 string query = $@"
-                                SELECT TOP 1 ""DocEntry""
+                                SELECT TOP 1
+                                    ""DocEntry"",
+                                    ""DocNum""
                                 FROM ""@FIL_DH_LEADTMST""
-                                WHERE 
-                                    ""U_EFROMDATE"" <= '{toDateStr}'
-                                    AND ""U_ETODATE"" >= '{fromDateStr}'";
-                // for update mode exclude current one 
+                                WHERE ""U_ACTIVE"" = 'Y'
+                                  AND ""U_EFROMDATE"" <= '{toDateStr}'
+                                  AND ""U_ETODATE"" >= '{fromDateStr}'";
+
                 if (!string.IsNullOrWhiteSpace(currentDocEntry))
                 {
-                    query += $@" AND ""DocEntry"" <> '{currentDocEntry}'";
+                    query += $@"
+                        AND ""DocEntry"" <> '{currentDocEntry}'";
                 }
+
+                query += @"
+                        ORDER BY ""DocEntry""";
 
                 rs.DoQuery(query);
 
-                return !rs.EoF;
+                if (!rs.EoF)
+                {
+                    existingDocNum =
+                        rs.Fields.Item("DocNum").Value.ToString().Trim();
+
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Date validation error: " + ex.Message);
+                Global.GFunc.ShowError("Date range validation error: " + ex.Message);
                 return true;
             }
             finally
             {
                 if (rs != null)
                 {
-                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    Global.GFunc.ReleaseComObject(rs);
                     rs = null;
                 }
-
-               // GC.Collect();
             }
         }
 
@@ -739,8 +813,6 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
 
             return true;
         }
-
-       
-
+        private SAPbouiCOM.CheckBox CheckBox0;
     }
 }

@@ -969,6 +969,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 return BubbleEvent = false;
             }
 
+            if (!ValidateDuplicateCombination(oForm))
+            {
+                return BubbleEvent = false;
+            }
+
             SAPbouiCOM.Matrix oMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
 
             for (int i = 1; i <= oMatrix.VisualRowCount; i++)
@@ -1111,6 +1116,80 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        private bool ValidateDuplicateCombination(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+
+                string brandCode = oDBH.GetValue("U_BRAND", 0).Trim();
+                string productGroupCode = oDBH.GetValue("U_PRDGRP", 0).Trim();
+                string routeStageCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETRTSGCD").Specific).Value.Trim();
+                string fromDate = oDBH.GetValue("U_FROMDATE", 0).Trim();
+                string toDate = oDBH.GetValue("U_TODATE", 0).Trim();
+                string docEntry = oDBH.GetValue("DocEntry", 0).Trim();
+
+                string safeBrandCode = brandCode.Replace("'", "''");
+                string safeProductGroupCode = productGroupCode.Replace("'", "''");
+                string safeRouteStageCode = routeStageCode.Replace("'", "''");
+
+                string excludeCurrentDocument = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(docEntry))
+                {
+                    excludeCurrentDocument = $@" AND T0.""DocEntry"" <> '{docEntry.Replace("'", "''")}'";
+                }
+
+                string query = $@"
+                                    SELECT
+                                        T0.""DocEntry"",
+                                        T0.""DocNum"",
+                                        T0.""U_FROMDATE"",
+                                        T0.""U_TODATE""
+                                    FROM ""@FIL_DH_CPM"" T0
+                                    WHERE IFNULL(T0.""U_BRAND"", '') = '{safeBrandCode}'
+                                      AND IFNULL(T0.""U_PRDGRP"", '') = '{safeProductGroupCode}'
+                                      AND IFNULL(T0.""U_RSTGECODE"", '') = '{safeRouteStageCode}'
+                                      AND T0.""U_FROMDATE"" <= '{toDate}'
+                                      AND T0.""U_TODATE"" >= '{fromDate}'
+                                      {excludeCurrentDocument}
+                                    LIMIT 1";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(query);
+
+                if (!rs.EoF)
+                {
+                    string existingDocNum = rs.Fields.Item("DocNum").Value.ToString().Trim();
+                    string existingFromDate = rs.Fields.Item("U_FROMDATE").Value.ToString().Trim();
+                    string existingToDate = rs.Fields.Item("U_TODATE").Value.ToString().Trim();
+
+                    Global.GFunc.ShowError(
+                        "CPM already exists for this Brand, Product Group and Route Stage within the selected period. " +
+                        "Existing Doc No: " + existingDocNum +
+                        ", Period: " + existingFromDate + " - " + existingToDate);
+
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("CPM duplicate period validation error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
         private void ShowSampleRateColumns(SAPbouiCOM.Form oForm, int samRangeCount)
         {
             SAPbouiCOM.Matrix oMatrix =

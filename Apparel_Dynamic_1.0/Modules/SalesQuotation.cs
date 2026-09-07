@@ -805,7 +805,8 @@ namespace Apparel_Dynamic_1._0.Modules
 
                                 if (currentCol == "Colour Name" ||
                                     currentCol == "Colour Code" ||
-                                    currentCol == "Total")
+                                    currentCol == "Total" ||
+                                    currentCol == "RCount")
                                     continue;
 
                                 object val = Global.oDataTable.Columns.Item(j).Cells.Item(dtRow).Value;

@@ -747,7 +747,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE
                        && pVal.ItemUID == "SCGrid"
                        && pVal.BeforeAction == false)
-                    {
+                     {
                         try
                         {
                             Global.G_Form.Freeze(true);

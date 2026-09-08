@@ -1287,11 +1287,9 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.GFunc.ShowError("Error in Get Item: " + ex.Message);
                         }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true
-       &&
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true &&
        (
-           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE ||
-           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
+           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
        ))
                     {
                         try
@@ -1313,7 +1311,8 @@ namespace Apparel_Dynamic_1._0.Modules
                                 return;
                             }
 
-                          
+                           
+
                             Global.G_Form.Freeze(true);
 
                             // =========================
@@ -1470,6 +1469,17 @@ namespace Apparel_Dynamic_1._0.Modules
 
             try
             {
+                if (BusinessObjectInfo.BeforeAction == true &&(
+                    BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD ||
+                    BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE
+                ))
+                {
+                    if (!ValidateDraftOrderAgainstSalesContract(Global.G_Form, ref BubbleEvent))
+                    {
+                        BubbleEvent = false;
+                        return;
+                    }
+                }
                 if (BusinessObjectInfo.BeforeAction == false &&
                     BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
                 {
@@ -3249,6 +3259,92 @@ namespace Apparel_Dynamic_1._0.Modules
             catch (Exception ex)
             {
                 Global.GFunc.ShowError("Error calculating total quantity: " + ex.Message);
+            }
+        }
+
+        private bool ValidateDraftOrderAgainstSalesContract(SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            try
+            {
+                SAPbouiCOM.DBDataSource oDB = oForm.DataSources.DBDataSources.Item("OQUT");
+
+                string scNo = oDB.GetValue("U_SCNO", 0).Trim();
+
+                if (string.IsNullOrWhiteSpace(scNo))
+                    return true;
+
+                string safeSCNo = scNo.Replace("'", "''");
+
+                string scQuery = $@"
+                            SELECT IFNULL(""U_SCVALUE"", 0) AS ""SCValue""
+                            FROM ""@FIL_DH_OSCM""
+                            WHERE ""U_SCNO"" = '{safeSCNo}'";
+
+                SAPbobsCOM.Recordset scRs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                scRs.DoQuery(scQuery);
+
+                if (scRs.EoF)
+                {
+                    Global.GFunc.ShowError("Sales Contract " + scNo + " was not found.");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                decimal scValue = Convert.ToDecimal(scRs.Fields.Item("SCValue").Value);
+
+                if (scValue <= 0)
+                {
+                    Global.GFunc.ShowError("Sales Contract Value must be greater than zero.");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                string docCurrency = oDB.GetValue("DocCur", 0).Trim();
+                string currentDocValueStr = docCurrency == "BDT" ? oDB.GetValue("DocTotal", 0).Trim() : oDB.GetValue("DocTotalFC", 0).Trim();
+
+                decimal currentDocValue = 0;
+                decimal.TryParse(currentDocValueStr.Replace(",", ""), out currentDocValue);
+
+                string currentDocEntry = oDB.GetValue("DocEntry", 0).Trim();
+                string excludeCurrentDoc = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(currentDocEntry))
+                    excludeCurrentDoc = $@" AND ""DocEntry"" <> '{currentDocEntry.Replace("'", "''")}'";
+
+                string usedQuery = $@"
+                              SELECT IFNULL(SUM(
+                                  CASE
+                                      WHEN ""DocCur"" = 'BDT' THEN ""DocTotal""
+                                      ELSE ""DocTotalFC""
+                                  END
+                              ), 0) AS ""UsedValue""
+                              FROM ""OQUT""
+                              WHERE ""U_SCNO"" = '{safeSCNo}'
+                              {excludeCurrentDoc}";
+
+                SAPbobsCOM.Recordset usedRs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                usedRs.DoQuery(usedQuery);
+
+                decimal usedValue = Convert.ToDecimal(usedRs.Fields.Item("UsedValue").Value);
+                decimal remainingValue = scValue - usedValue;
+
+                if (remainingValue < 0)
+                    remainingValue = 0;
+
+                if (currentDocValue > remainingValue)
+                {
+                    Global.GFunc.ShowValidationError("Draft Order Value exceeds the Sales Contract limit.\n\nSales Contract Value: " + scValue.ToString("#,##0.00") + "\nAlready Used Value: " + usedValue.ToString("#,##0.00") + "\nRemaining Value: " + remainingValue.ToString("#,##0.00") + "\nCurrent Draft Order Value: " + currentDocValue.ToString("#,##0.00") + "\n\nDraft Order Value must be between 0.00 and " + remainingValue.ToString("#,##0.00") + ".");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Contract value validation error: " + ex.Message);
+                BubbleEvent = false;
+                return false;
             }
         }
 

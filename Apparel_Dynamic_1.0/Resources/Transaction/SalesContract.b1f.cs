@@ -884,9 +884,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
 
                 if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum))
-                {
                     return;
-                }
 
                 SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMEND").Specific;
 
@@ -900,61 +898,50 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     oDT = oForm.DataSources.DataTables.Add("DT_AMEN");
                 }
 
-                // Clear grid/data table first
-                oGrid.DataTable = null;
                 oDT.Clear();
 
                 string query = $@"
-                                SELECT 
-                                    ROW_NUMBER() OVER (ORDER BY ""DocEntry"") AS ""#"",
-                                    ""DocEntry"",
-                                    ""DocNum"",
-                                    ""Creator"",
-                                    ""CreateDate"",
-                                    ""UpdateDate"",
-                                    ""LogInst"",
-                                    ""U_AMNDMNT"" AS ""Amendment No""
-                                FROM
-                                (
-                                    SELECT 
-                                        ""DocEntry"",
-                                        ""DocNum"",
-                                        ""Creator"",
-                                        ""CreateDate"",
-                                        ""UpdateDate"",
-                                        MAX(""LogInst"") AS ""LogInst"",
-                                        ""U_AMNDMNT""
-                                    FROM ""@AFIL_DH_OSCM""
-                                    WHERE ""DocEntry"" = {docEntry}
-                                      AND ""DocNum"" = {docNum}
-                                    GROUP BY 
-                                        ""DocEntry"",
-                                        ""DocNum"",
-                                        ""Creator"",
-                                        ""CreateDate"",
-                                        ""UpdateDate"",
-                                        ""U_AMNDMNT""
-                                ) T
-                                ORDER BY ""DocEntry"";
-        ";
+                        SELECT 
+                            ROW_NUMBER() OVER (ORDER BY TO_INTEGER(""U_AMNDMNT"") DESC) AS ""#"",
+                            ""DocEntry"",
+                            ""DocNum"",
+                            ""Creator"",
+                            ""CreateDate"",
+                            ""UpdateDate"",
+                            ""LogInst"",
+                            ""U_AMNDMNT"" AS ""Amendment No""
+                        FROM
+                        (
+                            SELECT 
+                                ""DocEntry"",
+                                ""DocNum"",
+                                ""Creator"",
+                                ""CreateDate"",
+                                ""UpdateDate"",
+                                ""LogInst"",
+                                ""U_AMNDMNT"",
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY ""DocEntry"", ""DocNum"", ""U_AMNDMNT""
+                                    ORDER BY ""LogInst"" DESC
+                                ) AS ""RN""
+                            FROM ""@AFIL_DH_OSCM""
+                            WHERE ""DocEntry"" = {docEntry}
+                              AND ""DocNum"" = {docNum}
+                        ) T
+                        WHERE ""RN"" = 1
+                        ORDER BY TO_INTEGER(""U_AMNDMNT"") DESC";
 
                 oDT.ExecuteQuery(query);
-
                 oGrid.DataTable = oDT;
 
                 for (int i = 0; i < oGrid.Columns.Count; i++)
-                {
                     oGrid.Columns.Item(i).Editable = false;
-                }
 
                 oGrid.AutoResizeColumns();
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error loading amendment grid: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Application.SBO_Application.StatusBar.SetText("Error loading amendment grid: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
             finally
             {
@@ -962,73 +949,235 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void LoadAmendmentGrid(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        oForm.Freeze(true);
+
+        //        string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+        //        string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
+
+        //        if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum))
+        //        {
+        //            return;
+        //        }
+
+        //        SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMEND").Specific;
+
+        //        SAPbouiCOM.DataTable oDT;
+        //        try
+        //        {
+        //            oDT = oForm.DataSources.DataTables.Item("DT_AMEN");
+        //        }
+        //        catch
+        //        {
+        //            oDT = oForm.DataSources.DataTables.Add("DT_AMEN");
+        //        }
+
+        //        // Clear grid/data table first
+        //        oGrid.DataTable = null;
+        //        oDT.Clear();
+
+        //        string query = $@"
+        //                        SELECT 
+        //                            ROW_NUMBER() OVER (ORDER BY ""DocEntry"") AS ""#"",
+        //                            ""DocEntry"",
+        //                            ""DocNum"",
+        //                            ""Creator"",
+        //                            ""CreateDate"",
+        //                            ""UpdateDate"",
+        //                            ""LogInst"",
+        //                            ""U_AMNDMNT"" AS ""Amendment No""
+        //                        FROM
+        //                        (
+        //                            SELECT 
+        //                                ""DocEntry"",
+        //                                ""DocNum"",
+        //                                ""Creator"",
+        //                                ""CreateDate"",
+        //                                ""UpdateDate"",
+        //                                MAX(""LogInst"") AS ""LogInst"",
+        //                                ""U_AMNDMNT""
+        //                            FROM ""@AFIL_DH_OSCM""
+        //                            WHERE ""DocEntry"" = {docEntry}
+        //                              AND ""DocNum"" = {docNum}
+        //                            GROUP BY 
+        //                                ""DocEntry"",
+        //                                ""DocNum"",
+        //                                ""Creator"",
+        //                                ""CreateDate"",
+        //                                ""UpdateDate"",
+        //                                ""U_AMNDMNT""
+        //                        ) T
+        //                        ORDER BY ""DocEntry"";
+        //";
+
+        //        oDT.ExecuteQuery(query);
+
+        //        oGrid.DataTable = oDT;
+
+        //        for (int i = 0; i < oGrid.Columns.Count; i++)
+        //        {
+        //            oGrid.Columns.Item(i).Editable = false;
+        //        }
+
+        //        oGrid.AutoResizeColumns();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error loading amendment grid: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //    finally
+        //    {
+        //        oForm.Freeze(false);
+        //    }
+        //}
+
+        //private void BTNAMEND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        SAPbouiCOM.ComboBox cbDSNBNK = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBDSNBNK").Specific;
+        //        SAPbouiCOM.ComboBox cbMRSTAT = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBMRSTAT").Specific;
+        //        SAPbouiCOM.ComboBox cbCMSTAT = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
+        //        SAPbouiCOM.EditText etAmndNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETAMNDNO").Specific;
+
+        //        string comboValue = "";
+        //        if (cbDSNBNK.Selected != null)
+        //            comboValue = cbDSNBNK.Selected.Value.Trim();
+
+        //        string dbValue = GetSentToBankFromDB(oForm);
+
+        //        // Case 1 : DB = N and Combo = N
+        //        if (dbValue == "N" && comboValue == "N")
+        //        {
+        //            Application.SBO_Application.MessageBox("This document is not sent to Bank yet.");
+        //            return;
+        //        }
+
+        //        // Case 2 : Combo = Y but DB = N
+        //        if (dbValue == "N" && comboValue == "Y")
+        //        {
+        //            Application.SBO_Application.MessageBox("Please Update the Sales Contract before creating Amendment.");
+        //            return;
+        //        }
+
+        //        // Case 3 : Allowed
+        //        if (dbValue == "Y")
+        //        {
+        //            int confirm = Application.SBO_Application.MessageBox(
+        //                "Are you sure you want to create Amendment?",
+        //                1,
+        //                "Yes",
+        //                "No"
+        //            );
+
+        //            if (confirm != 1)
+        //                return;
+
+        //            cbMRSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //            cbCMSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //            cbDSNBNK.Select("N", SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+        //            Global.GFunc.SetItemsEnabled(oForm, true, "CBMRSTAT", "CBCMSTAT");
+        //            Global.GFunc.SetItemsEnabled(oForm, false, "CBDSNBNK");
+
+        //            int amendNo = 0;
+
+        //            if (!string.IsNullOrWhiteSpace(etAmndNo.Value))
+        //                amendNo = Convert.ToInt32(etAmndNo.Value);
+
+        //            amendNo++;
+
+        //            etAmndNo.Value = amendNo.ToString();
+
+        //            Application.SBO_Application.MessageBox("Amendment Done successfully.");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "BTNAMEND Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error
+        //        );
+        //    }
+        //}
+
         private void BTNAMEND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
+            SAPbouiCOM.Form oForm = null;
+
             try
             {
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
                 SAPbouiCOM.ComboBox cbDSNBNK = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBDSNBNK").Specific;
                 SAPbouiCOM.ComboBox cbMRSTAT = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBMRSTAT").Specific;
                 SAPbouiCOM.ComboBox cbCMSTAT = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
                 SAPbouiCOM.EditText etAmndNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETAMNDNO").Specific;
 
-                string comboValue = "";
-                if (cbDSNBNK.Selected != null)
-                    comboValue = cbDSNBNK.Selected.Value.Trim();
-
+                string comboValue = cbDSNBNK.Selected == null ? "" : cbDSNBNK.Selected.Value.Trim();
                 string dbValue = GetSentToBankFromDB(oForm);
 
-                // Case 1 : DB = N and Combo = N
                 if (dbValue == "N" && comboValue == "N")
                 {
                     Application.SBO_Application.MessageBox("This document is not sent to Bank yet.");
                     return;
                 }
 
-                // Case 2 : Combo = Y but DB = N
                 if (dbValue == "N" && comboValue == "Y")
                 {
                     Application.SBO_Application.MessageBox("Please Update the Sales Contract before creating Amendment.");
                     return;
                 }
 
-                // Case 3 : Allowed
-                if (dbValue == "Y")
-                {
-                    int confirm = Application.SBO_Application.MessageBox(
-                        "Are you sure you want to create Amendment?",
-                        1,
-                        "Yes",
-                        "No"
-                    );
+                if (dbValue != "Y")
+                    return;
 
-                    if (confirm != 1)
-                        return;
+                int confirm = Application.SBO_Application.MessageBox("Are you sure you want to create Amendment?", 1, "Yes", "No");
 
-                    cbMRSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                    cbCMSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                    cbDSNBNK.Select("N", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                if (confirm != 1)
+                    return;
 
-                    int amendNo = 0;
+                oForm.Freeze(true);
 
-                    if (!string.IsNullOrWhiteSpace(etAmndNo.Value))
-                        amendNo = Convert.ToInt32(etAmndNo.Value);
+                Global.GFunc.SetItemsEnabled(oForm, true, "CBMRSTAT", "CBCMSTAT");
 
-                    amendNo++;
+                cbMRSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                cbCMSTAT.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                cbDSNBNK.Select("N", SAPbouiCOM.BoSearchKey.psk_ByValue);
 
-                    etAmndNo.Value = amendNo.ToString();
+                int amendNo = 0;
 
-                    Application.SBO_Application.MessageBox("Amendment Done successfully.");
-                }
+                if (!string.IsNullOrWhiteSpace(etAmndNo.Value))
+                    int.TryParse(etAmndNo.Value.Trim(), out amendNo);
+
+                amendNo++;
+                etAmndNo.Value = amendNo.ToString();
+
+                ControlSendToBank(oForm);
+
+                Application.SBO_Application.MessageBox("Amendment Done successfully.");
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "BTNAMEND Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Application.SBO_Application.StatusBar.SetText("BTNAMEND Error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                try
+                {
+                    if (oForm != null)
+                        oForm.Freeze(false);
+                }
+                catch { }
             }
         }
 
@@ -1066,30 +1215,30 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return rs.Fields.Item("U_DOCSNDBK").Value.ToString().Trim();
         }
 
-        private void ControlSendToBank(SAPbouiCOM.Form oForm)
-        {
-            try
-            {
-                SAPbouiCOM.ComboBox cbMR =
-                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBMRSTAT").Specific;
+        //private void ControlSendToBank(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.ComboBox cbMR =
+        //            (SAPbouiCOM.ComboBox)oForm.Items.Item("CBMRSTAT").Specific;
 
-                SAPbouiCOM.ComboBox cbCM =
-                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
+        //        SAPbouiCOM.ComboBox cbCM =
+        //            (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
 
-                string mr = cbMR.Selected == null ? "" : cbMR.Selected.Value.Trim();
-                string cm = cbCM.Selected == null ? "" : cbCM.Selected.Value.Trim();
+        //        string mr = cbMR.Selected == null ? "" : cbMR.Selected.Value.Trim();
+        //        string cm = cbCM.Selected == null ? "" : cbCM.Selected.Value.Trim();
 
-                if (mr == "C" && cm == "C")
-                {
-                    oForm.Items.Item("CBDSNBNK").Enabled = true;
-                }
-                else
-                {
-                    oForm.Items.Item("CBDSNBNK").Enabled = false;
-                }
-            }
-            catch { }
-        }
+        //        if (mr == "C" && cm == "C")
+        //        {
+        //            oForm.Items.Item("CBDSNBNK").Enabled = true;
+        //        }
+        //        else
+        //        {
+        //            oForm.Items.Item("CBDSNBNK").Enabled = false;
+        //        }
+        //    }
+        //    catch { }
+        //}
 
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
@@ -1100,7 +1249,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
                 ControlCompletedStatusCombos(oForm);
-                ControlDesignBankCombo(oForm);
+                ControlSendToBank(oForm);
                 LoadCustomerShippingAddress(oForm);
                 SetItemsEnabled(oForm, false, "ETCUSTNM", "ETBRNDNM", "ETDOVAL", "ETCUSBNK", "ETOWNBNK", "ETAMNDNO","ETDOCDAT");
                 string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
@@ -1271,40 +1420,71 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Sales Contract Value validation error: " + ex.Message);
+                Global.GFunc.ShowError("Sales Contract Form Value validation error: " + ex.Message);
                 return BubbleEvent = false;
             }
         }
-        private void ControlDesignBankCombo(SAPbouiCOM.Form oForm)
+        //private void ControlDesignBankCombo(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.ComboBox cbDesignBank =
+        //            (SAPbouiCOM.ComboBox)oForm.Items.Item("CBDSNBNK").Specific;
+
+        //        SAPbouiCOM.ComboBox cbCMStatus =
+        //            (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
+
+        //        string designBankValue = cbDesignBank.Value.Trim();
+        //        string cmStatusValue = cbCMStatus.Value.Trim();
+
+        //        if (designBankValue == "Y")
+        //        {
+        //            oForm.Items.Item("CBDSNBNK").Enabled = false;
+        //        }
+        //        else if (cmStatusValue == "C")
+        //        {
+        //            oForm.Items.Item("CBDSNBNK").Enabled = true;
+        //        }
+        //        else
+        //        {
+        //            oForm.Items.Item("CBDSNBNK").Enabled = false;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "ControlDesignBankCombo Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        private void ControlSendToBank(SAPbouiCOM.Form oForm)
         {
             try
             {
-                SAPbouiCOM.ComboBox cbDesignBank =
-                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBDSNBNK").Specific;
+                SAPbouiCOM.ComboBox cbMR =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBMRSTAT").Specific;
 
-                SAPbouiCOM.ComboBox cbCMStatus =
-                    (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
+                SAPbouiCOM.ComboBox cbCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCMSTAT").Specific;
 
-                string designBankValue = cbDesignBank.Value.Trim();
-                string cmStatusValue = cbCMStatus.Value.Trim();
+                SAPbouiCOM.ComboBox cbBank =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBDSNBNK").Specific;
 
-                if (designBankValue == "Y")
-                {
-                    oForm.Items.Item("CBDSNBNK").Enabled = false;
-                }
-                else if (cmStatusValue == "C")
-                {
-                    oForm.Items.Item("CBDSNBNK").Enabled = true;
-                }
-                else
-                {
-                    oForm.Items.Item("CBDSNBNK").Enabled = false;
-                }
+                string mr = cbMR.Selected == null? "": cbMR.Selected.Value.Trim();
+
+                string cm = cbCM.Selected == null? "" : cbCM.Selected.Value.Trim();
+
+                string bank = cbBank.Selected == null? "" : cbBank.Selected.Value.Trim();
+
+                bool enableBank = mr == "C" &&
+                                  cm == "C" &&
+                                  bank != "Y";
+
+                oForm.Items.Item("CBDSNBNK").Enabled = enableBank;
             }
             catch (Exception ex)
             {
                 Application.SBO_Application.StatusBar.SetText(
-                    "ControlDesignBankCombo Error: " + ex.Message,
+                    "ControlSendToBank Error: " + ex.Message,
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }

@@ -1469,12 +1469,15 @@ namespace Apparel_Dynamic_1._0.Modules
 
             try
             {
-                if (BusinessObjectInfo.BeforeAction == true &&(
-                    BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD ||
-                    BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE
-                ))
+                if (BusinessObjectInfo.FormTypeEx == "149" &&
+                    BusinessObjectInfo.BeforeAction == true &&
+                    (BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD ||
+                     BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE))
                 {
-                    if (!ValidateDraftOrderAgainstSalesContract(Global.G_Form, ref BubbleEvent))
+                    SAPbouiCOM.Form oForm =
+                        Application.SBO_Application.Forms.Item(BusinessObjectInfo.FormUID);
+
+                    if (!ValidateDraftOrderAgainstSalesContract(oForm, ref BubbleEvent))
                     {
                         BubbleEvent = false;
                         return;

@@ -103,7 +103,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.oEdit.ChooseFromListAlias = "DocNum";
 
                             //***** Sales Contract***** 
-                            
+
                             //Static Text
                             Global.G_Form.Items.Add("STSCNO", SAPbouiCOM.BoFormItemTypes.it_STATIC);
                             Global.oStatic = (SAPbouiCOM.StaticText)Global.G_Form.Items.Item("STSCNO").Specific;
@@ -310,7 +310,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Add("ETSLNTRY", SAPbouiCOM.BoFormItemTypes.it_EDIT);
 
                             Global.G_Form.Items.Item("ETSLNTRY").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
-                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
+                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width;
                             Global.G_Form.Items.Item("ETSLNTRY").Width = 10;
                             Global.G_Form.Items.Item("ETSLNTRY").Height = Global.G_Form.Items.Item("ETSTYLNO").Height;
                             Global.G_Form.Items.Item("ETSLNTRY").FromPane = 0;
@@ -571,7 +571,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Item("LNSTYLNO").Left = Global.G_Form.Items.Item("ETSTYLNO").Left - 19;
 
                             Global.G_Form.Items.Item("ETSLNTRY").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
-                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width + 5;
+                            Global.G_Form.Items.Item("ETSLNTRY").Left = Global.G_Form.Items.Item("ETSTYLNO").Left + Global.G_Form.Items.Item("ETSTYLNO").Width;
 
                             Global.G_Form.Items.Item("BTNSTYLD").Top = Global.G_Form.Items.Item("ETSTYLNO").Top;
                             Global.G_Form.Items.Item("BTNSTYLD").Left = Global.G_Form.Items.Item("ETSLNTRY").Left + Global.G_Form.Items.Item("ETSLNTRY").Width + 5;
@@ -585,7 +585,7 @@ namespace Apparel_Dynamic_1._0.Modules
                             Global.G_Form.Items.Item("ETSTYLDS").Left = Global.G_Form.Items.Item("254000015").Left;
 
                             Global.G_Form.Items.Item("ETCUSLNM").Top = Global.G_Form.Items.Item("ETSTYLDS").Top;
-                            Global.G_Form.Items.Item("ETCUSLNM").Left = Global.G_Form.Items.Item("ETSTYLDS").Left + Global.G_Form.Items.Item("ETSTYLDS").Width + 5;
+                            Global.G_Form.Items.Item("ETCUSLNM").Left = Global.G_Form.Items.Item("ETSTYLDS").Left + Global.G_Form.Items.Item("ETSTYLDS").Width + 2;
 
                             //// Buyer Style No Row
                             //Global.G_Form.Items.Item("STBSTYLENO").Top = Global.G_Form.Items.Item("STStyleNo").Top + 18;
@@ -747,7 +747,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE
                        && pVal.ItemUID == "SCGrid"
                        && pVal.BeforeAction == false)
-                    {
+                     {
                         try
                         {
                             Global.G_Form.Freeze(true);
@@ -805,7 +805,8 @@ namespace Apparel_Dynamic_1._0.Modules
 
                                 if (currentCol == "Colour Name" ||
                                     currentCol == "Colour Code" ||
-                                    currentCol == "Total")
+                                    currentCol == "Total" ||
+                                    currentCol == "RCount")
                                     continue;
 
                                 object val = Global.oDataTable.Columns.Item(j).Cells.Item(dtRow).Value;
@@ -832,34 +833,231 @@ namespace Apparel_Dynamic_1._0.Modules
                                 SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction)
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_VALIDATE && pVal.ItemUID == "38" && pVal.ColUID == "11" && pVal.BeforeAction == false)
                     {
                         try
                         {
-                            SAPbouiCOM.IChooseFromListEvent cflEvent = (SAPbouiCOM.IChooseFromListEvent)pVal;
-                            if (cflEvent.ChooseFromListUID == "CFL_OTT")
-                            {
-                                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                                SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFL_OTT");
-
-                                SAPbouiCOM.Conditions oCons = (SAPbouiCOM.Conditions)
-                                    Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
-
-                                SAPbouiCOM.Condition oCon1 = oCons.Add();
-                                oCon1.Alias = "U_OTTSTTS";
-                                oCon1.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
-                                oCon1.CondVal = "C";
-
-                                oCFL.SetConditions(oCons);
-                            }
+                            UpdateTotalQtyFromMatrix(Global.G_Form);
                         }
                         catch (Exception ex)
                         {
-                            Application.SBO_Application.StatusBar.SetText(
-                                "Error filtering OTT CFL: " + ex.Message,
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                            Global.GFunc.ShowError("Error updating total quantity: " + ex.Message);
+                        }
+                    }
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction)
+                    //{
+                    //    try
+                    //    {
+                    //        SAPbouiCOM.IChooseFromListEvent cflEvent = (SAPbouiCOM.IChooseFromListEvent)pVal;
+                    //        if (cflEvent.ChooseFromListUID == "CFL_OTT")
+                    //        {
+                    //            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    //            SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFL_OTT");
+
+                    //            SAPbouiCOM.Conditions oCons = (SAPbouiCOM.Conditions)
+                    //                Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+
+                    //            SAPbouiCOM.Condition oCon1 = oCons.Add();
+                    //            oCon1.Alias = "U_OTTSTTS";
+                    //            oCon1.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    //            oCon1.CondVal = "C";
+
+                    //            oCFL.SetConditions(oCons);
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        Application.SBO_Application.StatusBar.SetText(
+                    //            "Error filtering OTT CFL: " + ex.Message,
+                    //            SAPbouiCOM.BoMessageTime.bmt_Short,
+                    //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    //        BubbleEvent = false;
+                    //    }
+                    //}
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction == true)
+                    //{
+                    //    SAPbobsCOM.Recordset oRecordset = null;
+
+                    //    try
+                    //    {
+                    //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                    //        SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSTYLNO").Specific;
+                    //        string styleCode = etStyleNo.Value.Trim();
+
+                    //        if (string.IsNullOrWhiteSpace(styleCode))
+                    //        {
+                    //            BubbleEvent = false;
+                    //            Global.GFunc.ShowError("Please select Style No. first.");
+                    //            return;
+                    //        }
+
+                    //        SAPbouiCOM.IChooseFromListEvent cflEvent = (SAPbouiCOM.IChooseFromListEvent)pVal;
+
+                    //        if (cflEvent.ChooseFromListUID != "CFL_OTT")
+                    //            return;
+
+                    //        string safeStyleCode = styleCode.Replace("'", "''");
+
+                    //        string query = @"SELECT DISTINCT H.""DocNum""
+                    //                         FROM ""@FIL_DH_OTT"" H
+                    //                         INNER JOIN ""@FIL_DR_TT1"" D ON D.""DocEntry"" = H.""DocEntry""
+                    //                         WHERE D.""U_STYLECODE"" = '" + safeStyleCode + @"'
+                    //                         AND H.""U_OTTSTTS"" = 'C'
+                    //                         ORDER BY H.""DocNum""";
+
+                    //        oRecordset = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                    //        oRecordset.DoQuery(query);
+
+                    //        if (oRecordset.EoF)
+                    //        {
+                    //            BubbleEvent = false;
+                    //            Global.GFunc.ShowError("No OTT found for Style No. " + styleCode + ".");
+                    //            return;
+                    //        }
+
+                    //        SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFL_OTT");
+
+                    //        SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+
+                    //        while (!oRecordset.EoF)
+                    //        {
+                    //            string docNum = oRecordset.Fields.Item("DocNum").Value.ToString().Trim();
+
+                    //            SAPbouiCOM.Condition oCondition = oConditions.Add();
+                    //            oCondition.Alias = "DocNum";
+                    //            oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    //            oCondition.CondVal = docNum;
+
+                    //            oRecordset.MoveNext();
+
+                    //            if (!oRecordset.EoF)
+                    //                oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_OR;
+                    //        }
+
+                    //        oCFL.SetConditions(oConditions);
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        BubbleEvent = false;
+                    //        Global.GFunc.ShowError("Error filtering OTT CFL: " + ex.Message);
+                    //    }
+                    //    finally
+                    //    {
+                    //        if (oRecordset != null)
+                    //        {
+                    //            try
+                    //            {
+                    //                System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordset);
+                    //                oRecordset = null;
+                    //            }
+                    //            catch
+                    //            {
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction == true)
+                    {
+                        SAPbobsCOM.Recordset oRecordset = null;
+
+                        try
+                        {
+                            SAPbouiCOM.IChooseFromListEvent cflEvent = (SAPbouiCOM.IChooseFromListEvent)pVal;
+
+                            if (cflEvent.ChooseFromListUID != "CFL_OTT")
+                                return;
+
+                            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                            SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFL_OTT");
+                            SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSTYLNO").Specific;
+
+                            string styleCode = etStyleNo.Value.Trim();
+
+                            if (string.IsNullOrWhiteSpace(styleCode))
+                            {
+                                SAPbouiCOM.Conditions oEmptyConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+                                SAPbouiCOM.Condition oEmptyCondition = oEmptyConditions.Add();
+
+                                oEmptyCondition.Alias = "DocNum";
+                                oEmptyCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                                oEmptyCondition.CondVal = "-999999999";
+
+                                oCFL.SetConditions(oEmptyConditions);
+
+                                BubbleEvent = false;
+
+                                Global.GFunc.ShowError("Please select Style No. first.");
+
+                                return;
+                            }
+
+                            string safeStyleCode = styleCode.Replace("'", "''");
+
+                            string query = @"SELECT DISTINCT H.""DocNum""
+                                             FROM ""@FIL_DH_OTT"" H
+                                             INNER JOIN ""@FIL_DR_TT1"" D ON D.""DocEntry"" = H.""DocEntry""
+                                             WHERE D.""U_STYLECODE"" = '" + safeStyleCode + @"'
+                                             AND H.""U_OTTSTTS"" = 'C'
+                                             ORDER BY H.""DocNum""";
+
+                            oRecordset = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                            oRecordset.DoQuery(query);
+
+                            if (oRecordset.EoF)
+                            {
+                                SAPbouiCOM.Conditions oEmptyConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+                                SAPbouiCOM.Condition oEmptyCondition = oEmptyConditions.Add();
+
+                                oEmptyCondition.Alias = "DocNum";
+                                oEmptyCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                                oEmptyCondition.CondVal = "-999999999";
+
+                                oCFL.SetConditions(oEmptyConditions);
+
+                                Global.GFunc.ShowError("No OTT found for Style No. " + styleCode + ".");
+
+                                return;
+                            }
+
+                            SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+
+                            while (!oRecordset.EoF)
+                            {
+                                string docNum = oRecordset.Fields.Item("DocNum").Value.ToString().Trim();
+
+                                SAPbouiCOM.Condition oCondition = oConditions.Add();
+
+                                oCondition.Alias = "DocNum";
+                                oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                                oCondition.CondVal = docNum;
+
+                                oRecordset.MoveNext();
+
+                                if (!oRecordset.EoF)
+                                    oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_OR;
+                            }
+
+                            oCFL.SetConditions(oConditions);
+                        }
+                        catch (Exception ex)
+                        {
                             BubbleEvent = false;
+                            Global.GFunc.ShowError("Error filtering OTT CFL: " + ex.Message);
+                        }
+                        finally
+                        {
+                            if (oRecordset != null)
+                            {
+                                try
+                                {
+                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordset);
+                                    oRecordset = null;
+                                }
+                                catch
+                                {
+                                }
+                            }
                         }
                     }
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST && pVal.ItemUID == "ETOTTNO" && pVal.BeforeAction == false)
@@ -980,31 +1178,100 @@ namespace Apparel_Dynamic_1._0.Modules
                                 Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSLNTRY").Specific;
                                 Global.oEdit.Value = oDataTable.GetValue("DocEntry", 0).ToString().Trim();
 
+                                Global.oEdit = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCUSLNM").Specific;
+                                Global.oEdit.Value = oDataTable.GetValue("U_BURSNAME", 0).ToString().Trim();
+
                             }
                         }
                         catch { }
                     }
+                    //tHIS IS PREV 
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "BTNSTYLD" && pVal.BeforeAction == false)
+                    //{
+                    //    try
+                    //    {
+                    //        SAPbouiCOM.EditText oETSTYLNO =(SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+                    //        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)Global.G_Form.Items.Item("38").Specific;
+                    //        if (string.IsNullOrWhiteSpace(oETSTYLNO.Value))
+                    //        {
+                    //            Application.SBO_Application.StatusBar.SetText(
+                    //                "Please select a Style Master.",
+                    //                SAPbouiCOM.BoMessageTime.bmt_Short,
+                    //                SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                    //            return;
+                    //        }
+
+                    //        Global.G_Form.Freeze(true);
+                    //        // First clear matrix 38 if it already has rows/item codes
+                    //        ClearQuotationMatrix(ref Global.G_Form);
+                    //        // Then load grid
+                    //        LoadGrid(ref Global.G_Form, false);
+                    //        Global.G_Form.Freeze(false);
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        try
+                    //        {
+                    //            Global.G_Form.Freeze(false);
+                    //        }
+                    //        catch { }
+
+                    //        Application.SBO_Application.StatusBar.SetText(
+                    //            "Error in BTNSTYLD: " + ex.Message,
+                    //            SAPbouiCOM.BoMessageTime.bmt_Short,
+                    //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    //    }
+                    //}
+
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "BTNSTYLD" && pVal.BeforeAction == false)
                     {
                         try
                         {
-                            SAPbouiCOM.EditText oETSTYLNO =
-                                (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
-                            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)Global.G_Form.Items.Item("38").Specific;
+                            SAPbouiCOM.EditText oETSTYLNO = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+
                             if (string.IsNullOrWhiteSpace(oETSTYLNO.Value))
                             {
-                                Application.SBO_Application.StatusBar.SetText(
-                                    "Please select a Style Master.",
-                                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                                    SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                                Global.GFunc.ShowError("Please select a Style Master.");
                                 return;
                             }
 
                             Global.G_Form.Freeze(true);
-                            // First clear matrix 38 if it already has rows/item codes
-                            ClearQuotationMatrix(ref Global.G_Form);
-                            // Then load grid
-                            LoadGrid(ref Global.G_Form, false);
+
+                            RefreshGridPreserveQty(ref Global.G_Form);
+
+                            Global.G_Form.Freeze(false);
+
+                            Global.GFunc.ShowSuccess("Style information loaded successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            try
+                            {
+                                Global.G_Form.Freeze(false);
+                            }
+                            catch
+                            {
+                            }
+
+                            Global.GFunc.ShowError("Error in Load Info: " + ex.Message);
+                        }
+                    }
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "BTQty" && pVal.BeforeAction == false)
+                    {
+                        try
+                        {
+                            SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+
+                            if (string.IsNullOrWhiteSpace(etStyleNo.Value))
+                            {
+                                Global.GFunc.ShowError("Please select Style No. first.");
+                                return;
+                            }
+
+                            Global.G_Form.Freeze(true);
+
+                            LoadMatrix(ref Global.G_Form);
+
                             Global.G_Form.Freeze(false);
                         }
                         catch (Exception ex)
@@ -1013,51 +1280,16 @@ namespace Apparel_Dynamic_1._0.Modules
                             {
                                 Global.G_Form.Freeze(false);
                             }
-                            catch { }
-
-                            Application.SBO_Application.StatusBar.SetText(
-                                "Error in BTNSTYLD: " + ex.Message,
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                        }
-                    }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "BTQty" && pVal.BeforeAction == false)
-                    {
-                        try
-                        {
-                            SAPbouiCOM.EditText etStyleNo =
-                                (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
-
-                            if (string.IsNullOrWhiteSpace(etStyleNo.Value))
+                            catch
                             {
-                                Application.SBO_Application.StatusBar.SetText(
-                                    "Please select Style No. first.",
-                                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                                return;
                             }
 
-                            Global.G_Form.Freeze(true);
-                            LoadMatrix(ref Global.G_Form);
-                            Global.G_Form.Freeze(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            try { Global.G_Form.Freeze(false); } catch { }
-
-                            Application.SBO_Application.StatusBar.SetText(
-                                "Error in BTQty: " + ex.Message,
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                            Global.GFunc.ShowError("Error in Get Item: " + ex.Message);
                         }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED
-       && pVal.ItemUID == "1"
-       && pVal.BeforeAction == true
-       &&
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true &&
        (
-           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE ||
-           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
+           Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE
        ))
                     {
                         try
@@ -1079,14 +1311,7 @@ namespace Apparel_Dynamic_1._0.Modules
                                 return;
                             }
 
-                            // =========================
-                            // 2. Matrix 38 Qty vs SCGrid Qty Validation
-                            // =========================
-                            if (!ValidateMatrixAndGridQty(Global.G_Form))
-                            {
-                                BubbleEvent = false;
-                                return;
-                            }
+                           
 
                             Global.G_Form.Freeze(true);
 
@@ -1144,6 +1369,78 @@ namespace Apparel_Dynamic_1._0.Modules
                             return;
                         }
                     }
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == true && (Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE))
+                    //{
+                    //    try
+                    //    {
+                    //        SAPbouiCOM.EditText etStyleNo = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETSTYLNO").Specific;
+
+                    //        if (string.IsNullOrWhiteSpace(etStyleNo.Value))
+                    //        {
+                    //            BubbleEvent = false;
+                    //            Global.GFunc.ShowError("Please enter the Style Code first.");
+                    //            return;
+                    //        }
+
+                    //        if (!ValidateMatrixAndGridQty(Global.G_Form))
+                    //        {
+                    //            BubbleEvent = false;
+
+                    //            Application.SBO_Application.MessageBox("VALIDATION FAILED - BUBBLE EVENT FALSE");
+
+                    //            return;
+                    //        }
+
+                    //        Global.G_Form.Freeze(true);
+
+                    //        int sizeEntry = 0;
+
+                    //        SAPbouiCOM.EditText etSizeEntry = (SAPbouiCOM.EditText)Global.G_Form.Items.Item("ETCRSZNTRY").Specific;
+
+                    //        if (!string.IsNullOrWhiteSpace(etSizeEntry.Value))
+                    //            sizeEntry = Convert.ToInt32(etSizeEntry.Value);
+
+                    //        try
+                    //        {
+                    //            if (!Global.oComp.InTransaction)
+                    //                Global.oComp.StartTransaction();
+
+                    //            InsertSizeDetails(Global.G_Form, "", "", sizeEntry);
+
+                    //            if (Global.oComp.InTransaction)
+                    //                Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            if (Global.oComp.InTransaction)
+                    //                Global.oComp.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+
+                    //            BubbleEvent = false;
+
+                    //            Global.GFunc.ShowError("Error saving Size-Colour details: " + ex.Message);
+
+                    //            return;
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        BubbleEvent = false;
+                    //        Global.GFunc.ShowError("Error before saving document: " + ex.Message);
+                    //        return;
+                    //    }
+                    //    finally
+                    //    {
+                    //        try
+                    //        {
+                    //            Global.G_Form.Freeze(false);
+                    //        }
+                    //        catch
+                    //        {
+                    //        }
+                    //    }
+                    //}
+                    //Test
+
                     else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == false && Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                     {
                         try
@@ -1172,6 +1469,20 @@ namespace Apparel_Dynamic_1._0.Modules
 
             try
             {
+                if (BusinessObjectInfo.FormTypeEx == "149" &&
+                    BusinessObjectInfo.BeforeAction == true &&
+                    (BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD ||
+                     BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE))
+                {
+                    SAPbouiCOM.Form oForm =
+                        Application.SBO_Application.Forms.Item(BusinessObjectInfo.FormUID);
+
+                    if (!ValidateDraftOrderAgainstSalesContract(oForm, ref BubbleEvent))
+                    {
+                        BubbleEvent = false;
+                        return;
+                    }
+                }
                 if (BusinessObjectInfo.BeforeAction == false &&
                     BusinessObjectInfo.EventType == SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
                 {
@@ -1314,36 +1625,75 @@ namespace Apparel_Dynamic_1._0.Modules
                     SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
+        //prev workkable field diable enable except styleno
+        //private void SetCustomItemState(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        bool isFindMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+
+        //        // Editable fields
+        //        oForm.Items.Item("ETSTYLNO").Enabled = true;
+        //        oForm.Items.Item("ETOTTNO").Enabled = true;
+        //        oForm.Items.Item("ETSCNO").Enabled = true;
+        //        oForm.Items.Item("BTNSTYLD").Enabled = true;
+        //        oForm.Items.Item("BTQty").Enabled = true;
+
+        //        // Always disabled except FIND mode
+        //        SetEditable(oForm, "ETOTNTRY", isFindMode);
+        //        SetEditable(oForm, "ETSCNTRY", isFindMode);
+        //        SetEditable(oForm, "ETSTYLDS", isFindMode);
+        //        SetEditable(oForm, "ETSLNTRY", isFindMode);
+        //        SetEditable(oForm, "ETCRSZNTRY", isFindMode);
+        //        SetEditable(oForm, "ETCUSLNM", isFindMode);
+
+        //        // Always disabled
+        //        SetEditable(oForm, "ETQty", false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "SetCustomItemState Error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
 
         private void SetCustomItemState(SAPbouiCOM.Form oForm)
         {
             try
             {
                 bool isFindMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                bool isAddMode = oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE;
 
-                // Editable fields
-                oForm.Items.Item("ETSTYLNO").Enabled = true;
+                bool canChangeStyle = isAddMode || isFindMode;
+
+                // ************** STYLE NO **************
+                SetEditable(oForm, "ETSTYLNO", canChangeStyle);
+
+                if (isAddMode)
+                {
+                    Global.GFunc.ReEnableChooseFromList(oForm,"ETSTYLNO","CFL_OPSM","U_STYLECODE");
+                }
+
+                // ************** OTHER CONTROLS **************
                 oForm.Items.Item("ETOTTNO").Enabled = true;
                 oForm.Items.Item("ETSCNO").Enabled = true;
                 oForm.Items.Item("BTNSTYLD").Enabled = true;
                 oForm.Items.Item("BTQty").Enabled = true;
 
-                // Always disabled except FIND mode
                 SetEditable(oForm, "ETOTNTRY", isFindMode);
                 SetEditable(oForm, "ETSCNTRY", isFindMode);
                 SetEditable(oForm, "ETSTYLDS", isFindMode);
                 SetEditable(oForm, "ETSLNTRY", isFindMode);
                 SetEditable(oForm, "ETCRSZNTRY", isFindMode);
+                SetEditable(oForm, "ETCUSLNM", isFindMode);
 
-                // Always disabled
                 SetEditable(oForm, "ETQty", false);
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "SetCustomItemState Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("SetCustomItemState Error: " + ex.Message);
             }
         }
 
@@ -1594,117 +1944,423 @@ namespace Apparel_Dynamic_1._0.Modules
 
 
 
+        //private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
+        //{
+        //    try
+        //    {
+        //        string qStr = string.Empty;
+
+        //        if (FromDataEvent == false)
+        //        {
+        //            SAPbouiCOM.EditText oETSLNTRY =
+        //                (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+
+        //            qStr = @"
+        //                    SELECT A.""U_SIZECODE""
+        //                    FROM ""@FIL_DR_PSMST"" A
+        //                    INNER JOIN ""@FIL_MR_STM1"" B ON B.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                    WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //                    AND A.""U_SIZEAPPL"" = 'Y'
+        //                    GROUP BY A.""U_SIZECODE""
+        //                    ORDER BY A.""U_SIZECODE""";
+
+        //            SAPbobsCOM.Recordset SizerSet =
+        //                (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //            SizerSet.DoQuery(qStr);
+
+        //            string SizeString = "";
+
+        //            while (!SizerSet.EoF)
+        //            {
+        //                string sizeCode = SizerSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //                string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+        //                SizeString += @"0 AS """ + safeSizeCodeAlias + @"""";
+
+        //                SizerSet.MoveNext();
+
+        //                if (!SizerSet.EoF)
+        //                    SizeString += ",";
+        //            }
+
+        //            //qStr = @"
+        //            //        SELECT ""U_COLORNAME"" AS ""Colour Name"",
+        //            //               ""U_COLORCODE"" AS ""Colour Code"""
+        //            //               + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //            //               ""Total"" AS ""Total""
+        //            //                FROM
+        //            //                (
+        //            //                        SELECT 0 AS ""LineId"",
+        //            //                               B.""LineId"" AS ""RCount"",
+        //            //                               B.""U_COLORCODE"",
+        //            //                               B.""U_COLORNAME"",
+        //            //                               0 AS ""Total""
+        //            //                        FROM ""@FIL_DR_PSMST"" A
+        //            //                        INNER JOIN ""@FIL_DR_PSMCO"" B
+        //            //                            ON A.""DocEntry"" = B.""DocEntry""
+        //            //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //            //                        GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
+        //            //                ) V1
+        //            //                ORDER BY V1.""RCount""";
+        //            qStr = @"
+        //                    SELECT ""U_COLORNAME"" AS ""Colour Name"",
+        //                           ""U_COLORCODE"" AS ""Colour Code"""
+        //                           + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           ""Total"" AS ""Total""
+        //                    FROM
+        //                    (
+        //                        SELECT 0 AS ""LineId"",
+        //                               B.""LineId"" AS ""RCount"",
+        //                               B.""U_COLORCODE"",
+        //                               B.""U_COLORNAME"",
+        //                               0 AS ""Total""
+        //                        FROM ""@FIL_DR_PSMST"" A
+        //                        INNER JOIN ""@FIL_DR_PSMCO"" B
+        //                            ON A.""DocEntry"" = B.""DocEntry""
+        //                        WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
+        //                          AND A.""U_SIZEAPPL"" = 'Y'
+        //                        GROUP BY B.""LineId"",
+        //                                 B.""U_COLORCODE"",
+        //                                 B.""U_COLORNAME""
+        //                    ) V1
+        //                    ORDER BY V1.""RCount""";
+        //        }
+        //        else
+        //        {
+        //            string docEntry = pform.DataSources.DBDataSources.Item("OQUT")
+        //                              .GetValue("U_CRSZNTRY", 0).ToString().Trim();
+
+        //            if (string.IsNullOrWhiteSpace(docEntry))
+        //                return;
+
+        //            string styleEntry = pform.DataSources.DBDataSources.Item("OQUT")
+        //             .GetValue("U_STYLENTRY", 0)
+        //             .ToString()
+        //             .Trim();
+
+        //            qStr = @"
+        //                    SELECT A.""U_SIZECODE""
+        //                    FROM ""@FIL_DR_OQUT"" A
+        //                    INNER JOIN ""@FIL_DR_PSMST"" S
+        //                        ON S.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                       AND S.""U_SIZEAPPL"" = 'Y'
+        //                    WHERE A.""DocEntry"" = '" + docEntry + @"'
+        //                    GROUP BY A.""U_SIZECODE""
+        //                    ORDER BY A.""U_SIZECODE""";
+
+        //            SAPbobsCOM.Recordset SizerSet1 =
+        //                (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //            SizerSet1.DoQuery(qStr);
+
+        //            string SizeString = "";
+
+        //            while (!SizerSet1.EoF)
+        //            {
+        //                string sizeCode = SizerSet1.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //                string safeSizeCodeValue = sizeCode.Replace("'", "''");
+        //                string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+        //                SizeString += @"SUM(CASE
+        //                    WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"'
+        //                    THEN A.""U_QTY""
+        //                    ELSE 0
+        //                END) AS """ + safeSizeCodeAlias + @"""";
+
+        //                SizerSet1.MoveNext();
+
+        //                if (!SizerSet1.EoF)
+        //                    SizeString += ",";
+        //            }
+
+        //            qStr = @"
+        //                    SELECT A.""U_COLORNAME"" AS ""Colour Name"",
+        //                           A.""U_COLORCODE"" AS ""Colour Code"""
+        //                            + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           SUM(A.""U_QTY"") AS ""Total""
+        //                    FROM ""@FIL_DR_OQUT"" A
+        //                    INNER JOIN ""@FIL_DR_PSMST"" S
+        //                        ON S.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND S.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                       AND S.""U_SIZEAPPL"" = 'Y'
+        //                    WHERE A.""DocEntry"" = '" + docEntry + @"'
+        //                    GROUP BY A.""U_COLORNAME"",
+        //                             A.""U_COLORCODE""
+        //                    ORDER BY A.""U_COLORCODE""";
+        //        }
+
+        //        Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
+        //        Global.oDataTable = pform.DataSources.DataTables.Item("DT_0");
+
+        //        Global.oDataTable.ExecuteQuery(qStr);
+        //        Global.oGrid.DataTable = Global.oDataTable;
+
+        //        Global.oGrid.Columns.Item("Colour Name").Editable = false;
+        //        Global.oGrid.Columns.Item("Colour Code").Editable = false;
+        //        Global.oGrid.Columns.Item("Total").Editable = false;
+
+        //        Global.oGrid.AutoResizeColumns();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error in LoadGrid: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        private void RefreshGridPreserveQty(ref SAPbouiCOM.Form pForm)
+        {
+            try
+            {
+                SAPbouiCOM.DataTable oldDataTable = pForm.DataSources.DataTables.Item("DT_0");
+                Dictionary<string, double> oldQty = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+
+                if (oldDataTable != null && oldDataTable.Rows.Count > 0)
+                {
+                    for (int row = 0; row < oldDataTable.Rows.Count; row++)
+                    {
+                        string colourCode = "";
+
+                        try
+                        {
+                            object colourObj = oldDataTable.Columns.Item("Colour Code").Cells.Item(row).Value;
+
+                            if (colourObj != null)
+                                colourCode = colourObj.ToString().Trim();
+                        }
+                        catch
+                        {
+                            colourCode = "";
+                        }
+
+                        if (string.IsNullOrWhiteSpace(colourCode))
+                            continue;
+
+                        for (int col = 0; col < oldDataTable.Columns.Count; col++)
+                        {
+                            string columnName = oldDataTable.Columns.Item(col).Name;
+
+                            if (columnName == "Colour Name" || columnName == "Colour Code" || columnName == "Total")
+                                continue;
+
+                            double qty = 0;
+
+                            try
+                            {
+                                object qtyObj = oldDataTable.Columns.Item(columnName).Cells.Item(row).Value;
+
+                                if (qtyObj != null && !string.IsNullOrWhiteSpace(qtyObj.ToString()))
+                                    double.TryParse(qtyObj.ToString(), out qty);
+                            }
+                            catch
+                            {
+                                qty = 0;
+                            }
+
+                            string key = colourCode + "|" + columnName;
+
+                            if (oldQty.ContainsKey(key))
+                                oldQty[key] = qty;
+                            else
+                                oldQty.Add(key, qty);
+                        }
+                    }
+                }
+
+                LoadGrid(ref pForm, false);
+
+                SAPbouiCOM.DataTable newDataTable = pForm.DataSources.DataTables.Item("DT_0");
+
+                if (newDataTable == null || newDataTable.Rows.Count == 0)
+                    return;
+
+                for (int row = 0; row < newDataTable.Rows.Count; row++)
+                {
+                    string colourCode = "";
+
+                    try
+                    {
+                        object colourObj = newDataTable.Columns.Item("Colour Code").Cells.Item(row).Value;
+
+                        if (colourObj != null)
+                            colourCode = colourObj.ToString().Trim();
+                    }
+                    catch
+                    {
+                        colourCode = "";
+                    }
+
+                    if (string.IsNullOrWhiteSpace(colourCode))
+                        continue;
+
+                    double rowTotal = 0;
+
+                    for (int col = 0; col < newDataTable.Columns.Count; col++)
+                    {
+                        string columnName = newDataTable.Columns.Item(col).Name;
+
+                        if (columnName == "Colour Name" || columnName == "Colour Code" || columnName == "Total")
+                            continue;
+
+                        string key = colourCode + "|" + columnName;
+                        double qty = 0;
+
+                        if (oldQty.ContainsKey(key))
+                        {
+                            qty = oldQty[key];
+                            newDataTable.Columns.Item(columnName).Cells.Item(row).Value = qty.ToString();
+                        }
+
+                        rowTotal += qty;
+                    }
+
+                    newDataTable.Columns.Item("Total").Cells.Item(row).Value = rowTotal.ToString();
+                }
+
+                SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)pForm.Items.Item("SCGrid").Specific;
+
+                oGrid.DataTable = newDataTable;
+                oGrid.Columns.Item("Colour Name").Editable = false;
+                oGrid.Columns.Item("Colour Code").Editable = false;
+                oGrid.Columns.Item("Total").Editable = false;
+                oGrid.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error refreshing Size-Colour grid: " + ex.Message);
+            }
+        }
+
         private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
         {
             try
             {
                 string qStr = string.Empty;
+                string SizeString = string.Empty;
 
+                Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
+                Global.oDataTable = pform.DataSources.DataTables.Item("DT_0");
+
+                // ============================================================
+                // LOAD INFO / NEW DATA
+                // Structure comes from CURRENT STYLE MASTER
+                // ============================================================
                 if (FromDataEvent == false)
                 {
-                    SAPbouiCOM.EditText oETSLNTRY =
-                        (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+                    string styleEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLENTRY", 0).ToString().Trim();
+
+                    if (string.IsNullOrWhiteSpace(styleEntry))
+                    {
+                        SAPbouiCOM.EditText oETSLNTRY = (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+                        styleEntry = oETSLNTRY.Value.Trim();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(styleEntry))
+                    {
+                        Global.GFunc.ShowError("Style Entry is missing.");
+                        return;
+                    }
+
+                    string safeStyleEntry = styleEntry.Replace("'", "''");
 
                     qStr = @"
-                            SELECT A.""U_SIZECODE""
+                            SELECT A.""U_SIZECODE"",
+                                   A.""LineId""
                             FROM ""@FIL_DR_PSMST"" A
-                            INNER JOIN ""@FIL_MR_STM1"" B ON B.""U_SIZECODE"" = A.""U_SIZECODE""
-                            WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                            AND A.""U_SIZEAPPL"" = 'Y'
-                            GROUP BY A.""U_SIZECODE""
-                            ORDER BY A.""U_SIZECODE""";
+                            WHERE A.""DocEntry"" = '" + safeStyleEntry + @"'
+                              AND A.""U_SIZEAPPL"" = 'Y'
+                            ORDER BY A.""LineId""";
 
-                    SAPbobsCOM.Recordset SizerSet =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                    SizerSet.DoQuery(qStr);
+                    SAPbobsCOM.Recordset sizeSet = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                    sizeSet.DoQuery(qStr);
 
-                    string SizeString = "";
-
-                    while (!SizerSet.EoF)
+                    while (!sizeSet.EoF)
                     {
-                        string sizeCode = SizerSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+                        string sizeCode = sizeSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
                         string safeSizeCodeAlias = sizeCode.Replace("\"", "");
 
                         SizeString += @"0 AS """ + safeSizeCodeAlias + @"""";
 
-                        SizerSet.MoveNext();
+                        sizeSet.MoveNext();
 
-                        if (!SizerSet.EoF)
+                        if (!sizeSet.EoF)
                             SizeString += ",";
                     }
 
                     qStr = @"
-                            SELECT ""U_COLORNAME"" AS ""Colour Name"",
-                                   ""U_COLORCODE"" AS ""Colour Code"""
+                    SELECT B.""U_COLORNAME"" AS ""Colour Name"",
+                           B.""U_COLORCODE"" AS ""Colour Code"""
                                    + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
-                                   ""Total"" AS ""Total""
-                                    FROM
-                                    (
-                                            SELECT 0 AS ""LineId"",
-                                                   B.""LineId"" AS ""RCount"",
-                                                   B.""U_COLORCODE"",
-                                                   B.""U_COLORNAME"",
-                                                   0 AS ""Total""
-                                            FROM ""@FIL_DR_PSMST"" A
-                                            INNER JOIN ""@FIL_DR_PSMCO"" B
-                                                ON A.""DocEntry"" = B.""DocEntry""
-                                            WHERE A.""DocEntry"" = '" + oETSLNTRY.Value.Trim() + @"'
-                                            GROUP BY B.""LineId"", B.""U_COLORCODE"", B.""U_COLORNAME""
-                                    ) V1
-                                    ORDER BY V1.""RCount""";
+                           0 AS ""Total""
+                    FROM ""@FIL_DR_PSMCO"" B
+                    WHERE B.""DocEntry"" = '" + safeStyleEntry + @"'
+                    ORDER BY B.""LineId""";
                 }
+
+                // ============================================================
+                // PREVIOUS / DRAFT / SAVED DATA
+                // EVERYTHING comes ONLY from @FIL_DR_OQUT
+                // Do NOT take new Size or Colour from Style Master
+                // ============================================================
                 else
                 {
-                    string docEntry = pform.DataSources.DBDataSources.Item("OQUT")
-                                      .GetValue("U_CRSZNTRY", 0).ToString().Trim();
+                    string sizeEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_CRSZNTRY", 0).ToString().Trim();
 
-                    if (string.IsNullOrWhiteSpace(docEntry))
+                    if (string.IsNullOrWhiteSpace(sizeEntry))
                         return;
 
+                    string safeSizeEntry = sizeEntry.Replace("'", "''");
+
+                    // ========================================================
+                    // Saved Size columns only
+                    // ========================================================
+
                     qStr = @"
-                            SELECT A.""U_SIZECODE""
-                            FROM ""@FIL_DR_OQUT"" A
-                            WHERE A.""DocEntry"" = '" + docEntry + @"'
-                            GROUP BY A.""U_SIZECODE""
-                            ORDER BY A.""U_SIZECODE""";
+                    SELECT A.""U_SIZECODE"",
+                           MIN(A.""LineId"") AS ""RCount""
+                    FROM ""@FIL_DR_OQUT"" A
+                    WHERE A.""DocEntry"" = '" + safeSizeEntry + @"'
+                    GROUP BY A.""U_SIZECODE""
+                    ORDER BY ""RCount""";
 
-                    SAPbobsCOM.Recordset SizerSet1 =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                    SizerSet1.DoQuery(qStr);
+                    SAPbobsCOM.Recordset sizeSet = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                    sizeSet.DoQuery(qStr);
 
-                    string SizeString = "";
-
-                    while (!SizerSet1.EoF)
+                    while (!sizeSet.EoF)
                     {
-                        string sizeCode = SizerSet1.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+                        string sizeCode = sizeSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
                         string safeSizeCodeValue = sizeCode.Replace("'", "''");
                         string safeSizeCodeAlias = sizeCode.Replace("\"", "");
 
                         SizeString += @"SUM(CASE
-                            WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"'
-                            THEN A.""U_QTY""
-                            ELSE 0
-                        END) AS """ + safeSizeCodeAlias + @"""";
+                                    WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"'
+                                    THEN IFNULL(A.""U_QTY"", 0)
+                                    ELSE 0
+                                END) AS """ + safeSizeCodeAlias + @"""";
 
-                        SizerSet1.MoveNext();
+                        sizeSet.MoveNext();
 
-                        if (!SizerSet1.EoF)
+                        if (!sizeSet.EoF)
                             SizeString += ",";
                     }
 
+                    // ========================================================
+                    // Saved Colours only
+                    // ========================================================
                     qStr = @"
-                            SELECT A.""U_COLORNAME"" AS ""Colour Name"",
-                                   A.""U_COLORCODE"" AS ""Colour Code"""
-                                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
-                                   SUM(A.""U_QTY"") AS ""Total""
-                            FROM ""@FIL_DR_OQUT"" A
-                            WHERE A.""DocEntry"" = '" + docEntry + @"'
-                            GROUP BY A.""U_COLORNAME"", A.""U_COLORCODE""
-                            ORDER BY A.""U_COLORCODE""";
+                    SELECT A.""U_COLORNAME"" AS ""Colour Name"",
+                           A.""U_COLORCODE"" AS ""Colour Code"""
+                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+                           SUM(IFNULL(A.""U_QTY"", 0)) AS ""Total"",
+                           MIN(A.""LineId"") AS ""RCount""
+                    FROM ""@FIL_DR_OQUT"" A
+                    WHERE A.""DocEntry"" = '" + safeSizeEntry + @"'
+                    GROUP BY A.""U_COLORNAME"",
+                             A.""U_COLORCODE""
+                    ORDER BY ""RCount""";
                 }
-
-                Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
-                Global.oDataTable = pform.DataSources.DataTables.Item("DT_0");
 
                 Global.oDataTable.ExecuteQuery(qStr);
                 Global.oGrid.DataTable = Global.oDataTable;
@@ -1713,16 +2369,22 @@ namespace Apparel_Dynamic_1._0.Modules
                 Global.oGrid.Columns.Item("Colour Code").Editable = false;
                 Global.oGrid.Columns.Item("Total").Editable = false;
 
+                try
+                {
+                    Global.oGrid.Columns.Item("RCount").Visible = false;
+                }
+                catch
+                {
+                }
+
                 Global.oGrid.AutoResizeColumns();
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error in LoadGrid: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Error in LoadGrid: " + ex.Message);
             }
         }
+
         private void LoadMatrix(ref SAPbouiCOM.Form pForm)
         {
             try
@@ -1730,17 +2392,18 @@ namespace Apparel_Dynamic_1._0.Modules
                 SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)pForm.Items.Item("38").Specific;
                 SAPbouiCOM.DataTable oDataTable = pForm.DataSources.DataTables.Item("DT_0");
 
-                double TotalQty = 0;
-
                 string styleEntry = pForm.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLENTRY", 0).Trim();
                 string styleCode = pForm.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLECODE", 0).Trim();
 
                 if (string.IsNullOrWhiteSpace(styleEntry) || string.IsNullOrWhiteSpace(styleCode))
                 {
-                    Application.SBO_Application.StatusBar.SetText(
-                        "Style Entry / Style Code is missing.",
-                        SAPbouiCOM.BoMessageTime.bmt_Short,
-                        SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                    Global.GFunc.ShowError("Style Entry / Style Code is missing.");
+                    return;
+                }
+
+                if (oDataTable == null || oDataTable.Rows.Count == 0)
+                {
+                    Global.GFunc.ShowError("Size and Colour grid has no data.");
                     return;
                 }
 
@@ -1753,147 +2416,460 @@ namespace Apparel_Dynamic_1._0.Modules
                 Global.oColumn = oMatrix.Columns.Item("U_STYLECODE");
                 Global.oColumn.Editable = true;
 
-                for (int j = 0; j <= oDataTable.Rows.Count - 1; j++)
-                {
-                    string qStr = @"SELECT A.""ItemCode"",
-                                   A.""U_COLORCODE"",
-                                   B.""U_COLORNAME"",
-                                   A.""U_SIZECODE"",
-                                   C.""U_SIZENAME""
-                            FROM ""OITM"" A
-                            INNER JOIN ""@FIL_DR_PSMCO"" B
-                                ON B.""DocEntry"" = '" + styleEntry + @"'
-                               AND B.""U_COLORCODE"" = A.""U_COLORCODE""
-                            INNER JOIN ""@FIL_DR_PSMST"" C
-                                ON C.""DocEntry"" = '" + styleEntry + @"'
-                               AND C.""U_SIZECODE"" = A.""U_SIZECODE""
-                            WHERE A.""U_STYLECODE"" = '" + styleCode + @"'
-                              AND A.""U_COLORCODE"" = '" + oDataTable.Columns.Item("Colour Code").Cells.Item(j).Value.ToString().Trim() + @"'
-                            ORDER BY B.""LineId"", C.""LineId""";
+                HashSet<string> existingItemCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    SAPbobsCOM.Recordset rs =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    try
+                    {
+                        string existingItemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+
+                        if (!string.IsNullOrWhiteSpace(existingItemCode))
+                            existingItemCodes.Add(existingItemCode);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                int addedCount = 0;
+                int skippedCount = 0;
+
+                for (int j = 0; j < oDataTable.Rows.Count; j++)
+                {
+                    string colourCode = "";
+
+                    try
+                    {
+                        object colourObj = oDataTable.Columns.Item("Colour Code").Cells.Item(j).Value;
+
+                        if (colourObj != null)
+                            colourCode = colourObj.ToString().Trim();
+                    }
+                    catch
+                    {
+                        colourCode = "";
+                    }
+
+                    if (string.IsNullOrWhiteSpace(colourCode))
+                        continue;
+
+                    string safeStyleEntry = styleEntry.Replace("'", "''");
+                    string safeStyleCode = styleCode.Replace("'", "''");
+                    string safeColourCode = colourCode.Replace("'", "''");
+
+                    string qStr = @"
+                                    SELECT A.""ItemCode"",
+                                           A.""U_COLORCODE"",
+                                           B.""U_COLORNAME"",
+                                           A.""U_SIZECODE"",
+                                           C.""U_SIZENAME""
+                                    FROM ""OITM"" A
+                                    INNER JOIN ""@FIL_DR_PSMCO"" B
+                                        ON B.""DocEntry"" = '" + safeStyleEntry + @"'
+                                       AND B.""U_COLORCODE"" = A.""U_COLORCODE""
+                                    INNER JOIN ""@FIL_DR_PSMST"" C
+                                        ON C.""DocEntry"" = '" + safeStyleEntry + @"'
+                                       AND C.""U_SIZECODE"" = A.""U_SIZECODE""
+                                       AND C.""U_SIZEAPPL"" = 'Y'
+                                    WHERE A.""U_STYLECODE"" = '" + safeStyleCode + @"'
+                                      AND A.""U_COLORCODE"" = '" + safeColourCode + @"'
+                                    ORDER BY B.""LineId"",
+                                             C.""LineId""";
+
+                    SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                     rs.DoQuery(qStr);
 
                     while (!rs.EoF)
                     {
-                        double cellValue = 0;
-                        string sizeCode = rs.Fields.Item("U_SIZECODE").Value.ToString().Trim();
                         string itemCode = rs.Fields.Item("ItemCode").Value.ToString().Trim();
+                        string sizeCode = rs.Fields.Item("U_SIZECODE").Value.ToString().Trim();
                         string colorCode = rs.Fields.Item("U_COLORCODE").Value.ToString().Trim();
                         string colorName = rs.Fields.Item("U_COLORNAME").Value.ToString().Trim();
 
-                        object cellObj = null;
+                        double cellValue = 0;
+
                         try
                         {
-                            cellObj = oDataTable.Columns.Item(sizeCode).Cells.Item(j).Value;
+                            object cellObj = oDataTable.Columns.Item(sizeCode).Cells.Item(j).Value;
+
+                            if (cellObj != null && !string.IsNullOrWhiteSpace(cellObj.ToString()))
+                                double.TryParse(cellObj.ToString(), out cellValue);
                         }
                         catch
                         {
-                            cellObj = null;
+                            cellValue = 0;
                         }
 
-                        if (cellObj != null && cellObj.ToString().Trim() != "")
-                            double.TryParse(cellObj.ToString(), out cellValue);
-
-                        int existingRow = FindMatrixRowByItemCode(oMatrix, itemCode);
-
-                        if (cellValue > 0)
+                        // Qty zero or negative means do nothing.
+                        if (cellValue <= 0)
                         {
-                            if (existingRow > 0)
-                            {
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(existingRow).Specific).Value =
-                                    cellValue.ToString();
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLOUR").Cells.Item(existingRow).Specific).Value =
-                                    colorCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLRNM").Cells.Item(existingRow).Specific).Value =
-                                    colorName;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGSIZE").Cells.Item(existingRow).Specific).Value =
-                                    sizeCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLECODE").Cells.Item(existingRow).Specific).Value =
-                                    styleCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLENTRY").Cells.Item(existingRow).Specific).Value =
-                                    styleEntry;
-                            }
-                            else
-                            {
-                                AddMatrixRowIfNeeded(oMatrix);
-
-                                int newRow = oMatrix.RowCount;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(newRow).Specific).Value =
-                                    itemCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLOUR").Cells.Item(newRow).Specific).Value =
-                                    colorCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLRNM").Cells.Item(newRow).Specific).Value =
-                                    colorName;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGSIZE").Cells.Item(newRow).Specific).Value =
-                                    sizeCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLECODE").Cells.Item(newRow).Specific).Value =
-                                    styleCode;
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(newRow).Specific).Value =
-                                    cellValue.ToString();
-
-                                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLENTRY").Cells.Item(newRow).Specific).Value =
-                                    styleEntry;
-                            }
+                            rs.MoveNext();
+                            continue;
                         }
-                        else
+
+                        // Existing Matrix 38 item must remain completely untouched.
+                        if (existingItemCodes.Contains(itemCode))
                         {
-                            // Qty 0 hole existing row delete
-                            if (existingRow > 0)
-                            {
-                                try
-                                {
-                                    oMatrix.DeleteRow(existingRow);
-                                }
-                                catch
-                                {
-                                }
-                            }
+                            skippedCount++;
+                            rs.MoveNext();
+                            continue;
                         }
+
+                        AddMatrixRowIfNeeded(oMatrix);
+
+                        int newRow = oMatrix.RowCount;
+
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(newRow).Specific).Value = itemCode;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLOUR").Cells.Item(newRow).Specific).Value = colorCode;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLRNM").Cells.Item(newRow).Specific).Value = colorName;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGSIZE").Cells.Item(newRow).Specific).Value = sizeCode;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLECODE").Cells.Item(newRow).Specific).Value = styleCode;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLENTRY").Cells.Item(newRow).Specific).Value = styleEntry;
+                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(newRow).Specific).Value = cellValue.ToString();
+
+                        existingItemCodes.Add(itemCode);
+                        addedCount++;
 
                         rs.MoveNext();
                     }
                 }
 
-                // Remove duplicate ItemCode rows if any
-                RemoveDuplicateMatrixRows(oMatrix);
-                // Remove rows where qty = 0 or itemcode blank
-                RemoveZeroQtyAndBlankRows(oMatrix);
-                // Recalculate total qty from matrix
-                TotalQty = 0;
-                for (int i = 1; i <= oMatrix.RowCount; i++)
-                {
-                    string itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
-                    if (!string.IsNullOrWhiteSpace(itemCode))
-                    {
-                        double rowQty = 0;
-                        double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value, out rowQty);
-                        TotalQty += rowQty;
-                    }
-                }
-                ((SAPbouiCOM.EditText)pForm.Items.Item("ETQty").Specific).Value = TotalQty.ToString();
+                //double totalQty = 0;
 
+                //for (int i = 1; i <= oMatrix.RowCount; i++)
+                //{
+                //    try
+                //    {
+                //        string itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+
+                //        if (string.IsNullOrWhiteSpace(itemCode))
+                //            continue;
+
+                //        double rowQty = 0;
+                //        double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim(), out rowQty);
+
+                //        totalQty += rowQty;
+                //    }
+                //    catch
+                //    {
+                //    }
+                //}
+
+                //((SAPbouiCOM.EditText)pForm.Items.Item("ETQty").Specific).Value = totalQty.ToString();
+                UpdateTotalQtyFromMatrix(pForm);
+                if (addedCount > 0)
+                    Global.GFunc.ShowSuccess(addedCount + " new item(s) added successfully.");
+                else
+                    Global.GFunc.ShowSuccess("No new item found to add.");
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error in Load Matrix: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Error in Load Matrix: " + ex.Message);
             }
         }
+
+
+        //pREV WORKING LOAD GRID
+        //private void LoadGrid(ref SAPbouiCOM.Form pform, bool FromDataEvent)
+        //{
+        //    try
+        //    {
+        //        string qStr = string.Empty;
+        //        string SizeString = string.Empty;
+
+        //        string styleEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLENTRY", 0).ToString().Trim();
+
+        //        if (string.IsNullOrWhiteSpace(styleEntry))
+        //        {
+        //            SAPbouiCOM.EditText oETSLNTRY = (SAPbouiCOM.EditText)pform.Items.Item("ETSLNTRY").Specific;
+        //            styleEntry = oETSLNTRY.Value.Trim();
+        //        }
+
+        //        if (string.IsNullOrWhiteSpace(styleEntry))
+        //            return;
+
+        //        // ============================================================
+        //        // SIZE COLUMNS
+        //        // Always take Size from Style Master.
+        //        // Always order Size by @FIL_DR_PSMST.LineId.
+        //        // ============================================================
+        //        qStr = @"
+        //                SELECT A.""U_SIZECODE"", A.""LineId""
+        //                FROM ""@FIL_DR_PSMST"" A
+        //                WHERE A.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+        //                  AND A.""U_SIZEAPPL"" = 'Y'
+        //                ORDER BY A.""LineId""";
+
+        //        SAPbobsCOM.Recordset sizeSet = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //        sizeSet.DoQuery(qStr);
+
+        //        while (!sizeSet.EoF)
+        //        {
+        //            string sizeCode = sizeSet.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //            string safeSizeCodeValue = sizeCode.Replace("'", "''");
+        //            string safeSizeCodeAlias = sizeCode.Replace("\"", "");
+
+        //            if (FromDataEvent == false)
+        //            {
+        //                SizeString += @"0 AS """ + safeSizeCodeAlias + @"""";
+        //            }
+        //            else
+        //            {
+        //                SizeString += @"SUM(CASE WHEN A.""U_SIZECODE"" = '" + safeSizeCodeValue + @"' THEN IFNULL(A.""U_QTY"", 0) ELSE 0 END) AS """ + safeSizeCodeAlias + @"""";
+        //            }
+
+        //            sizeSet.MoveNext();
+
+        //            if (!sizeSet.EoF)
+        //                SizeString += ",";
+        //        }
+
+        //        // ============================================================
+        //        // NEW / LOAD INFO
+        //        // Color always comes from Style Master.
+        //        // Color order = @FIL_DR_PSMCO.LineId.
+        //        // ============================================================
+        //        if (FromDataEvent == false)
+        //        {
+        //            qStr = @"
+        //                    SELECT B.""U_COLORNAME"" AS ""Colour Name"",
+        //                           B.""U_COLORCODE"" AS ""Colour Code"""
+        //                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           0 AS ""Total""
+        //                    FROM ""@FIL_DR_PSMCO"" B
+        //                    WHERE B.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+        //                    ORDER BY B.""LineId""";
+        //        }
+        //        else
+        //        {
+        //            // ============================================================
+        //            // PREVIOUS SAVED DATA
+        //            // Grid structure still comes from Style Master, not OQUT.
+        //            // Therefore blank/zero Size columns do not disappear.
+        //            // Color rows also remain in Style Master LineId order.
+        //            // ============================================================
+        //            string sizeEntry = pform.DataSources.DBDataSources.Item("OQUT").GetValue("U_CRSZNTRY", 0).ToString().Trim();
+
+        //            if (string.IsNullOrWhiteSpace(sizeEntry))
+        //                return;
+
+        //            qStr = @"
+        //                    SELECT B.""U_COLORNAME"" AS ""Colour Name"",
+        //                           B.""U_COLORCODE"" AS ""Colour Code"""
+        //                                   + (string.IsNullOrWhiteSpace(SizeString) ? "" : "," + SizeString) + @",
+        //                           SUM(IFNULL(A.""U_QTY"", 0)) AS ""Total""
+        //                    FROM ""@FIL_DR_PSMCO"" B
+        //                    LEFT JOIN ""@FIL_DR_OQUT"" A
+        //                        ON A.""DocEntry"" = '" + sizeEntry.Replace("'", "''") + @"'
+        //                       AND A.""U_COLORCODE"" = B.""U_COLORCODE""
+        //                       AND A.""U_SIZECODE"" IN
+        //                       (
+        //                           SELECT S.""U_SIZECODE""
+        //                           FROM ""@FIL_DR_PSMST"" S
+        //                           WHERE S.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+        //                             AND S.""U_SIZEAPPL"" = 'Y'
+        //                       )
+        //                    WHERE B.""DocEntry"" = '" + styleEntry.Replace("'", "''") + @"'
+        //                    GROUP BY B.""LineId"", B.""U_COLORNAME"", B.""U_COLORCODE""
+        //                    ORDER BY B.""LineId""";
+        //        }
+
+        //        Global.oGrid = (SAPbouiCOM.Grid)pform.Items.Item("SCGrid").Specific;
+        //        Global.oDataTable = pform.DataSources.DataTables.Item("DT_0");
+
+        //        Global.oDataTable.ExecuteQuery(qStr);
+        //        Global.oGrid.DataTable = Global.oDataTable;
+
+        //        Global.oGrid.Columns.Item("Colour Name").Editable = false;
+        //        Global.oGrid.Columns.Item("Colour Code").Editable = false;
+        //        Global.oGrid.Columns.Item("Total").Editable = false;
+
+        //        Global.oGrid.AutoResizeColumns();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error in LoadGrid: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+        // prev load Grid
+        //private void LoadMatrix(ref SAPbouiCOM.Form pForm)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)pForm.Items.Item("38").Specific;
+        //        SAPbouiCOM.DataTable oDataTable = pForm.DataSources.DataTables.Item("DT_0");
+
+        //        double TotalQty = 0;
+
+        //        string styleEntry = pForm.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLENTRY", 0).Trim();
+        //        string styleCode = pForm.DataSources.DBDataSources.Item("OQUT").GetValue("U_STYLECODE", 0).Trim();
+
+        //        if (string.IsNullOrWhiteSpace(styleEntry) || string.IsNullOrWhiteSpace(styleCode))
+        //        {
+        //            Application.SBO_Application.StatusBar.SetText(
+        //                "Style Entry / Style Code is missing.",
+        //                SAPbouiCOM.BoMessageTime.bmt_Short,
+        //                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //            return;
+        //        }
+
+        //        Global.oColumn = oMatrix.Columns.Item("U_FGCOLOUR");
+        //        Global.oColumn.Editable = true;
+
+        //        Global.oColumn = oMatrix.Columns.Item("U_FGSIZE");
+        //        Global.oColumn.Editable = true;
+
+        //        Global.oColumn = oMatrix.Columns.Item("U_STYLECODE");
+        //        Global.oColumn.Editable = true;
+
+        //        for (int j = 0; j <= oDataTable.Rows.Count - 1; j++)
+        //        {
+        //            string qStr = @"SELECT A.""ItemCode"",
+        //                           A.""U_COLORCODE"",
+        //                           B.""U_COLORNAME"",
+        //                           A.""U_SIZECODE"",
+        //                           C.""U_SIZENAME""
+        //                    FROM ""OITM"" A
+        //                    INNER JOIN ""@FIL_DR_PSMCO"" B
+        //                        ON B.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND B.""U_COLORCODE"" = A.""U_COLORCODE""
+        //                    INNER JOIN ""@FIL_DR_PSMST"" C
+        //                        ON C.""DocEntry"" = '" + styleEntry + @"'
+        //                       AND C.""U_SIZECODE"" = A.""U_SIZECODE""
+        //                       AND C.""U_SIZEAPPL"" = 'Y'
+        //                    WHERE A.""U_STYLECODE"" = '" + styleCode + @"'
+        //                      AND A.""U_COLORCODE"" = '" + oDataTable.Columns.Item("Colour Code").Cells.Item(j).Value.ToString().Trim() + @"'
+        //                    ORDER BY B.""LineId"", C.""LineId""";
+
+        //            SAPbobsCOM.Recordset rs =
+        //                (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //            rs.DoQuery(qStr);
+
+        //            while (!rs.EoF)
+        //            {
+        //                double cellValue = 0;
+        //                string sizeCode = rs.Fields.Item("U_SIZECODE").Value.ToString().Trim();
+        //                string itemCode = rs.Fields.Item("ItemCode").Value.ToString().Trim();
+        //                string colorCode = rs.Fields.Item("U_COLORCODE").Value.ToString().Trim();
+        //                string colorName = rs.Fields.Item("U_COLORNAME").Value.ToString().Trim();
+
+        //                object cellObj = null;
+        //                try
+        //                {
+        //                    cellObj = oDataTable.Columns.Item(sizeCode).Cells.Item(j).Value;
+        //                }
+        //                catch
+        //                {
+        //                    cellObj = null;
+        //                }
+
+        //                if (cellObj != null && cellObj.ToString().Trim() != "")
+        //                    double.TryParse(cellObj.ToString(), out cellValue);
+
+        //                int existingRow = FindMatrixRowByItemCode(oMatrix, itemCode);
+
+        //                if (cellValue > 0)
+        //                {
+        //                    if (existingRow > 0)
+        //                    {
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(existingRow).Specific).Value =
+        //                            cellValue.ToString();
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLOUR").Cells.Item(existingRow).Specific).Value =
+        //                            colorCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLRNM").Cells.Item(existingRow).Specific).Value =
+        //                            colorName;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGSIZE").Cells.Item(existingRow).Specific).Value =
+        //                            sizeCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLECODE").Cells.Item(existingRow).Specific).Value =
+        //                            styleCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLENTRY").Cells.Item(existingRow).Specific).Value =
+        //                            styleEntry;
+        //                    }
+        //                    else
+        //                    {
+        //                        AddMatrixRowIfNeeded(oMatrix);
+
+        //                        int newRow = oMatrix.RowCount;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(newRow).Specific).Value =
+        //                            itemCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLOUR").Cells.Item(newRow).Specific).Value =
+        //                            colorCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGCOLRNM").Cells.Item(newRow).Specific).Value =
+        //                            colorName;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_FGSIZE").Cells.Item(newRow).Specific).Value =
+        //                            sizeCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLECODE").Cells.Item(newRow).Specific).Value =
+        //                            styleCode;
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(newRow).Specific).Value =
+        //                            cellValue.ToString();
+
+        //                        ((SAPbouiCOM.EditText)oMatrix.Columns.Item("U_STYLENTRY").Cells.Item(newRow).Specific).Value =
+        //                            styleEntry;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    // Qty 0 hole existing row delete
+        //                    if (existingRow > 0)
+        //                    {
+        //                        try
+        //                        {
+        //                            oMatrix.DeleteRow(existingRow);
+        //                        }
+        //                        catch
+        //                        {
+        //                        }
+        //                    }
+        //                }
+
+        //                rs.MoveNext();
+        //            }
+        //        }
+
+        //        // Remove duplicate ItemCode rows if any
+        //        RemoveDuplicateMatrixRows(oMatrix);
+        //        // Remove rows where qty = 0 or itemcode blank
+        //        RemoveZeroQtyAndBlankRows(oMatrix);
+        //        // Recalculate total qty from matrix
+        //        TotalQty = 0;
+        //        for (int i = 1; i <= oMatrix.RowCount; i++)
+        //        {
+        //            string itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+        //            if (!string.IsNullOrWhiteSpace(itemCode))
+        //            {
+        //                double rowQty = 0;
+        //                double.TryParse(((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value, out rowQty);
+        //                TotalQty += rowQty;
+        //            }
+        //        }
+        //        ((SAPbouiCOM.EditText)pForm.Items.Item("ETQty").Specific).Value = TotalQty.ToString();
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Error in Load Matrix: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
         private void InsertSizeDetails(SAPbouiCOM.Form pForm, string ObjType, string ObjEntry, int SizeEntry)
         {
             SAPbobsCOM.Recordset rSet =
@@ -1950,6 +2926,7 @@ namespace Apparel_Dynamic_1._0.Modules
                         INNER JOIN ""@FIL_DR_PSMST"" C
                             ON C.""DocEntry"" = '" + styleEntry + @"'
                            AND C.""U_SIZECODE"" = A.""U_SIZECODE""
+                           AND C.""U_SIZEAPPL"" = 'Y'
                         WHERE A.""U_STYLECODE"" = '" + styleCode + @"'
                           AND A.""U_COLORCODE"" = '" + colourCode + @"'
                         ORDER BY B.""LineId"", C.""LineId""";
@@ -1979,7 +2956,7 @@ namespace Apparel_Dynamic_1._0.Modules
                     double dQty = 0;
                     double.TryParse(qty, out dQty);
 
-                    if (dQty > 0)
+                    if (dQty >= 0)
                     {
                         string safeColourCode = colourCode.Replace("'", "''");
                         string safeColourName = colourName.Replace("'", "''");
@@ -2080,18 +3057,67 @@ namespace Apparel_Dynamic_1._0.Modules
         }
 
 
+        //private bool ValidateMatrixAndGridQty(SAPbouiCOM.Form oForm)
+        //{
+        //    SAPbouiCOM.Matrix oMatrix =
+        //        (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+
+        //    SAPbouiCOM.DataTable oDataTable =
+        //        oForm.DataSources.DataTables.Item("DT_0");
+
+        //    double matrixQty = 0;
+        //    double gridQty = 0;
+
+        //    // Matrix 38 qty column = "11"
+        //    for (int i = 1; i <= oMatrix.RowCount; i++)
+        //    {
+        //        string itemCode = "";
+        //        string qtyText = "";
+
+        //        try
+        //        {
+        //            itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+        //            qtyText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim();
+        //        }
+        //        catch { }
+
+        //        if (!string.IsNullOrWhiteSpace(itemCode))
+        //        {
+        //            double qty = 0;
+        //            double.TryParse(qtyText, out qty);
+        //            matrixQty += qty;
+        //        }
+        //    }
+
+        //    // SCGrid total column = "Total"
+        //    for (int i = 0; i < oDataTable.Rows.Count; i++)
+        //    {
+        //        double qty = 0;
+        //        object val = oDataTable.Columns.Item("Total").Cells.Item(i).Value;
+
+        //        if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
+        //            double.TryParse(val.ToString(), out qty);
+
+        //        gridQty += qty;
+        //    }
+
+        //    if (matrixQty != gridQty)
+        //    {
+        //        Global.GFunc.ShowValidationError("Item quantity and Size-Colour quantity are not matched.\n\nItem Qty: " + matrixQty + "\nSize-Colour Qty: " + gridQty);
+        //        return false;
+        //    }
+
+        //    return true;
+        //}
+
         private bool ValidateMatrixAndGridQty(SAPbouiCOM.Form oForm)
         {
-            SAPbouiCOM.Matrix oMatrix =
-                (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
-
-            SAPbouiCOM.DataTable oDataTable =
-                oForm.DataSources.DataTables.Item("DT_0");
+            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+            SAPbouiCOM.DataTable oDataTable = oForm.DataSources.DataTables.Item("DT_0");
 
             double matrixQty = 0;
             double gridQty = 0;
 
-            // Matrix 38 qty column = "11"
             for (int i = 1; i <= oMatrix.RowCount; i++)
             {
                 string itemCode = "";
@@ -2102,7 +3128,9 @@ namespace Apparel_Dynamic_1._0.Modules
                     itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
                     qtyText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim();
                 }
-                catch { }
+                catch
+                {
+                }
 
                 if (!string.IsNullOrWhiteSpace(itemCode))
                 {
@@ -2112,31 +3140,27 @@ namespace Apparel_Dynamic_1._0.Modules
                 }
             }
 
-            // SCGrid total column = "Total"
             for (int i = 0; i < oDataTable.Rows.Count; i++)
             {
                 double qty = 0;
-                object val = oDataTable.Columns.Item("Total").Cells.Item(i).Value;
+                object value = oDataTable.Columns.Item("Total").Cells.Item(i).Value;
 
-                if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
-                    double.TryParse(val.ToString(), out qty);
+                if (value != null && !string.IsNullOrWhiteSpace(value.ToString()))
+                {
+                    double.TryParse(value.ToString(), out qty);
+                }
 
                 gridQty += qty;
             }
 
-            if (matrixQty != gridQty)
+            if (Math.Abs(matrixQty - gridQty) > 0.0001)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    $"Item quantity and Size-Colour quantity are not matched. Item Qty: {matrixQty}, Grid Qty: {gridQty}",
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
+                Global.GFunc.ShowValidationError("Item quantity and Size-Colour quantity are not matched.\n\nItem Qty: " + matrixQty + "\nSize-Colour Qty: " + gridQty);
                 return false;
             }
 
             return true;
         }
-
 
         private void AddMatrixRowIfNeeded(SAPbouiCOM.Matrix oMatrix)
         {
@@ -2198,6 +3222,132 @@ namespace Apparel_Dynamic_1._0.Modules
             }
             catch
             {
+            }
+        }
+
+        private void UpdateTotalQtyFromMatrix(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+
+                double totalQty = 0;
+
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    string itemCode = "";
+                    double rowQty = 0;
+
+                    try
+                    {
+                        itemCode = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("1").Cells.Item(i).Specific).Value.Trim();
+
+                        if (string.IsNullOrWhiteSpace(itemCode))
+                            continue;
+
+                        string qtyText = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("11").Cells.Item(i).Specific).Value.Trim();
+
+                        double.TryParse(qtyText, out rowQty);
+                    }
+                    catch
+                    {
+                        rowQty = 0;
+                    }
+
+                    totalQty += rowQty;
+                }
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETQty").Specific).Value = totalQty.ToString();
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error calculating total quantity: " + ex.Message);
+            }
+        }
+
+        private bool ValidateDraftOrderAgainstSalesContract(SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            try
+            {
+                SAPbouiCOM.DBDataSource oDB = oForm.DataSources.DBDataSources.Item("OQUT");
+
+                string scNo = oDB.GetValue("U_SCNO", 0).Trim();
+
+                if (string.IsNullOrWhiteSpace(scNo))
+                    return true;
+
+                string safeSCNo = scNo.Replace("'", "''");
+
+                string scQuery = $@"
+                            SELECT IFNULL(""U_SCVALUE"", 0) AS ""SCValue""
+                            FROM ""@FIL_DH_OSCM""
+                            WHERE ""U_SCNO"" = '{safeSCNo}'";
+
+                SAPbobsCOM.Recordset scRs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                scRs.DoQuery(scQuery);
+
+                if (scRs.EoF)
+                {
+                    Global.GFunc.ShowError("Sales Contract " + scNo + " was not found.");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                decimal scValue = Convert.ToDecimal(scRs.Fields.Item("SCValue").Value);
+
+                if (scValue <= 0)
+                {
+                    Global.GFunc.ShowError("Sales Contract Value must be greater than zero.");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                string docCurrency = oDB.GetValue("DocCur", 0).Trim();
+                string currentDocValueStr = docCurrency == "BDT" ? oDB.GetValue("DocTotal", 0).Trim() : oDB.GetValue("DocTotalFC", 0).Trim();
+
+                decimal currentDocValue = 0;
+                decimal.TryParse(currentDocValueStr.Replace(",", ""), out currentDocValue);
+
+                string currentDocEntry = oDB.GetValue("DocEntry", 0).Trim();
+                string excludeCurrentDoc = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(currentDocEntry))
+                    excludeCurrentDoc = $@" AND ""DocEntry"" <> '{currentDocEntry.Replace("'", "''")}'";
+
+                string usedQuery = $@"
+                              SELECT IFNULL(SUM(
+                                  CASE
+                                      WHEN ""DocCur"" = 'BDT' THEN ""DocTotal""
+                                      ELSE ""DocTotalFC""
+                                  END
+                              ), 0) AS ""UsedValue""
+                              FROM ""OQUT""
+                              WHERE ""U_SCNO"" = '{safeSCNo}'
+                              {excludeCurrentDoc}";
+
+                SAPbobsCOM.Recordset usedRs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                usedRs.DoQuery(usedQuery);
+
+                decimal usedValue = Convert.ToDecimal(usedRs.Fields.Item("UsedValue").Value);
+                decimal remainingValue = scValue - usedValue;
+
+                if (remainingValue < 0)
+                    remainingValue = 0;
+
+                if (currentDocValue > remainingValue)
+                {
+                    Global.GFunc.ShowValidationError("Draft Order Value exceeds the Sales Contract limit.\n\nSales Contract Value: " + scValue.ToString("#,##0.00") + "\nAlready Used Value: " + usedValue.ToString("#,##0.00") + "\nRemaining Value: " + remainingValue.ToString("#,##0.00") + "\nCurrent Draft Order Value: " + currentDocValue.ToString("#,##0.00") + "\n\nDraft Order Value must be between 0.00 and " + remainingValue.ToString("#,##0.00") + ".");
+                    BubbleEvent = false;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Contract value validation error: " + ex.Message);
+                BubbleEvent = false;
+                return false;
             }
         }
 

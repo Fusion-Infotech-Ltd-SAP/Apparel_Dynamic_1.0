@@ -505,6 +505,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     "CPM data loaded successfully.",
                     SAPbouiCOM.BoMessageTime.bmt_Short,
                     SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                {
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                }
             }
             catch (Exception ex)
             {

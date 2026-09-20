@@ -915,6 +915,34 @@ namespace Apparel_Dynamic_1._0
                         }
                     }
                 }
+                //Export LC
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_COM_EXP")
+                {
+                    string formUID = "FIL_FRM_EXPLC";
+
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText(
+                            "Form is already open.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short,
+                            SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                        return;
+                    }
+                    try
+                    {
+                        ExportLC activeForm = new ExportLC();
+                        activeForm.Show();
+                        SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_EXPLC");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Global.GFunc.ShowError("Failed to open Export form.\n" + ex.Message);
+                    }
+                }
+
                 //___________________________________________________________Standard______________________________________________
                 //ADD
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1282")

@@ -617,9 +617,9 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     double sam = 0;
                     double.TryParse(samValue, out sam);
 
-                    if (sam <= 0)
+                    if (sam < 0)
                     {
-                        Global.GFunc.ShowError("SAM value must be greater than 0 at row " + row);
+                        Global.GFunc.ShowError("SAM value must be greater than or Equal to  0 at row " + row);
                         matrix.Columns.Item("CLSAM").Cells.Item(row).Click(SAPbouiCOM.BoCellClickType.ct_Regular);
                         return BubbleEvent = false;
                     }

@@ -162,7 +162,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                 {
                     HideSampleRateColumns(oForm);
@@ -178,22 +177,18 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void ETDOCDAT_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
-
             try
             {
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                     return;
 
                 string docDate = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value.Trim();
-
                 if (string.IsNullOrWhiteSpace(docDate))
                     return;
 
                 SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
-                UpdateSeriesAndDocNumByDate(oForm, oDBH, docDate, "FIL_D_CPM");
-                
+                UpdateSeriesAndDocNumByDate(oForm, oDBH, docDate, "FIL_D_CPM");                
             }
             catch (Exception ex)
             {
@@ -204,14 +199,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
         {
             BubbleEvent = true;
-
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
-
                 if (eventInfo.ItemUID != "MTXSAMRN" || eventInfo.Row <= 0)
                     return;
-
                 oForm.EnableMenu("1293", true);
             }
             catch (Exception ex)
@@ -233,7 +225,6 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             {
                 ValidateForm(ref oForm, ref BubbleEvent);
             }
-
         }
 
         private void CBSERIES_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -269,15 +260,197 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        //private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        //{
+        //    //Load CPM Button Press Before Event (Validation Check) 
+
+        //    BubbleEvent = true;
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        string productGroupCode =((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
+
+        //        if (string.IsNullOrWhiteSpace(productGroupCode))
+        //        {
+        //            Global.GFunc.ShowError("Please enter Product Group Code.");
+        //            oForm.Items.Item("ETPDGPCD").Click();
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+
+        //        if (samMatrix.RowCount == 0)
+        //        {
+        //            Global.GFunc.ShowError("Please enter at least one SAM Range row.");
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        for (int i = 1; i <= samMatrix.RowCount; i++)
+        //        {
+        //            string fromQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLFROM").Cells.Item(i).Specific).Value.Trim();
+        //            string toQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLTO").Cells.Item(i).Specific).Value.Trim();
+
+        //            if (string.IsNullOrWhiteSpace(fromQty))
+        //            {
+        //                Global.GFunc.ShowError($"Please enter From Quantity in SAM Range row {i}.");
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+
+        //            if (string.IsNullOrWhiteSpace(toQty))
+        //            {
+        //                Global.GFunc.ShowError($"Please enter To Quantity in SAM Range row {i}.");
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+        //        }
+
+        //        //Check CPM Matrix has data or not
+
+        //        SAPbouiCOM.Matrix cpmMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+        //        bool hasCPMData = false;
+
+        //        for (int i = 1; i <= cpmMatrix.RowCount; i++)
+        //        {
+        //            string orderType = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLORDTYP").Cells.Item(i).Specific).Value.Trim();
+        //            string minQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Specific).Value.Trim();
+        //            string maxQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Specific).Value.Trim();
+
+        //            if (!string.IsNullOrWhiteSpace(orderType) ||
+        //                !string.IsNullOrWhiteSpace(minQty) ||
+        //                !string.IsNullOrWhiteSpace(maxQty))
+        //            {
+        //                hasCPMData = true;
+        //                break;
+        //            }
+        //        }
+
+        //        if (hasCPMData)
+        //        {
+        //            int confirm = Application.SBO_Application.MessageBox(
+        //                "Existing CPM range data will be lost. Are you sure you want to load new CPM data?",
+        //                1,
+        //                "Yes",
+        //                "No",
+        //                "");
+
+        //            if (confirm != 1)
+        //            {
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError($"BTNLDCPM_PressedBefore Error: {ex.Message}");
+        //        BubbleEvent = false;
+        //    }
+        //}
+
+        //private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        //{
+        //    BubbleEvent = true;
+
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+        //        {
+        //            Global.GFunc.ShowWarning("Document has been changed. Please update the document first, then load CPM again.");
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        string productGroupCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
+
+        //        if (string.IsNullOrWhiteSpace(productGroupCode))
+        //        {
+        //            Global.GFunc.ShowError("Please enter Product Group Code.");
+        //            oForm.Items.Item("ETPDGPCD").Click();
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        SAPbouiCOM.Matrix samMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+
+        //        if (samMatrix.VisualRowCount == 0)
+        //        {
+        //            Global.GFunc.ShowError("Please enter at least one SAM Range row.");
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        for (int i = 1; i <= samMatrix.VisualRowCount; i++)
+        //        {
+        //            string fromQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLFROM").Cells.Item(i).Specific).Value.Trim();
+        //            string toQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLTO").Cells.Item(i).Specific).Value.Trim();
+
+        //            if (string.IsNullOrWhiteSpace(fromQty))
+        //            {
+        //                Global.GFunc.ShowError($"Please enter From Quantity in SAM Range row {i}.");
+        //                samMatrix.Columns.Item("CLFROM").Cells.Item(i).Click();
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+
+        //            if (string.IsNullOrWhiteSpace(toQty))
+        //            {
+        //                Global.GFunc.ShowError($"Please enter To Quantity in SAM Range row {i}.");
+        //                samMatrix.Columns.Item("CLTO").Cells.Item(i).Click();
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+        //        }
+
+        //        samMatrix.FlushToDataSource();
+
+        //        SAPbouiCOM.Matrix cpmMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+        //        bool hasCPMData = false;
+
+        //        for (int i = 1; i <= cpmMatrix.VisualRowCount; i++)
+        //        {
+        //            string orderType = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLORDTYP").Cells.Item(i).Specific).Value.Trim();
+        //            string minQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Specific).Value.Trim();
+        //            string maxQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Specific).Value.Trim();
+
+        //            if (!string.IsNullOrWhiteSpace(orderType) || !string.IsNullOrWhiteSpace(minQty) || !string.IsNullOrWhiteSpace(maxQty))
+        //            {
+        //                hasCPMData = true;
+        //                break;
+        //            }
+        //        }
+
+        //        if (hasCPMData)
+        //        {
+        //            int confirm = Application.SBO_Application.MessageBox("Existing CPM range data will be lost. Are you sure you want to load new CPM data?", 1, "Yes", "No", "");
+
+        //            if (confirm != 1)
+        //            {
+        //                BubbleEvent = false;
+        //                return;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError($"BTNLDCPM_PressedBefore Error: {ex.Message}");
+        //        BubbleEvent = false;
+        //    }
+        //}
+
         private void BTNLDCPM_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
-            //Load CPM Button Press Before Event (Validation Check) 
-
             BubbleEvent = true;
+
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                string productGroupCode =((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
+
+                string productGroupCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
 
                 if (string.IsNullOrWhiteSpace(productGroupCode))
                 {
@@ -287,16 +460,16 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     return;
                 }
 
-                SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                SAPbouiCOM.Matrix samMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
 
-                if (samMatrix.RowCount == 0)
+                if (samMatrix.VisualRowCount == 0)
                 {
                     Global.GFunc.ShowError("Please enter at least one SAM Range row.");
                     BubbleEvent = false;
                     return;
                 }
 
-                for (int i = 1; i <= samMatrix.RowCount; i++)
+                for (int i = 1; i <= samMatrix.VisualRowCount; i++)
                 {
                     string fromQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLFROM").Cells.Item(i).Specific).Value.Trim();
                     string toQty = ((SAPbouiCOM.EditText)samMatrix.Columns.Item("CLTO").Cells.Item(i).Specific).Value.Trim();
@@ -304,6 +477,7 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (string.IsNullOrWhiteSpace(fromQty))
                     {
                         Global.GFunc.ShowError($"Please enter From Quantity in SAM Range row {i}.");
+                        samMatrix.Columns.Item("CLFROM").Cells.Item(i).Click();
                         BubbleEvent = false;
                         return;
                     }
@@ -311,46 +485,13 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (string.IsNullOrWhiteSpace(toQty))
                     {
                         Global.GFunc.ShowError($"Please enter To Quantity in SAM Range row {i}.");
+                        samMatrix.Columns.Item("CLTO").Cells.Item(i).Click();
                         BubbleEvent = false;
                         return;
                     }
                 }
 
-                //Check CPM Matrix has data or not
-
-                SAPbouiCOM.Matrix cpmMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
-                bool hasCPMData = false;
-
-                for (int i = 1; i <= cpmMatrix.RowCount; i++)
-                {
-                    string orderType = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLORDTYP").Cells.Item(i).Specific).Value.Trim();
-                    string minQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMINQTY").Cells.Item(i).Specific).Value.Trim();
-                    string maxQty = ((SAPbouiCOM.EditText)cpmMatrix.Columns.Item("CLMAXQTY").Cells.Item(i).Specific).Value.Trim();
-
-                    if (!string.IsNullOrWhiteSpace(orderType) ||
-                        !string.IsNullOrWhiteSpace(minQty) ||
-                        !string.IsNullOrWhiteSpace(maxQty))
-                    {
-                        hasCPMData = true;
-                        break;
-                    }
-                }
-
-                if (hasCPMData)
-                {
-                    int confirm = Application.SBO_Application.MessageBox(
-                        "Existing CPM range data will be lost. Are you sure you want to load new CPM data?",
-                        1,
-                        "Yes",
-                        "No",
-                        "");
-
-                    if (confirm != 1)
-                    {
-                        BubbleEvent = false;
-                        return;
-                    }
-                }
+                samMatrix.FlushToDataSource();
             }
             catch (Exception ex)
             {
@@ -358,6 +499,98 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 BubbleEvent = false;
             }
         }
+
+        //private void BTNLDCPM_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+        //    SAPbobsCOM.Recordset rs = null;
+
+        //    try
+        //    {
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        oForm.Freeze(true);
+
+        //        string productGroupCode =((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
+        //        SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+        //        SAPbouiCOM.Matrix cpmMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+        //        SAPbouiCOM.DBDataSource db =oForm.DataSources.DBDataSources.Item("@FIL_DR_CPMD");
+
+        //        // Hide all SAM Range columns first
+        //        //HideSampleRateColumns(oForm);
+
+        //        // Show only required SAM Range columns
+        //        ShowSampleRateColumns(oForm, samMatrix.RowCount);
+
+        //        // Clear old CPM matrix data
+        //        db.Clear();
+        //        cpmMatrix.Clear();
+        //        SAPbobsCOM.Company oCompany =(SAPbobsCOM.Company)Application.SBO_Application.Company.GetDICompany();
+        //        rs = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+        //        string query = $@"
+        //                        SELECT
+        //                            R.""LineId"",
+        //                            R.""U_OTYPECODE"",
+        //                            R.""U_MINQTY"",
+        //                            R.""U_MAXQTY""
+        //                        FROM ""@FIL_MH_ORDRTYPE"" H
+        //                        INNER JOIN ""@FIL_MR_ORDRTYPE"" R
+        //                            ON H.""Code"" = R.""Code""
+        //                        WHERE H.""Code"" = '{productGroupCode.Replace("'", "''")}'
+        //                        ORDER BY R.""LineId""";
+
+        //        rs.DoQuery(query);
+
+        //        int row = 0;
+        //        while (!rs.EoF)
+        //        {
+        //            db.InsertRecord(row);
+
+        //            db.SetValue("LineId", row, (row + 1).ToString());
+        //            db.SetValue("U_OTYPECODE", row, rs.Fields.Item("U_OTYPECODE").Value.ToString());
+        //            db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
+        //            db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
+
+        //            row++;
+        //            rs.MoveNext();
+        //        }
+
+        //        cpmMatrix.LoadFromDataSource();
+        //        cpmMatrix.AutoResizeColumns();
+
+        //        Global.GFunc.ShowSuccess("CPM data loaded successfully.");
+
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "CPM data loaded successfully.",
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //        {
+        //            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError($"Load CPM error: {ex.Message}");
+
+        //    }
+        //    finally
+        //    {
+        //        try
+        //        {
+        //            if (rs != null)
+        //                System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+
+        //            if (oForm != null)
+        //                oForm.Freeze(false);
+        //        }
+        //        catch(Exception ex)
+        //        {
+        //            Global.GFunc.ShowError($"BTNLDCPM_PressedAfter Finally Error: {ex.Message}");
+        //        }
+        //    }
+        //}
 
         private void BTNLDCPM_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -369,48 +602,52 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
                 oForm.Freeze(true);
 
-                string productGroupCode =((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
-                SAPbouiCOM.Matrix samMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
-                SAPbouiCOM.Matrix cpmMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
-                SAPbouiCOM.DBDataSource db =oForm.DataSources.DBDataSources.Item("@FIL_DR_CPMD");
+                string productGroupCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETPDGPCD").Specific).Value.Trim();
 
-                // Hide all SAM Range columns first
-                //HideSampleRateColumns(oForm);
+                SAPbouiCOM.Matrix samMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
+                SAPbouiCOM.Matrix cpmMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCPM").Specific;
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DR_CPMD");
 
-                // Show only required SAM Range columns
-                ShowSampleRateColumns(oForm, samMatrix.RowCount);
+                int samRangeCount = samMatrix.VisualRowCount;
 
-                // Clear old CPM matrix data
-                db.Clear();
-                cpmMatrix.Clear();
-                SAPbobsCOM.Company oCompany =(SAPbobsCOM.Company)Application.SBO_Application.Company.GetDICompany();
+                HideSampleRateColumns(oForm);
+                ShowSampleRateColumns(oForm, samRangeCount);
+
+                cpmMatrix.FlushToDataSource();
+
+                SAPbobsCOM.Company oCompany = (SAPbobsCOM.Company)Application.SBO_Application.Company.GetDICompany();
                 rs = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                 string query = $@"
-                                SELECT
-                                    R.""LineId"",
-                                    R.""U_OTYPECODE"",
-                                    R.""U_MINQTY"",
-                                    R.""U_MAXQTY""
-                                FROM ""@FIL_MH_ORDRTYPE"" H
-                                INNER JOIN ""@FIL_MR_ORDRTYPE"" R
-                                    ON H.""Code"" = R.""Code""
-                                WHERE H.""Code"" = '{productGroupCode.Replace("'", "''")}'
-                                ORDER BY R.""LineId""";
+                        SELECT
+                            R.""LineId"",
+                            R.""U_OTYPECODE"",
+                            R.""U_MINQTY"",
+                            R.""U_MAXQTY""
+                        FROM ""@FIL_MH_ORDRTYPE"" H
+                        INNER JOIN ""@FIL_MR_ORDRTYPE"" R
+                            ON H.""Code"" = R.""Code""
+                        WHERE H.""Code"" = '{productGroupCode.Replace("'", "''")}'
+                        ORDER BY R.""LineId""";
 
                 rs.DoQuery(query);
 
-                int row = 0;
                 while (!rs.EoF)
                 {
-                    db.InsertRecord(row);
+                    string orderTypeCode = rs.Fields.Item("U_OTYPECODE").Value.ToString().Trim();
+                    int existingRow = FindCPMRow(db, orderTypeCode);
 
-                    db.SetValue("LineId", row, (row + 1).ToString());
-                    db.SetValue("U_OTYPECODE", row, rs.Fields.Item("U_OTYPECODE").Value.ToString());
-                    db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
-                    db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
+                    if (existingRow < 0)
+                    {
+                        int row = db.Size;
 
-                    row++;
+                        db.InsertRecord(row);
+                        db.SetValue("LineId", row, (row + 1).ToString());
+                        db.SetValue("U_OTYPECODE", row, orderTypeCode);
+                        db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
+                        db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
+                    }
+
                     rs.MoveNext();
                 }
 
@@ -418,16 +655,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 cpmMatrix.AutoResizeColumns();
 
                 Global.GFunc.ShowSuccess("CPM data loaded successfully.");
-
-                Application.SBO_Application.StatusBar.SetText(
-                    "CPM data loaded successfully.",
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Success);
             }
             catch (Exception ex)
             {
                 Global.GFunc.ShowError($"Load CPM error: {ex.Message}");
-
             }
             finally
             {
@@ -439,13 +670,25 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     if (oForm != null)
                         oForm.Freeze(false);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Global.GFunc.ShowError($"BTNLDCPM_PressedAfter Finally Error: {ex.Message}");
                 }
             }
         }
 
+        private int FindCPMRow(SAPbouiCOM.DBDataSource db, string orderTypeCode)
+        {
+            for (int i = 0; i < db.Size; i++)
+            {
+                string existingOrderType = db.GetValue("U_OTYPECODE", i).Trim();
+
+                if (string.Equals(existingOrderType, orderTypeCode, StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return -1;
+        }
 
         private void BTNWLN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -969,6 +1212,11 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                 return BubbleEvent = false;
             }
 
+            if (!ValidateDuplicateCombination(oForm))
+            {
+                return BubbleEvent = false;
+            }
+
             SAPbouiCOM.Matrix oMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSAMRN").Specific;
 
             for (int i = 1; i <= oMatrix.VisualRowCount; i++)
@@ -1111,6 +1359,80 @@ namespace Apparel_Dynamic_1._0.Resources.Master
             }
         }
 
+        private bool ValidateDuplicateCombination(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CPM");
+
+                string brandCode = oDBH.GetValue("U_BRAND", 0).Trim();
+                string productGroupCode = oDBH.GetValue("U_PRDGRP", 0).Trim();
+                string routeStageCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETRTSGCD").Specific).Value.Trim();
+                string fromDate = oDBH.GetValue("U_FROMDATE", 0).Trim();
+                string toDate = oDBH.GetValue("U_TODATE", 0).Trim();
+                string docEntry = oDBH.GetValue("DocEntry", 0).Trim();
+
+                string safeBrandCode = brandCode.Replace("'", "''");
+                string safeProductGroupCode = productGroupCode.Replace("'", "''");
+                string safeRouteStageCode = routeStageCode.Replace("'", "''");
+
+                string excludeCurrentDocument = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(docEntry))
+                {
+                    excludeCurrentDocument = $@" AND T0.""DocEntry"" <> '{docEntry.Replace("'", "''")}'";
+                }
+
+                string query = $@"
+                                    SELECT
+                                        T0.""DocEntry"",
+                                        T0.""DocNum"",
+                                        T0.""U_FROMDATE"",
+                                        T0.""U_TODATE""
+                                    FROM ""@FIL_DH_CPM"" T0
+                                    WHERE IFNULL(T0.""U_BRAND"", '') = '{safeBrandCode}'
+                                      AND IFNULL(T0.""U_PRDGRP"", '') = '{safeProductGroupCode}'
+                                      AND IFNULL(T0.""U_RSTGECODE"", '') = '{safeRouteStageCode}'
+                                      AND T0.""U_FROMDATE"" <= '{toDate}'
+                                      AND T0.""U_TODATE"" >= '{fromDate}'
+                                      {excludeCurrentDocument}
+                                    LIMIT 1";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(query);
+
+                if (!rs.EoF)
+                {
+                    string existingDocNum = rs.Fields.Item("DocNum").Value.ToString().Trim();
+                    string existingFromDate = rs.Fields.Item("U_FROMDATE").Value.ToString().Trim();
+                    string existingToDate = rs.Fields.Item("U_TODATE").Value.ToString().Trim();
+
+                    Global.GFunc.ShowError(
+                        "CPM already exists for this Brand, Product Group and Route Stage within the selected period. " +
+                        "Existing Doc No: " + existingDocNum +
+                        ", Period: " + existingFromDate + " - " + existingToDate);
+
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("CPM duplicate period validation error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
         private void ShowSampleRateColumns(SAPbouiCOM.Form oForm, int samRangeCount)
         {
             SAPbouiCOM.Matrix oMatrix =

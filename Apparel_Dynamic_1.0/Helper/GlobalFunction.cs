@@ -486,6 +486,11 @@ namespace Apparel_Dynamic_1._0.Helper
 
             }
         }
+        public void ShowValidationError(string message)
+        {
+            Application.SBO_Application.MessageBox(message);
+        }
+
         public void ShowError(string message)
         {
             Application.SBO_Application.StatusBar.SetText(message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);

@@ -60,16 +60,16 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_TRN", "APP_TRN_MRD", "Merchandising ", 2, 2, false);
 
                 //Apparel -> Transaction -> Commercial
-                CreateMainMenu("APP_TRN_COM", "APP_TRN_COM_EXP", "Export LC ", 0, 2, false);
-                CreateMainMenu("APP_TRN_COM", "APP_TRN_COM_IMP", "Import LC ", 1, 2, false);
+                CreateMainMenu("APP_TRN_COM", "APP_TRN_COM_EXP", "Export LC ", 0, 1, false);
+                CreateMainMenu("APP_TRN_COM", "APP_TRN_COM_IMP", "Import LC ", 1, 1, false);
 
                 //Apparel -> Transaction -> Commercial -> Export LC
-                CreateMainMenu("APP_TRN_COM_EXP", "APP_TRN_COM_EXP_MLC", "Master LC", 1, 1, false);
-                CreateMainMenu("APP_TRN_COM_EXP", "APP_TRN_COM_EXP_AMD", "Master LC Amendment", 2, 1, false);
+                //CreateMainMenu("APP_TRN_COM_EXP", "APP_TRN_COM_EXP_MLC", "Master LC", 1, 1, false);
+                //CreateMainMenu("APP_TRN_COM_EXP", "APP_TRN_COM_EXP_AMD", "Master LC Amendment", 2, 1, false);
 
                 //Apparel -> Transaction -> Commercial -> Import  LC
-                CreateMainMenu("APP_TRN_COM_IMP", "APP_TRN_COM_IMP_B2B_LC", "Import LC/TT/RTGS LC(B2B)", 0, 1, false);
-                CreateMainMenu("APP_TRN_COM_IMP", "APP_TRN_COM_IMP_B2B_AMD", "Import LC/TT/RTGS LC Ammendment (B2B)", 1, 1, false);
+                //CreateMainMenu("APP_TRN_COM_IMP", "APP_TRN_COM_IMP_B2B_LC", "Import LC/TT/RTGS LC(B2B)", 0, 1, false);
+                //CreateMainMenu("APP_TRN_COM_IMP", "APP_TRN_COM_IMP_B2B_AMD", "Import LC/TT/RTGS LC Ammendment (B2B)", 1, 1, false);
 
                 //Apparel -> Transaction -> Sampling
                 CreateMainMenu("APP_TRN_SAM", "APP_TRN_SAM_SM", "Sample Master", 1, 1, false);

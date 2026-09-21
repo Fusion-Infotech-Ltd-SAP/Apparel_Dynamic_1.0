@@ -935,6 +935,13 @@ namespace Apparel_Dynamic_1._0
                         ExportLC activeForm = new ExportLC();
                         activeForm.Show();
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_EXPLC");
+                        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                        SAPbouiCOM.Matrix MTXATTAC = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTAC").Specific;
+                        SAPbouiCOM.Grid GRDAMDTL = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
+
+                        MTXSLODR.AutoResizeColumns();
+                        MTXATTAC.AutoResizeColumns();
+                        //GRDAMDTL.AutoResizeColumns();
 
                     }
                     catch (Exception ex)

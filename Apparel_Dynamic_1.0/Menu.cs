@@ -934,6 +934,7 @@ namespace Apparel_Dynamic_1._0
                     {
                         ExportLC activeForm = new ExportLC();
                         activeForm.Show();
+
                         SAPbouiCOM.Form oForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_EXPLC");
                         SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
                         SAPbouiCOM.Matrix MTXATTAC = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTAC").Specific;
@@ -941,7 +942,22 @@ namespace Apparel_Dynamic_1._0
 
                         MTXSLODR.AutoResizeColumns();
                         MTXATTAC.AutoResizeColumns();
-                        //GRDAMDTL.AutoResizeColumns();
+                        GRDAMDTL.AutoResizeColumns();
+
+                        // Series Initialization
+                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                        {
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
+
+                        }
 
                     }
                     catch (Exception ex)

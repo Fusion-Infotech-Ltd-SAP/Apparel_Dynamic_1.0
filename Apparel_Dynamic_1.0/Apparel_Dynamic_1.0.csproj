@@ -134,6 +134,9 @@
     <Compile Include="Resources\Transaction\CAD.b1f.cs">
       <DependentUpon>CAD.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Transaction\ExportLC.b1f.cs">
+      <DependentUpon>ExportLC.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Transaction\OTT.b1f.cs">
       <DependentUpon>OTT.b1f</DependentUpon>
     </Compile>
@@ -233,6 +236,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Transaction\CAD.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\ExportLC.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Transaction\OTT.b1f">

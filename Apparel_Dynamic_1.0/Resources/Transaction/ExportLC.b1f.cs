@@ -16,9 +16,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.StaticText STSTATMR, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
-
+        
 
         private SAPbouiCOM.ComboBox CBSTATMR, CBSTATCM, CBCOMPNY, CBSERIES, CBINTRMS, CBPYTRMS, CBLCTRMS;
+
+        
 
         private SAPbouiCOM.EditText ETBP1BNM, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
@@ -70,6 +72,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETSCNO.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSCNO_ChooseFromListAfter);
             this.ETSCNO.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETSCNO_ChooseFromListBefore);
             this.ETLCNO = ((SAPbouiCOM.EditText)(this.GetItem("ETLCNO").Specific));
+            this.ETLCNO.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETLCNO_LostFocusAfter);
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETLCDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETLCDESC").Specific));
@@ -94,6 +97,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABAMDTL = ((SAPbouiCOM.Folder)(this.GetItem("TABAMDTL").Specific));
             this.TABATTCH = ((SAPbouiCOM.Folder)(this.GetItem("TABATTCH").Specific));
             this.MTXSLODR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSLODR").Specific));
+            this.MTXSLODR.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXSLODR_ChooseFromListAfter);
+            this.MTXSLODR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSLODR_ChooseFromListBefore);
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
             this.BRWSBTN = ((SAPbouiCOM.Button)(this.GetItem("BRWSBTN").Specific));
             this.BRWSBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BRWSBTN_PressedAfter);
@@ -124,6 +129,38 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
 
         }
+
+        private void ETLCNO_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                {
+                    string code = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCNO").Specific).Value.Trim();
+                    string UCode = Global.GFunc.ToUpperCase(code);
+
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCNO").Specific).Value = UCode;
+                    if (!string.IsNullOrEmpty(UCode))
+                    {
+                        SAPbobsCOM.Recordset oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                        string query = $@"SELECT 1 FROM ""@FIL_DH_OLCM"" WHERE ""U_LCNO"" = '{UCode.Replace("'", "''")}'";
+                        oRS.DoQuery(query);
+                        if (!oRS.EoF)
+                        {
+                            Global.GFunc.ShowError("Code already exists!");
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCNO").Specific).Value = "";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error: Sales Contract Code  " + ex.Message);
+            }
+
+        }
+
 
         private void DELBTN_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -310,6 +347,50 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+        private void MTXSLODR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            
+
+        }
+
+        private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            try
+            {
+                if (pVal.ColUID != "CLSLORDR")
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
+
+                if (string.IsNullOrEmpty(scNo))
+                {
+
+                    Global.GFunc.ShowError("Please select Sales Contract first.");
+                    BubbleEvent = false;
+                    return;
+                }
+
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.ChooseFromList oCFL =oForm.ChooseFromLists.Item(cflArg.ChooseFromListUID);
+                SAPbouiCOM.Conditions oConditions =(SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+                SAPbouiCOM.Condition oCondition = oConditions.Add();
+
+                oCondition.Alias = "U_SCNO";
+                oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                oCondition.CondVal = scNo;
+
+                oCFL.SetConditions(oConditions);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order CFL Error: " + ex.Message);
+                BubbleEvent = false;
+            }
+        }
 
         private void ETHUSBNK_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -443,18 +524,40 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
         private void ETSCNO_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
-                return;
-            SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
-            SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            if (dt == null || dt.Rows.Count == 0)
-                return;
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
 
-            string SCNo = dt.GetValue("U_SCNO", 0).ToString().Trim();
-            SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
-            ETCD.Value = SCNo;
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
+
+                string SCNo = dt.GetValue("U_SCNO", 0).ToString().Trim();
+
+                SAPbouiCOM.EditText ETSCNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+                ETSCNO.Value = SCNo;
+
+                SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                if (MTXSLODR.RowCount == 0)
+                {
+                    Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail, 1, "");
+                }
+                //Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail,1,"");
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
         }
 
         private void ETSCNO_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)

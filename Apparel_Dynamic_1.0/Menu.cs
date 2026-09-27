@@ -942,11 +942,11 @@ namespace Apparel_Dynamic_1._0
                         oForm.Freeze(true);
 
                         SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
-                        SAPbouiCOM.Matrix MTXATTAC = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTAC").Specific;
+                        SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
                         SAPbouiCOM.Grid GRDAMDTL = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
 
                         MTXSLODR.AutoResizeColumns();
-                        MTXATTAC.AutoResizeColumns();
+                        MTXATTCH.AutoResizeColumns();
                         //GRDAMDTL.AutoResizeColumns();
 
                         // Series Initialization
@@ -960,6 +960,9 @@ namespace Apparel_Dynamic_1._0
                             oDBH.SetValue("U_DOCDATE", 0, today);
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
                             UpdateSeriesAndDocNumByDate(oForm,oDBH,today,"FIL_D_OLCM");
+
+                            //Amendment No
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
                         }
 
                         // Branch combo

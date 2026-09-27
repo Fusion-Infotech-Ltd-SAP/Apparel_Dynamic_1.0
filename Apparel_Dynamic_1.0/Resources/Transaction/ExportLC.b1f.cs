@@ -117,6 +117,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETBP2BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNM").Specific));
             this.ETHUSBNM = ((SAPbouiCOM.EditText)(this.GetItem("ETHUSBNM").Specific));
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
+            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
             this.OnCustomInitialize();
 
         }
@@ -349,8 +351,118 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void MTXSLODR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            
+            try
+            {
+                if (pVal.ColUID != "CLSLORDR")
+                    return;
 
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
+
+                int docEntry = Convert.ToInt32(dt.GetValue("DocEntry", 0));
+                string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
+                string safeSCNo = scNo.Replace("'", "''");
+
+                SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                string qStr = @"
+                                SELECT
+                                    A.""DocNum"",
+                                    A.""DocEntry"",
+                                    A.""NumAtCard"",
+                                    A.""U_STYLECODE"",
+                                    A.""U_STYLENM"",
+                                    A.""U_STYLENTRY"",
+                                    SUM(B.""Quantity"") AS ""Quantity"",
+                                    CASE
+                                        WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+                                        ELSE A.""DocTotalFC""
+                                    END AS ""TotalValue""
+                                FROM ORDR A
+                                INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+                                WHERE A.""DocEntry"" = " + docEntry + @" AND A.""U_SCNO"" = '" + safeSCNo + @"'
+                                GROUP BY
+                                    A.""DocNum"",
+                                    A.""DocEntry"",
+                                    A.""NumAtCard"",
+                                    A.""U_STYLECODE"",
+                                    A.""U_STYLENM"",
+                                    A.""U_STYLENTRY"",
+                                    A.""DocCur"",
+                                    A.""DocTotal"",
+                                    A.""DocTotalFC""";
+
+                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(qStr);
+
+                if (rs.EoF)
+                {
+                    Global.GFunc.ShowError("Selected Sales Order data not found.");
+                    return;
+                }
+
+                MTXSLODR.FlushToDataSource();
+
+                int rowIndex = pVal.Row - 1;
+
+                if (oDBDSDetail.Size <= rowIndex)
+                    oDBDSDetail.InsertRecord(oDBDSDetail.Size);
+
+                oDBDSDetail.SetValue("LineId", rowIndex, pVal.Row.ToString());
+                oDBDSDetail.SetValue("U_SONO", rowIndex, Convert.ToString(rs.Fields.Item("DocNum").Value));
+                oDBDSDetail.SetValue("U_SOENTRY", rowIndex, Convert.ToString(rs.Fields.Item("DocEntry").Value));
+                oDBDSDetail.SetValue("U_CUSTREFNO", rowIndex, Convert.ToString(rs.Fields.Item("NumAtCard").Value));
+                oDBDSDetail.SetValue("U_STYLECODE", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLECODE").Value));
+                oDBDSDetail.SetValue("U_STYLENM", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLENM").Value));
+                oDBDSDetail.SetValue("U_STYLENTRY", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLENTRY").Value));
+                oDBDSDetail.SetValue("U_QUANTITY", rowIndex, Convert.ToString(rs.Fields.Item("Quantity").Value));
+                oDBDSDetail.SetValue("U_VALUE", rowIndex, Convert.ToString(rs.Fields.Item("TotalValue").Value));
+
+                oDBDSDetail.Offset = rowIndex;
+                MTXSLODR.SetLineData(pVal.Row);
+
+                CalculateLCValue(oForm, MTXSLODR);
+
+                if (pVal.Row == MTXSLODR.VisualRowCount)
+                    Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail);
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "Sales Order load error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
+
+        private void CalculateLCValue(SAPbouiCOM.Form oForm, SAPbouiCOM.Matrix oMatrix)
+        {
+            try
+            {
+                decimal totalLCValue = 0;
+
+                for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+                {
+                    SAPbouiCOM.EditText txtTotalAmount = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLTTLAMT").Cells.Item(i).Specific;
+                    string value = txtTotalAmount.Value.Trim();
+
+                    decimal rowValue;
+                    if (decimal.TryParse(value, out rowValue))
+                        totalLCValue += rowValue;
+                }
+
+                SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
+                ETLCVAL.Value = totalLCValue.ToString("0.00");
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
         }
 
         private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -627,5 +739,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+        private SAPbouiCOM.StaticText StaticText0;
+        private SAPbouiCOM.EditText EditText0;
     }
 }

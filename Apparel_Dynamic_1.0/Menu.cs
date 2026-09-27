@@ -967,7 +967,9 @@ namespace Apparel_Dynamic_1._0
 
                         // Branch combo
                         LoadUserBranches(oForm, "CBCOMPNY");
-
+                        SAPbouiCOM.ComboBox oCombo =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                        oCombo.Select(oCombo.ValidValues.Item(0).Value,SAPbouiCOM.BoSearchKey.psk_ByValue);
+                        
                         //Load Payment Terms
                         string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
                         SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
@@ -977,6 +979,9 @@ namespace Apparel_Dynamic_1._0
                         string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
                         SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
                         Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                        //Currencey Load
+                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
 
                     }
                     catch (Exception ex)

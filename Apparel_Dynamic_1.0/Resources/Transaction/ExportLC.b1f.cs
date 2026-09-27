@@ -20,7 +20,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.ComboBox CBSTATMR, CBSTATCM, CBCOMPNY, CBSERIES, CBINTRMS, CBPYTRMS, CBLCTRMS;
 
-        
+       
 
         private SAPbouiCOM.EditText ETBP1BNM, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
@@ -60,6 +60,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STINTRMS = ((SAPbouiCOM.StaticText)(this.GetItem("STINTRMS").Specific));
             this.STAMDNO = ((SAPbouiCOM.StaticText)(this.GetItem("STAMDNO").Specific));
             this.CBSTATMR = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATMR").Specific));
+            this.CBSTATMR.LostFocusAfter += new SAPbouiCOM._IComboBoxEvents_LostFocusAfterEventHandler(this.CBSTATMR_LostFocusAfter);
+            this.CBSTATMR.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSTATMR_ComboSelectAfter);
             this.CBSTATCM = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATCM").Specific));
             this.CBCOMPNY = ((SAPbouiCOM.ComboBox)(this.GetItem("CBCOMPNY").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
@@ -91,6 +93,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETSHPDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETSHPDAT").Specific));
             this.ETEXPDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETEXPDAT").Specific));
             this.ETB2BPER = ((SAPbouiCOM.EditText)(this.GetItem("ETB2BPER").Specific));
+            this.ETB2BPER.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETB2BPER_LostFocusAfter);
             this.ETB2BAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETB2BAMT").Specific));
             this.ETAMDNO = ((SAPbouiCOM.EditText)(this.GetItem("ETAMDNO").Specific));
             this.TABSODR = ((SAPbouiCOM.Folder)(this.GetItem("TABSODR").Specific));
@@ -130,6 +133,82 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private void OnCustomInitialize()
         {
 
+        }
+
+        private void CBSTATMR_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+
+                string selectedValue = "";
+                if (oCmb.Selected != null)
+                    selectedValue = oCmb.Selected.Value.Trim();
+
+                if (selectedValue == "C")
+                {
+                    int result = Application.SBO_Application.MessageBox(
+                        "Are you sure want to change?",
+                        1,
+                        "Yes",
+                        "No"
+                    );
+
+                    if (result != 1)
+                    {
+                        oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "Error in MR Status selection: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
+                );
+            }
+        }
+
+        private void CBSTATMR_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm =Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                SAPbouiCOM.ComboBox oCmb =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+
+                string selectedValue =oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
+
+                if (selectedValue == "C")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "CBSTATMR LostFocus Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+
+        }
+
+        private void ETB2BPER_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                CalculateB2BAmount(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("B2B Percentage calculation error: " + ex.Message);
+            }
         }
 
         private void ETLCNO_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -458,10 +537,43 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
                 ETLCVAL.Value = totalLCValue.ToString("0.00");
+
+                CalculateB2BAmount(oForm);
             }
             catch (Exception ex)
             {
                 Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
+
+        private void CalculateB2BAmount(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                string lcValueStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value.Trim();
+                string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
+
+                decimal lcValue = 0;
+                decimal b2bPercent = 0;
+
+                decimal.TryParse(lcValueStr, out lcValue);
+                decimal.TryParse(b2bPerStr, out b2bPercent);
+
+                if (b2bPercent < 0 || b2bPercent > 100)
+                {
+                    Global.GFunc.ShowError("B2B Percentage must be between 0 and 100.");
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value = "";
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = "0.00";
+                    return;
+                }
+
+                decimal b2bAmount = (lcValue * b2bPercent) / 100;
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = b2bAmount.ToString("0.00");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("B2B Amount calculation error: " + ex.Message);
             }
         }
 

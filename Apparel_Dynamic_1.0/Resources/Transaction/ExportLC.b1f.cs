@@ -119,6 +119,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDATA = ((SAPbouiCOM.Button)(this.GetItem("BTNLDATA").Specific));
             this.BTNAMND = ((SAPbouiCOM.Button)(this.GetItem("BTNAMND").Specific));
+            this.BTNAMND.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.BTNAMND_PressedBefore);
+            this.BTNAMND.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNAMND_PressedAfter);
             this.GRDAMDTL = ((SAPbouiCOM.Grid)(this.GetItem("GRDAMDTL").Specific));
             this.LKSCNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
             this.LKCUSTMR = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTMR").Specific));
@@ -143,6 +145,81 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
 
         }
+
+        private void BTNAMND_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+                SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+                string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+                string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+
+                if (mrStatus != "C" || cmStatus != "C")
+                {
+                    Global.GFunc.ShowError("MR Status and CM Status must be Confirmed before amendment.");
+                    BubbleEvent = false;
+                    return;
+                }
+
+                SAPbouiCOM.EditText ETAMDNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific;
+
+                int currentAmendNo = 0;
+                if (!int.TryParse(ETAMDNO.Value.Trim(), out currentAmendNo))
+                    currentAmendNo = 0;
+
+                int newAmendNo = currentAmendNo + 1;
+                ETAMDNO.Value = newAmendNo.ToString();
+
+                SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+
+                for (int i = 1; i <= MTXSLODR.VisualRowCount; i++)
+                {
+                    string soNo = ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLSLORDR").Cells.Item(i).Specific).Value.Trim();
+
+                    if (string.IsNullOrEmpty(soNo))
+                        continue;
+
+                    ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLAMDNO").Cells.Item(i).Specific).Value = newAmendNo.ToString();
+                }
+
+                MTXSLODR.FlushToDataSource();
+
+                SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+
+                for (int i = 1; i <= MTXATTCH.VisualRowCount; i++)
+                {
+                    string attachment = ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(i).Specific).Value.Trim();
+
+                    if (string.IsNullOrEmpty(attachment))
+                        continue;
+
+                    ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLAMDNO").Cells.Item(i).Specific).Value = newAmendNo.ToString();
+                }
+
+                MTXATTCH.FlushToDataSource();
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Amendment Error: " + ex.Message);
+                BubbleEvent = false;
+            }
+        }
+
+        private void BTNAMND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            
+
+        }
+
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -170,6 +247,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
             SetStatusFields(oForm);
+            CheckAndLoadAmendmentGrid(oForm);
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
@@ -956,6 +1034,104 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             return BubbleEvent;
         }
+
+        private void CheckAndLoadAmendmentGrid(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+                int amendNo = 0;
+                int.TryParse(amendNoStr, out amendNo);
+
+                if (amendNo > 0)
+                {
+                    LoadAmendmentGrid(oForm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Amendment check error: " + ex.Message);
+            }
+        }
+
+
+        private void LoadAmendmentGrid(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                oForm.Freeze(true);
+
+                string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+                string docNum = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCNUM").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(docEntry) || string.IsNullOrWhiteSpace(docNum))
+                    return;
+
+                SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
+
+                SAPbouiCOM.DataTable oDT;
+                try
+                {
+                    oDT = oForm.DataSources.DataTables.Item("DT_AMDTL");
+                }
+                catch
+                {
+                    oDT = oForm.DataSources.DataTables.Add("DT_AMDTL");
+                }
+
+                oDT.Clear();
+
+                string query = $@"
+                        SELECT 
+                            ROW_NUMBER() OVER (ORDER BY TO_INTEGER(""U_AMNDMNT"") DESC) AS ""#"",
+                            ""DocEntry"",
+                            ""DocNum"",
+                            ""Creator"",
+                            ""CreateDate"",
+                            ""UpdateDate"",
+                            ""LogInst"",
+                            ""U_AMNDMNT"" AS ""Amendment No""
+                        FROM
+                        (
+                            SELECT 
+                                ""DocEntry"",
+                                ""DocNum"",
+                                ""Creator"",
+                                ""CreateDate"",
+                                ""UpdateDate"",
+                                ""LogInst"",
+                                ""U_AMNDMNT"",
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY ""DocEntry"", ""DocNum"", ""U_AMNDMNT""
+                                    ORDER BY ""LogInst"" DESC
+                                ) AS ""RN""
+                            FROM ""@AFIL_DH_OLCM""
+                            WHERE ""DocEntry"" = {docEntry}
+                              AND ""DocNum"" = {docNum}
+                        ) T
+                        WHERE ""RN"" = 1
+                        ORDER BY TO_INTEGER(""U_AMNDMNT"") DESC";
+
+                oDT.ExecuteQuery(query);
+                oGrid.DataTable = oDT;
+
+                for (int i = 0; i < oGrid.Columns.Count; i++)
+                    oGrid.Columns.Item(i).Editable = false;
+
+                oGrid.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText("Error loading amendment grid: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
+        }
+
+
         private void SetStatusFields(SAPbouiCOM.Form oForm)
         {
             try

@@ -14,7 +14,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
         }
 
-        private SAPbouiCOM.StaticText STSTATMR, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
+        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
         
 
@@ -22,7 +22,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
        
 
-        private SAPbouiCOM.EditText ETBP1BNM, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
+        private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
         
 
@@ -126,8 +126,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETBP2BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNM").Specific));
             this.ETHUSBNM = ((SAPbouiCOM.EditText)(this.GetItem("ETHUSBNM").Specific));
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
+            this.STREMRKS = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
+            this.ETREMRKS = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
             this.OnCustomInitialize();
 
         }
@@ -162,99 +162,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
-        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
-        {
-            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
-            {
-                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
-
-                string branch = oHeader.GetValue("U_BRANCH", 0).Trim();
-                string customer = oHeader.GetValue("U_CARDCODE", 0).Trim();
-                string scNo = oHeader.GetValue("U_SCNO", 0).Trim();
-                string lcNo = oHeader.GetValue("U_LCNO", 0).Trim();
-
-                if (branch == "")
-                {
-                    Global.GFunc.ShowError("Select Branch");
-                    oForm.ActiveItem = "CBCOMPNY";
-                    return BubbleEvent = false;
-                }
-
-                if (customer == "")
-                {
-                    Global.GFunc.ShowError("Enter Customer Code");
-                    oForm.ActiveItem = "ETCUSTMR";
-                    return BubbleEvent = false;
-                }
-                else if (scNo == "")
-                {
-                    Global.GFunc.ShowError("Enter Sales Contract No");
-                    oForm.ActiveItem = "ETSCNO";
-                    return BubbleEvent = false;
-                }
-                else if (lcNo == "")
-                {
-                    Global.GFunc.ShowError("Enter LC No");
-                    oForm.ActiveItem = "ETLCNO";
-                    return BubbleEvent = false;
-                }
-
-                if (IsDuplicateLCNo(oForm, lcNo))
-                {
-                    Global.GFunc.ShowError("LC No already exists.");
-                    oForm.ActiveItem = "ETLCNO";
-                    return BubbleEvent = false;
-                }
-
-                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM1", MTXSLODR, "U_SONO");
-                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM2", MTXATTCH, "U_ATCHMENT");
-            }
-
-            return BubbleEvent;
-        }
-
-        private bool IsDuplicateLCNo(SAPbouiCOM.Form oForm, string lcNo)
-        {
-            SAPbobsCOM.Recordset oRS = null;
-            try
-            {
-                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
-                string safeLCNo = lcNo.Replace("'", "''");
-                string query = "";
-
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}')";
-                else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
-                {
-                    string docEntry = oHeader.GetValue("DocEntry", 0).Trim();
-                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}') AND ""DocEntry"" <> {docEntry}";
-                }
-
-                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                oRS.DoQuery(query);
-
-                return !oRS.EoF;
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("LC No validation error: " + ex.Message);
-                return true;
-            }
-            finally
-            {
-                if (oRS != null)
-                {
-                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
-                    oRS = null;
-                }
-            }
-        }
-
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            Global.GFunc.SetItemsEnabled(oForm,false, "ETLCNO", "ETDOCNUM", "CBSERIES", "CBCOMPNY");
+
+            Global.GFunc.SetItemsEnabled(oForm, false, "ETLCNO", "ETDOCNUM", "CBSERIES", "CBCOMPNY");
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+            SetStatusFields(oForm);
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
@@ -273,6 +188,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 BubbleEvent = false;
             }
         }
+
 
         private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -595,9 +511,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 string formTitle = oForm.Title;
                 string documentCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCNO").Specific).Value.Trim();
                 string serverFile = NetworkShareHelper.CopyFile(sourceFile, rootPath, username, password, formTitle, documentCode, lastRow);
+                string amendmentNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
 
                 ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLATTACH").Cells.Item(lastRow).Specific).Value = serverFile;
-
+                ((SAPbouiCOM.EditText)MTXATTCH.Columns.Item("CLAMDNO").Cells.Item(lastRow).Specific).Value = amendmentNo;
                 MTXATTCH.FlushToDataSource();
 
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
@@ -677,6 +594,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 MTXSLODR.FlushToDataSource();
 
                 int rowIndex = pVal.Row - 1;
+                string amendmentNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
 
                 if (oDBDSDetail.Size <= rowIndex)
                     oDBDSDetail.InsertRecord(oDBDSDetail.Size);
@@ -690,6 +608,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oDBDSDetail.SetValue("U_STYLENTRY", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLENTRY").Value));
                 oDBDSDetail.SetValue("U_QUANTITY", rowIndex, Convert.ToString(rs.Fields.Item("Quantity").Value));
                 oDBDSDetail.SetValue("U_VALUE", rowIndex, Convert.ToString(rs.Fields.Item("TotalValue").Value));
+                oDBDSDetail.SetValue("U_AMNDMNT", rowIndex, amendmentNo);
 
                 oDBDSDetail.Offset = rowIndex;
                 MTXSLODR.SetLineData(pVal.Row);
@@ -711,64 +630,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        private void CalculateLCValue(SAPbouiCOM.Form oForm, SAPbouiCOM.Matrix oMatrix)
-        {
-            try
-            {
-                decimal totalLCValue = 0;
-
-                for (int i = 1; i <= oMatrix.VisualRowCount; i++)
-                {
-                    SAPbouiCOM.EditText txtTotalAmount = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLTTLAMT").Cells.Item(i).Specific;
-                    string value = txtTotalAmount.Value.Trim();
-
-                    decimal rowValue;
-                    if (decimal.TryParse(value, out rowValue))
-                        totalLCValue += rowValue;
-                }
-
-                SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
-                ETLCVAL.Value = totalLCValue.ToString("0.00");
-
-                CalculateB2BAmount(oForm);
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-            }
-        }
-
-        private void CalculateB2BAmount(SAPbouiCOM.Form oForm)
-        {
-            try
-            {
-                string lcValueStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value.Trim();
-                string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
-
-                decimal lcValue = 0;
-                decimal b2bPercent = 0;
-
-                decimal.TryParse(lcValueStr, out lcValue);
-                decimal.TryParse(b2bPerStr, out b2bPercent);
-
-                if (b2bPercent < 0 || b2bPercent > 100)
-                {
-                    Global.GFunc.ShowError("B2B Percentage must be between 0 and 100.");
-                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value = "";
-                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = "0.00";
-                    return;
-                }
-
-                decimal b2bAmount = (lcValue * b2bPercent) / 100;
-
-                ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = b2bAmount.ToString("0.00");
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("B2B Amount calculation error: " + ex.Message);
-            }
-        }
-
+       
         private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
@@ -1042,8 +904,183 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             ETNM.Value = Name;
 
         }
+        //_____________________________________________________________________________________________________ User Define Function_____________________________
 
-        private SAPbouiCOM.StaticText StaticText0;
-        private SAPbouiCOM.EditText EditText0;
+        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+
+                string branch = oHeader.GetValue("U_BRANCH", 0).Trim();
+                string customer = oHeader.GetValue("U_CARDCODE", 0).Trim();
+                string scNo = oHeader.GetValue("U_SCNO", 0).Trim();
+                string lcNo = oHeader.GetValue("U_LCNO", 0).Trim();
+
+                if (branch == "")
+                {
+                    Global.GFunc.ShowError("Select Branch");
+                    oForm.ActiveItem = "CBCOMPNY";
+                    return BubbleEvent = false;
+                }
+
+                if (customer == "")
+                {
+                    Global.GFunc.ShowError("Enter Customer Code");
+                    oForm.ActiveItem = "ETCUSTMR";
+                    return BubbleEvent = false;
+                }
+                else if (scNo == "")
+                {
+                    Global.GFunc.ShowError("Enter Sales Contract No");
+                    oForm.ActiveItem = "ETSCNO";
+                    return BubbleEvent = false;
+                }
+                else if (lcNo == "")
+                {
+                    Global.GFunc.ShowError("Enter LC No");
+                    oForm.ActiveItem = "ETLCNO";
+                    return BubbleEvent = false;
+                }
+
+                if (IsDuplicateLCNo(oForm, lcNo))
+                {
+                    Global.GFunc.ShowError("LC No already exists.");
+                    oForm.ActiveItem = "ETLCNO";
+                    return BubbleEvent = false;
+                }
+
+                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM1", MTXSLODR, "U_SONO");
+                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM2", MTXATTCH, "U_ATCHMENT");
+            }
+
+            return BubbleEvent;
+        }
+        private void SetStatusFields(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+                SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+                string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+                string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+
+                if (mrStatus == "D" && cmStatus == "D")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = true;
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+                else if (mrStatus == "C" && cmStatus == "D")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = false;
+                    oForm.Items.Item("CBSTATCM").Enabled = true;
+                }
+                else if (mrStatus == "C" && cmStatus == "C")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = false;
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Status field control error: " + ex.Message);
+            }
+        }
+
+        private void CalculateB2BAmount(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                string lcValueStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value.Trim();
+                string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
+
+                decimal lcValue = 0;
+                decimal b2bPercent = 0;
+
+                decimal.TryParse(lcValueStr, out lcValue);
+                decimal.TryParse(b2bPerStr, out b2bPercent);
+
+                if (b2bPercent < 0 || b2bPercent > 100)
+                {
+                    Global.GFunc.ShowError("B2B Percentage must be between 0 and 100.");
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value = "";
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = "0.00";
+                    return;
+                }
+
+                decimal b2bAmount = (lcValue * b2bPercent) / 100;
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = b2bAmount.ToString("0.00");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("B2B Amount calculation error: " + ex.Message);
+            }
+        }
+        private bool IsDuplicateLCNo(SAPbouiCOM.Form oForm, string lcNo)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+            try
+            {
+                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                string safeLCNo = lcNo.Replace("'", "''");
+                string query = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}')";
+                else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                {
+                    string docEntry = oHeader.GetValue("DocEntry", 0).Trim();
+                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}') AND ""DocEntry"" <> {docEntry}";
+                }
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                oRS.DoQuery(query);
+
+                return !oRS.EoF;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("LC No validation error: " + ex.Message);
+                return true;
+            }
+            finally
+            {
+                if (oRS != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+                    oRS = null;
+                }
+            }
+        }
+
+        private void CalculateLCValue(SAPbouiCOM.Form oForm, SAPbouiCOM.Matrix oMatrix)
+        {
+            try
+            {
+                decimal totalLCValue = 0;
+
+                for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+                {
+                    SAPbouiCOM.EditText txtTotalAmount = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLTTLAMT").Cells.Item(i).Specific;
+                    string value = txtTotalAmount.Value.Trim();
+
+                    decimal rowValue;
+                    if (decimal.TryParse(value, out rowValue))
+                        totalLCValue += rowValue;
+                }
+
+                SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
+                ETLCVAL.Value = totalLCValue.ToString("0.00");
+
+                CalculateB2BAmount(oForm);
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
+
     }
 }

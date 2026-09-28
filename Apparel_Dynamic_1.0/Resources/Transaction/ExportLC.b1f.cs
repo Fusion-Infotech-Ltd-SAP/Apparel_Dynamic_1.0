@@ -114,6 +114,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.DELBTN = ((SAPbouiCOM.Button)(this.GetItem("DELBTN").Specific));
             this.DELBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.DELBTN_PressedAfter);
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
+            this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDATA = ((SAPbouiCOM.Button)(this.GetItem("BTNLDATA").Specific));
             this.BTNAMND = ((SAPbouiCOM.Button)(this.GetItem("BTNAMND").Specific));
@@ -132,13 +134,127 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
-            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.RightClickBefore += new SAPbouiCOM.Framework.FormBase.RightClickBeforeHandler(this.Form_RightClickBefore);
+            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
 
         }
 
         private void OnCustomInitialize()
         {
 
+        }
+
+        private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            
+
+        }
+
+        private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                ValidateForm(ref oForm, ref BubbleEvent);
+            }
+
+        }
+
+        private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
+        {
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+            {
+                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+
+                string branch = oHeader.GetValue("U_BRANCH", 0).Trim();
+                string customer = oHeader.GetValue("U_CARDCODE", 0).Trim();
+                string scNo = oHeader.GetValue("U_SCNO", 0).Trim();
+                string lcNo = oHeader.GetValue("U_LCNO", 0).Trim();
+
+                if (branch == "")
+                {
+                    Global.GFunc.ShowError("Select Branch");
+                    oForm.ActiveItem = "CBCOMPNY";
+                    return BubbleEvent = false;
+                }
+
+                if (customer == "")
+                {
+                    Global.GFunc.ShowError("Enter Customer Code");
+                    oForm.ActiveItem = "ETCUSTMR";
+                    return BubbleEvent = false;
+                }
+                else if (scNo == "")
+                {
+                    Global.GFunc.ShowError("Enter Sales Contract No");
+                    oForm.ActiveItem = "ETSCNO";
+                    return BubbleEvent = false;
+                }
+                else if (lcNo == "")
+                {
+                    Global.GFunc.ShowError("Enter LC No");
+                    oForm.ActiveItem = "ETLCNO";
+                    return BubbleEvent = false;
+                }
+
+                if (IsDuplicateLCNo(oForm, lcNo))
+                {
+                    Global.GFunc.ShowError("LC No already exists.");
+                    oForm.ActiveItem = "ETLCNO";
+                    return BubbleEvent = false;
+                }
+
+                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM1", MTXSLODR, "U_SONO");
+                Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM2", MTXATTCH, "U_ATCHMENT");
+            }
+
+            return BubbleEvent;
+        }
+
+        private bool IsDuplicateLCNo(SAPbouiCOM.Form oForm, string lcNo)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+            try
+            {
+                SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                string safeLCNo = lcNo.Replace("'", "''");
+                string query = "";
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}')";
+                else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                {
+                    string docEntry = oHeader.GetValue("DocEntry", 0).Trim();
+                    query = $@"SELECT ""DocEntry"" FROM ""@FIL_DH_OLCM"" WHERE TRIM(""U_LCNO"") = TRIM('{safeLCNo}') AND ""DocEntry"" <> {docEntry}";
+                }
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                oRS.DoQuery(query);
+
+                return !oRS.EoF;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("LC No validation error: " + ex.Message);
+                return true;
+            }
+            finally
+            {
+                if (oRS != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+                    oRS = null;
+                }
+            }
+        }
+
+        private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            Global.GFunc.SetItemsEnabled(oForm,false, "ETLCNO", "ETDOCNUM", "CBSERIES", "CBCOMPNY");
+            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
@@ -579,6 +695,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 MTXSLODR.SetLineData(pVal.Row);
 
                 CalculateLCValue(oForm, MTXSLODR);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
 
                 if (pVal.Row == MTXSLODR.VisualRowCount)
                     Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail);

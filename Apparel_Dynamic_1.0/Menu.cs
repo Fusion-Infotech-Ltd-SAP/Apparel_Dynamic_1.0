@@ -2293,51 +2293,61 @@ namespace Apparel_Dynamic_1._0
 
                                     break;
                                 }
+
                             case "FIL_FRM_EXPLC":
                                 {
                                     try
                                     {
-                                        
                                         oForm.Freeze(true);
 
-                                        SAPbouiCOM.Matrix MTXSLODR =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                                        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
                                         SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
 
-                                        // After 1293 deletion, sync remaining matrix rows to datasource
                                         MTXSLODR.FlushToDataSource();
 
-                                        // Rearrange LineId
-                                        for (int i = 0; i < oDBDSDetail.Size; i++)
+                                        // Remove all empty rows after deletion
+                                        for (int i = oDBDSDetail.Size - 1; i >= 0; i--)
                                         {
-                                            oDBDSDetail.SetValue("LineId", i, (i + 1).ToString());
+                                            string soNo = oDBDSDetail.GetValue("U_SONO", i).Trim();
+
+                                            if (string.IsNullOrEmpty(soNo))
+                                                oDBDSDetail.RemoveRecord(i);
                                         }
+
+                                        // Rearrange LineId only for actual rows
+                                        for (int i = 0; i < oDBDSDetail.Size; i++)
+                                            oDBDSDetail.SetValue("LineId", i, (i + 1).ToString());
+
                                         MTXSLODR.LoadFromDataSource();
 
-                                        // Recalculate LC Value from remaining rows
+                                        // Keep exactly one empty row for new entry
+                                        Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail);
+
+                                        // Recalculate LC Value
                                         decimal totalLCValue = 0;
 
                                         for (int i = 1; i <= MTXSLODR.VisualRowCount; i++)
                                         {
-                                            SAPbouiCOM.EditText txtTotalAmount = (SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLTTLAMT").Cells.Item(i).Specific;
+                                            string soNo = ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLSLORDR").Cells.Item(i).Specific).Value.Trim();
 
-                                            string value = txtTotalAmount.Value.Trim();
+                                            if (string.IsNullOrEmpty(soNo))
+                                                continue;
+
+                                            string value = ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLTTLAMT").Cells.Item(i).Specific).Value.Trim();
+
                                             decimal rowValue;
                                             if (decimal.TryParse(value, out rowValue))
                                                 totalLCValue += rowValue;
                                         }
 
-                                        // Update LC Value
-                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value =totalLCValue.ToString("0.00");
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value = totalLCValue.ToString("0.00");
 
-                                        // Recalculate B2B Amount
-                                        string b2bPerStr =((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
-
+                                        string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
                                         decimal b2bPercent = 0;
                                         decimal.TryParse(b2bPerStr, out b2bPercent);
 
                                         decimal b2bAmount = (totalLCValue * b2bPercent) / 100;
-
-                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value =b2bAmount.ToString("0.00");
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = b2bAmount.ToString("0.00");
 
                                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                                             oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;

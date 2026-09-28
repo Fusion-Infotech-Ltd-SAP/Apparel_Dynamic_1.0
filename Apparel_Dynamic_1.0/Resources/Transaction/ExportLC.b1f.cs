@@ -24,6 +24,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETBP1BNM, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
+        
+
         private SAPbouiCOM.Folder TABSODR, TABAMDTL, TABATTCH;
 
         private SAPbouiCOM.Matrix MTXSLODR, MTXATTCH;
@@ -63,6 +65,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.CBSTATMR.LostFocusAfter += new SAPbouiCOM._IComboBoxEvents_LostFocusAfterEventHandler(this.CBSTATMR_LostFocusAfter);
             this.CBSTATMR.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSTATMR_ComboSelectAfter);
             this.CBSTATCM = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATCM").Specific));
+            this.CBSTATCM.LostFocusAfter += new SAPbouiCOM._IComboBoxEvents_LostFocusAfterEventHandler(this.CBSTATCM_LostFocusAfter);
+            this.CBSTATCM.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSTATCM_ComboSelectAfter);
             this.CBCOMPNY = ((SAPbouiCOM.ComboBox)(this.GetItem("CBCOMPNY").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBINTRMS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBINTRMS").Specific));
@@ -134,7 +138,57 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
 
         }
+        private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
+                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
+
+                if (selectedValue == "C")
+                {
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error in CM LostFocus Error: " + ex.Message);
+            }
+        }
+
+        private void CBSTATCM_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+                string selectedValue = "";
+                if (oCmb.Selected != null)
+                    selectedValue = oCmb.Selected.Value.Trim();
+
+                if (selectedValue == "C")
+                {
+                    int result = Application.SBO_Application.MessageBox(
+                        "Are you sure want to confirm?",
+                        1,
+                        "Yes",
+                        "No"
+                    );
+
+                    if (result != 1)
+                    {
+                        oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Error in CM Status selection: " + ex.Message);
+            }
+        }
         private void CBSTATMR_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
@@ -155,20 +209,24 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         "No"
                     );
 
-                    if (result != 1)
+                    if (result == 1)
+                    {
+                        oForm.Items.Item("CBSTATCM").Enabled = true;
+                    }
+                    else
                     {
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-
+                        oForm.Items.Item("CBSTATCM").Enabled = false;
                     }
+                }
+                else
+                {
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
                 }
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Error in MR Status selection: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError("Error in MR Status selection: " + ex.Message);
             }
         }
 
@@ -176,26 +234,21 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             try
             {
-                SAPbouiCOM.Form oForm =Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
 
-                SAPbouiCOM.ComboBox oCmb =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
-
-                string selectedValue =oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
+                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
 
                 if (selectedValue == "C")
                 {
                     oForm.Items.Item("CBSTATMR").Enabled = false;
+                    oForm.Items.Item("CBSTATCM").Enabled = true;
                 }
-
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "CBSTATMR LostFocus Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError("Error in MR LostFocus Error: " + ex.Message);
             }
-
         }
 
         private void ETB2BPER_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

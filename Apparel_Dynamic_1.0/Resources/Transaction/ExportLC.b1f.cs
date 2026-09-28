@@ -132,12 +132,32 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
+            this.RightClickBefore += new RightClickBeforeHandler(this.Form_RightClickBefore);
+
         }
 
         private void OnCustomInitialize()
         {
 
         }
+
+        private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(eventInfo.FormUID);
+                if (eventInfo.ItemUID != "MTXSLODR" || eventInfo.Row <= 0)
+                    return;
+                oForm.EnableMenu("1293", true);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Form_RightClickBefore Error: {ex.Message}");
+                BubbleEvent = false;
+            }
+        }
+
         private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try

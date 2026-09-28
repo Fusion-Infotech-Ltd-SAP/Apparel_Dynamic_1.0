@@ -2220,11 +2220,11 @@ namespace Apparel_Dynamic_1._0
 
                                         oForm.Freeze(true);
 
-                                        SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
-                                        SAPbouiCOM.Matrix MTXCDCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
+                                        SAPbouiCOM.Matrix MTXMRCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                                        SAPbouiCOM.Matrix MTXCDCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
 
-                                        SAPbouiCOM.DBDataSource dbMRCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
-                                        SAPbouiCOM.DBDataSource dbCDCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
+                                        SAPbouiCOM.DBDataSource dbMRCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
+                                        SAPbouiCOM.DBDataSource dbCDCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
 
                                         // ==========================================
                                         // MTXMRCON
@@ -2234,7 +2234,7 @@ namespace Apparel_Dynamic_1._0
 
                                         for (int i = 0; i < dbMRCON.Size; i++)
                                         {
-                                            dbMRCON.SetValue("LineId",i,(i + 1).ToString());
+                                            dbMRCON.SetValue("LineId", i, (i + 1).ToString());
                                         }
 
                                         MTXMRCON.LoadFromDataSource();
@@ -2247,8 +2247,8 @@ namespace Apparel_Dynamic_1._0
 
                                         for (int i = dbCDCON.Size - 1; i >= 0; i--)
                                         {
-                                            string itemCode =dbCDCON.GetValue("U_ITEMCODE", i).Trim();
-                                            string position =dbCDCON.GetValue("U_POSITION", i).Trim();
+                                            string itemCode = dbCDCON.GetValue("U_ITEMCODE", i).Trim();
+                                            string position = dbCDCON.GetValue("U_POSITION", i).Trim();
 
                                             if (itemCode == _cadDeletedItemCode && position == _cadDeletedPosition)
                                             {
@@ -2261,7 +2261,7 @@ namespace Apparel_Dynamic_1._0
                                         // ==========================================
                                         for (int i = 0; i < dbCDCON.Size; i++)
                                         {
-                                            dbCDCON.SetValue("LineId",i,(i + 1).ToString());
+                                            dbCDCON.SetValue("LineId", i, (i + 1).ToString());
                                         }
 
                                         MTXCDCON.LoadFromDataSource();
@@ -2275,7 +2275,7 @@ namespace Apparel_Dynamic_1._0
                                         // Form must know there are unsaved changes
                                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                                         {
-                                            oForm.Mode =SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
                                         }
 
                                         _cadDeletedItemCode = "";
@@ -2284,11 +2284,72 @@ namespace Apparel_Dynamic_1._0
                                     }
                                     catch (Exception ex)
                                     {
-                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " +ex.Message);
+                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " + ex.Message);
                                     }
                                     finally
                                     {
                                         oForm.Freeze(false);
+                                    }
+
+                                    break;
+                                }
+                            case "FIL_FRM_EXPLC":
+                                {
+                                    try
+                                    {
+                                        
+                                        oForm.Freeze(true);
+
+                                        SAPbouiCOM.Matrix MTXSLODR =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                                        SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                                        // After 1293 deletion, sync remaining matrix rows to datasource
+                                        MTXSLODR.FlushToDataSource();
+
+                                        // Rearrange LineId
+                                        for (int i = 0; i < oDBDSDetail.Size; i++)
+                                        {
+                                            oDBDSDetail.SetValue("LineId", i, (i + 1).ToString());
+                                        }
+                                        MTXSLODR.LoadFromDataSource();
+
+                                        // Recalculate LC Value from remaining rows
+                                        decimal totalLCValue = 0;
+
+                                        for (int i = 1; i <= MTXSLODR.VisualRowCount; i++)
+                                        {
+                                            SAPbouiCOM.EditText txtTotalAmount = (SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLTTLAMT").Cells.Item(i).Specific;
+
+                                            string value = txtTotalAmount.Value.Trim();
+                                            decimal rowValue;
+                                            if (decimal.TryParse(value, out rowValue))
+                                                totalLCValue += rowValue;
+                                        }
+
+                                        // Update LC Value
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value =totalLCValue.ToString("0.00");
+
+                                        // Recalculate B2B Amount
+                                        string b2bPerStr =((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
+
+                                        decimal b2bPercent = 0;
+                                        decimal.TryParse(b2bPerStr, out b2bPercent);
+
+                                        decimal b2bAmount = (totalLCValue * b2bPercent) / 100;
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value =b2bAmount.ToString("0.00");
+
+                                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Global.GFunc.ShowError("Export LC - Sales Order Tab row delete error: " + ex.Message);
+                                    }
+                                    finally
+                                    {
+                                        if (oForm != null)
+                                            oForm.Freeze(false);
                                     }
 
                                     break;

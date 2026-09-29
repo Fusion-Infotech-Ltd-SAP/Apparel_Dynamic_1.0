@@ -25,7 +25,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
-       
+        
 
         private SAPbouiCOM.Folder TABSODR, TABAMDTL, TABATTCH;
 
@@ -119,6 +119,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDATA = ((SAPbouiCOM.Button)(this.GetItem("BTNLDATA").Specific));
+            this.BTNLDATA.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNLDATA_PressedAfter);
             this.BTNAMND = ((SAPbouiCOM.Button)(this.GetItem("BTNAMND").Specific));
             this.BTNAMND.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.BTNAMND_PressedBefore);
             this.BTNAMND.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNAMND_PressedAfter);
@@ -147,6 +148,60 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private void OnCustomInitialize()
         {
 
+        }
+        private void BTNLDATA_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                mtx.FlushToDataSource();
+
+                List<SalesOrderMismatch> mismatches = GetSalesOrderMismatches(oForm);
+
+                if (mismatches.Count == 0)
+                {
+                    Global.GFunc.ShowSuccess("Sales Order Quantity and Total Value are already up to date.");
+                    return;
+                }
+
+                foreach (SalesOrderMismatch item in mismatches)
+                {
+                    dbDetail.SetValue("U_QUANTITY", item.Row, item.CurrentQty.ToString());
+                    dbDetail.SetValue("U_VALUE", item.Row, item.CurrentValue.ToString());
+                }
+
+                mtx.LoadFromDataSource();
+
+                CalculateLCValue(oForm, mtx);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                StringBuilder message = new StringBuilder();
+                message.AppendLine("Latest Sales Order data loaded successfully.");
+                message.AppendLine("");
+
+                foreach (SalesOrderMismatch item in mismatches)
+                    message.AppendLine("Sales Order: " + item.SONo);
+
+                Application.SBO_Application.MessageBox(message.ToString());
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Load Sales Order data error: " + ex.Message);
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
+            }
         }
 
         private void GRDAMDTL_DoubleClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -1128,6 +1183,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     oForm.ActiveItem = "ETLCNO";
                     return BubbleEvent = false;
                 }
+                if (!ValidateSalesOrderCurrentValues(oForm))
+                    return BubbleEvent = false;
 
                 Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM1", MTXSLODR, "U_SONO");
                 Global.GFunc.PreventEmptyLastRow(oForm, "@FIL_DR_LCM2", MTXATTCH, "U_ATCHMENT");
@@ -1788,5 +1845,167 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
+
+        private class SalesOrderMismatch
+        {
+            public int Row { get; set; }
+            public string SONo { get; set; }
+            public string SOEntry { get; set; }
+            public decimal MatrixQty { get; set; }
+            public decimal CurrentQty { get; set; }
+            public decimal MatrixValue { get; set; }
+            public decimal CurrentValue { get; set; }
+            public bool QtyMismatch { get; set; }
+            public bool ValueMismatch { get; set; }
+        }
+
+        private decimal ParseDecimal(string value)
+        {
+            decimal result = 0;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return 0;
+
+            decimal.TryParse(value.Replace(",", "").Trim(), out result);
+            return result;
+        }
+
+        private List<SalesOrderMismatch> GetSalesOrderMismatches(SAPbouiCOM.Form oForm)
+        {
+            List<SalesOrderMismatch> mismatches = new List<SalesOrderMismatch>();
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                mtx.FlushToDataSource();
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                for (int i = 0; i < dbDetail.Size; i++)
+                {
+                    string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+                    string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+                        continue;
+
+                    decimal matrixQty = ParseDecimal(dbDetail.GetValue("U_QUANTITY", i));
+                    decimal matrixValue = ParseDecimal(dbDetail.GetValue("U_VALUE", i));
+
+                    string query = $@"
+                                    SELECT
+                                        SUM(B.""Quantity"") AS ""Quantity"",
+                                        CASE
+                                            WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+                                            ELSE A.""DocTotalFC""
+                                        END AS ""TotalValue""
+                                    FROM ORDR A
+                                    INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+                                    WHERE A.""DocEntry"" = {soEntry}
+                                    GROUP BY
+                                        A.""DocCur"",
+                                        A.""DocTotal"",
+                                        A.""DocTotalFC""";
+
+                    rs.DoQuery(query);
+
+                    if (rs.EoF)
+                    {
+                        mismatches.Add(new SalesOrderMismatch
+                        {
+                            Row = i,
+                            SONo = soNo,
+                            SOEntry = soEntry,
+                            MatrixQty = matrixQty,
+                            CurrentQty = 0,
+                            MatrixValue = matrixValue,
+                            CurrentValue = 0,
+                            QtyMismatch = true,
+                            ValueMismatch = true
+                        });
+
+                        continue;
+                    }
+
+                    decimal currentQty = Convert.ToDecimal(rs.Fields.Item("Quantity").Value);
+                    decimal currentValue = Convert.ToDecimal(rs.Fields.Item("TotalValue").Value);
+
+                    bool qtyMismatch = Math.Abs(matrixQty - currentQty) > 0.000001M;
+                    bool valueMismatch = Math.Abs(matrixValue - currentValue) > 0.01M;
+
+                    if (qtyMismatch || valueMismatch)
+                    {
+                        mismatches.Add(new SalesOrderMismatch
+                        {
+                            Row = i,
+                            SONo = soNo,
+                            SOEntry = soEntry,
+                            MatrixQty = matrixQty,
+                            CurrentQty = currentQty,
+                            MatrixValue = matrixValue,
+                            CurrentValue = currentValue,
+                            QtyMismatch = qtyMismatch,
+                            ValueMismatch = valueMismatch
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order validation error: " + ex.Message);
+                throw;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+
+            return mismatches;
+        }
+        private bool ValidateSalesOrderCurrentValues(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                List<SalesOrderMismatch> mismatches = GetSalesOrderMismatches(oForm);
+
+                if (mismatches.Count == 0)
+                    return true;
+
+                StringBuilder message = new StringBuilder();
+                message.AppendLine("Sales Order data has changed.");
+                message.AppendLine("");
+
+                foreach (SalesOrderMismatch item in mismatches)
+                {
+                    message.AppendLine("Sales Order: " + item.SONo);
+
+                    if (item.QtyMismatch)
+                        message.AppendLine("Quantity: LC = " + item.MatrixQty.ToString("0.######") + ", Current SO = " + item.CurrentQty.ToString("0.######"));
+
+                    if (item.ValueMismatch)
+                        message.AppendLine("Total Value: LC = " + item.MatrixValue.ToString("0.00") + ", Current SO = " + item.CurrentValue.ToString("0.00"));
+
+                    message.AppendLine("");
+                }
+
+                message.AppendLine("Please press Load Data to update the changed Sales Order row(s).");
+
+                Application.SBO_Application.MessageBox(message.ToString());
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 }

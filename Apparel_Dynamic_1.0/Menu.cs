@@ -963,25 +963,27 @@ namespace Apparel_Dynamic_1._0
 
                             //Amendment No
                             ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+
+                            // Branch combo
+                            LoadUserBranches(oForm, "CBCOMPNY");
+                            SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                            oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                            //Load Payment Terms
+                            string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+                            SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+                            Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+                            //Load FOB
+                            string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+                            SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+                            Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                            //Currencey Load
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
                         }
 
-                        // Branch combo
-                        LoadUserBranches(oForm, "CBCOMPNY");
-                        SAPbouiCOM.ComboBox oCombo =(SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
-                        oCombo.Select(oCombo.ValidValues.Item(0).Value,SAPbouiCOM.BoSearchKey.psk_ByValue);
                         
-                        //Load Payment Terms
-                        string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
-                        SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
-                        Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
-                        
-                        //Load FOB
-                        string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
-                        SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
-                        Global.GFunc.setComboBoxValue(CBINTRMS, fob);
-
-                        //Currencey Load
-                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
 
                     }
                     catch (Exception ex)
@@ -1472,6 +1474,47 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, false, "ETDESC");
                                 break;
                             }
+                        case "FIL_FRM_EXPLC":
+                            {
+
+                                // Series Initialization
+                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                {
+                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                    string today = DateTime.Now.ToString("yyyyMMdd");
+                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                                    oDBH.SetValue("U_DOCDATE", 0, today);
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
+
+                                    //Amendment No
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+
+                                    // Branch combo
+                                    LoadUserBranches(oForm, "CBCOMPNY");
+                                    SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                                    oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                                    //Load Payment Terms
+                                    string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+                                    SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+                                    Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+                                    //Load FOB
+                                    string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+                                    SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+                                    Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                                    //Currencey Load
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+                                }
+                                Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETDOCNUM", "ETB2BAMT");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1662,6 +1705,14 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_SAM":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETDESC");
+                                break;
+                            }
+                        case "FIL_FRM_EXPLC":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBCOMPNY", "CBSTATMR", "CBSTATCM", "ETCUSTNM", "ETLCNO", 
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETDOCNUM", "ETB2BAMT");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETAMDNO", "CBSERIES");
+
                                 break;
                             }
                     }

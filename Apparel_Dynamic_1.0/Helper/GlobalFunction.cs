@@ -47,6 +47,42 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
+        public void LoadUserBranches(SAPbouiCOM.Form oForm, string comboId)
+        {
+            try
+            {
+                int userSign = Global.oComp.UserSignature;
+
+                string sql = $@"
+                                SELECT DISTINCT
+                                    T0.""BPLId"",
+                                    T0.""BPLName""
+                                FROM ""OBPL"" T0
+                                INNER JOIN ""USR6"" T1
+                                    ON T0.""BPLId"" = T1.""BPLId""
+                                WHERE T1.""UserID"" = {userSign}
+                                ORDER BY T0.""BPLName""";
+
+                SAPbouiCOM.ComboBox oCombo =
+                    (SAPbouiCOM.ComboBox)oForm.Items.Item(comboId).Specific;
+
+                Global.GFunc.setComboBoxValue(oCombo, sql);
+
+                if (oCombo.ValidValues.Count == 1)
+                {
+                    oCombo.Select(
+                        oCombo.ValidValues.Item(0).Value,
+                        SAPbouiCOM.BoSearchKey.psk_ByValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "LoadUserBranches Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
 
         public void ResetMatrixCellsEditable(SAPbouiCOM.Matrix matrix, string codeColumnId)
         {

@@ -13,27 +13,31 @@ namespace Apparel_Dynamic_1._0.Resources.Version
         {
         }
 
-        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
+        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, 
+                                      STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, 
+                                      STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, 
+                                      STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
 
 
-        private SAPbouiCOM.ComboBox CBSTATMR, CBSTATCM, CBCOMPNY, CBSERIES, CBINTRMS, CBPYTRMS, CBLCTRMS;
+
+
+        private SAPbouiCOM.EditText ETCOMPNY, ETPYTRMS, ETINTRMS, ETLCTRMS, ETSERIES, ETSTATCM, ETSTATMR, 
+                                    ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM, ETCUSTMR, ETSCNO, ETLCNO, 
+                                    ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, 
+                                    ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
 
 
-        private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM, ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
-
-
-
-        private SAPbouiCOM.Folder TABSODR, TABAMDTL, TABATTCH;
+        private SAPbouiCOM.Folder TABSODR, TABATTCH;
 
         private SAPbouiCOM.Matrix MTXSLODR, MTXATTCH;
 
-        private SAPbouiCOM.Button BRWSBTN, DISPBTN, DELBTN, ADDButton, CancelButton, BTNLDATA, BTNAMND;
+        private SAPbouiCOM.Button  ADDButton, CancelButton;
 
-        private SAPbouiCOM.Grid GRDAMDTL;
 
-        private SAPbouiCOM.LinkedButton LKSCNO, LKCUSTMR;
+        private SAPbouiCOM.LinkedButton LKCUSTMR;
+
 
         public override void OnInitializeComponent()
         {
@@ -60,27 +64,16 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.STPYTRMS = ((SAPbouiCOM.StaticText)(this.GetItem("STPYTRMS").Specific));
             this.STINTRMS = ((SAPbouiCOM.StaticText)(this.GetItem("STINTRMS").Specific));
             this.STAMDNO = ((SAPbouiCOM.StaticText)(this.GetItem("STAMDNO").Specific));
-
-            this.CBSTATMR = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATMR").Specific));
-            this.CBSTATCM = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATCM").Specific));
-            this.CBCOMPNY = ((SAPbouiCOM.ComboBox)(this.GetItem("CBCOMPNY").Specific));
-            this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            this.CBINTRMS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBINTRMS").Specific));
-            this.CBPYTRMS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBPYTRMS").Specific));
-            this.CBLCTRMS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBLCTRMS").Specific));
-
             this.ETCUSTMR = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTMR").Specific));
             this.ETSCNO = ((SAPbouiCOM.EditText)(this.GetItem("ETSCNO").Specific));
             this.ETLCNO = ((SAPbouiCOM.EditText)(this.GetItem("ETLCNO").Specific));
-
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
             this.ETDOCNUM = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
             this.ETLCDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETLCDESC").Specific));
             this.ETCURR = ((SAPbouiCOM.EditText)(this.GetItem("ETCURR").Specific));
-
-            this.ETBP1BNK = ((SAPbouiCOM.EditText)(this.GetItem("ETBP1BNK").Specific));  
-            this.ETBP2BNK = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNK").Specific));           
-            this.ETHUSBNK = ((SAPbouiCOM.EditText)(this.GetItem("ETHUSBNK").Specific));         
+            this.ETBP1BNK = ((SAPbouiCOM.EditText)(this.GetItem("ETBP1BNK").Specific));
+            this.ETBP2BNK = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNK").Specific));
+            this.ETHUSBNK = ((SAPbouiCOM.EditText)(this.GetItem("ETHUSBNK").Specific));
             this.ETLCVAL = ((SAPbouiCOM.EditText)(this.GetItem("ETLCVAL").Specific));
             this.ETDOCDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
             this.ETISUDAT = ((SAPbouiCOM.EditText)(this.GetItem("ETISUDAT").Specific));
@@ -90,36 +83,30 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.ETB2BAMT = ((SAPbouiCOM.EditText)(this.GetItem("ETB2BAMT").Specific));
             this.ETAMDNO = ((SAPbouiCOM.EditText)(this.GetItem("ETAMDNO").Specific));
             this.TABSODR = ((SAPbouiCOM.Folder)(this.GetItem("TABSODR").Specific));
-            this.TABAMDTL = ((SAPbouiCOM.Folder)(this.GetItem("TABAMDTL").Specific));
             this.TABATTCH = ((SAPbouiCOM.Folder)(this.GetItem("TABATTCH").Specific));
             this.MTXSLODR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSLODR").Specific));
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
-
-
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
-
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
-            this.BTNLDATA = ((SAPbouiCOM.Button)(this.GetItem("BTNLDATA").Specific));
-            this.BTNAMND = ((SAPbouiCOM.Button)(this.GetItem("BTNAMND").Specific));
-
-
-            this.LKSCNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
             this.LKCUSTMR = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTMR").Specific));
-
             this.ETBP1BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP1BNM").Specific));
             this.ETBP2BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNM").Specific));
             this.ETHUSBNM = ((SAPbouiCOM.EditText)(this.GetItem("ETHUSBNM").Specific));
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
             this.STREMRKS = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
             this.ETREMRKS = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
-
+            this.ETCOMPNY = ((SAPbouiCOM.EditText)(this.GetItem("ETCOMPNY").Specific));
+            this.ETSTATMR = ((SAPbouiCOM.EditText)(this.GetItem("ETSTATMR").Specific));
+            this.ETSTATCM = ((SAPbouiCOM.EditText)(this.GetItem("ETSTATCM").Specific));
+            this.ETSERIES = ((SAPbouiCOM.EditText)(this.GetItem("ETSERIES").Specific));
+            this.ETLCTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETLCTRMS").Specific));
+            this.ETPYTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETPYTRMS").Specific));
+            this.ETINTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETINTRMS").Specific));
+            this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
             this.OnCustomInitialize();
 
         }
 
-        /// <summary>
-        /// Initialize form event. Called by framework before form creation.
-        /// </summary>
         public override void OnInitializeFormEvents()
         {
         }
@@ -129,6 +116,6 @@ namespace Apparel_Dynamic_1._0.Resources.Version
 
         }
 
-        private SAPbouiCOM.Matrix Matrix0;
+        private SAPbouiCOM.LinkedButton LinkedButton0;
     }
 }

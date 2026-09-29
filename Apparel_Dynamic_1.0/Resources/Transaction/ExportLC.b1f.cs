@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Apparel_Dynamic_1._0.Helper;
+using Apparel_Dynamic_1._0.Resources.Version;
 
 namespace Apparel_Dynamic_1._0.Resources.Transaction
 {
@@ -150,8 +151,32 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void GRDAMDTL_DoubleClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            throw new System.NotImplementedException();
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
+            try
+            {
+                if (pVal.Row < 0)
+                    return;
+
+                int result = Application.SBO_Application.MessageBox("Are you sure you want to see the Amendment Details?", 1, "OK", "Cancel");
+
+                if (result != 1)
+                    return;
+
+                SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
+                SAPbouiCOM.DataTable oDT = oGrid.DataTable;
+
+                string docEntry = oDT.GetValue("DocEntry", pVal.Row).ToString().Trim();
+                string docNum = oDT.GetValue("DocNum", pVal.Row).ToString().Trim();
+                string amendNo = oDT.GetValue("Amendment No", pVal.Row).ToString().Trim();
+                string logInst = oDT.GetValue("LogInst", pVal.Row).ToString().Trim();
+
+                OpenLCAmendmentInNewForm(docEntry, docNum, amendNo, logInst);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Amendment Details Error: " + ex.Message);
+            }
         }
 
         private void BTNAMND_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -1095,6 +1120,436 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        private void OpenLCAmendmentInNewForm(string docEntry, string docNum, string amendNo, string logInst)
+        {
+            SAPbouiCOM.Form newForm = null;
+
+            try
+            {
+                ExportLCAmendment frm = new ExportLCAmendment();
+                frm.Show();
+
+                newForm = (SAPbouiCOM.Form)frm.UIAPIRawForm;
+
+                if (newForm == null)
+                    throw new Exception("Export LC Amendment form could not be opened.");
+
+                newForm.Freeze(true);
+
+                newForm.Title = "Export LC - Amendment " + amendNo;
+                newForm.PaneLevel = 1;
+
+                LoadLCAmendmentHeader(newForm, docEntry, docNum, amendNo, logInst);
+                LoadLCAmendmentSalesOrderMatrix(newForm, docEntry, amendNo, logInst);
+                LoadLCAmendmentAttachmentMatrix(newForm, docEntry, amendNo, logInst);
+
+                newForm.Mode = SAPbouiCOM.BoFormMode.fm_VIEW_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Open Export LC Amendment Error: " + ex.Message);
+            }
+            finally
+            {
+                if (newForm != null)
+                    newForm.Freeze(false);
+            }
+        }
+        //private void LoadLCAmendmentHeader(SAPbouiCOM.Form oForm, string docEntry, string docNum, string amendNo, string logInst)
+        //{
+        //    string sql = $@"
+        //                    SELECT
+        //                        T0.""DocEntry"",
+        //                        T0.""DocNum"",
+        //                        T0.""Series"",
+        //                        T0.""U_BRANCH"",
+        //                        T0.""U_MLCSTATUS"",
+        //                        T0.""U_CLCSTATUS"",
+        //                        T0.""U_CARDCODE"",
+        //                        T0.""U_CARDNAME"",
+        //                        T0.""U_SCNO"",
+        //                        T0.""U_LCNO"",
+        //                        T0.""U_LCDESC"",
+        //                        T0.""U_CURRENCY"",
+        //                        T0.""U_BNK1CODE"",
+        //                        T0.""U_BNK1NAME"",
+        //                        T0.""U_BNK2CODE"",
+        //                        T0.""U_BNK2NAME"",
+        //                        T0.""U_HBNKCODE"",
+        //                        T0.""U_HBNKNAME"",
+        //                        T0.""U_LCVALUE"",
+        //                        T0.""U_DOCDATE"",
+        //                        T0.""U_ISSUEDATE"",
+        //                        T0.""U_SHIPDATE"",
+        //                        T0.""U_EXPDATE"",
+        //                        T0.""U_BTOBLCPER"",
+        //                        T0.""U_BTOBLCVALUE"",
+        //                        T0.""U_LCTERMS"",
+        //                        T0.""U_PAYTERMS"",
+        //                        T0.""U_INCOTRMS"",
+        //                        T0.""U_AMNDMNT"",
+        //                        T0.""U_Remarks""
+        //                    FROM ""@AFIL_DH_OLCM"" T0
+        //                    WHERE T0.""DocEntry"" = '{docEntry}'
+        //                    AND T0.""DocNum"" = '{docNum}'
+        //                    AND T0.""U_AMNDMNT"" = '{amendNo}'
+        //                    AND T0.""LogInst"" = '{logInst}'";
+
+        //    SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //    rs.DoQuery(sql);
+
+        //    if (rs.EoF)
+        //    {
+        //        Global.GFunc.ShowError("Export LC amendment header data not found.");
+        //        return;
+        //    }
+
+        //    string mrStatus = Convert.ToString(rs.Fields.Item("U_MLCSTATUS").Value).Trim();
+        //    string cmStatus = Convert.ToString(rs.Fields.Item("U_CLCSTATUS").Value).Trim();
+
+        //    SetEdit(oForm, "ETDOCTRY", rs.Fields.Item("DocEntry").Value);
+        //    SetEdit(oForm, "ETDOCNUM", rs.Fields.Item("DocNum").Value);
+        //    SetEdit(oForm, "ETSERIES", rs.Fields.Item("Series").Value);
+        //    SetEdit(oForm, "ETCOMPNY", rs.Fields.Item("U_BRANCH").Value);
+
+        //    SetEdit(oForm, "ETSTATMR", mrStatus == "C" ? "Confirmed" : mrStatus == "D" ? "Draft" : mrStatus);
+        //    SetEdit(oForm, "ETSTATCM", cmStatus == "C" ? "Confirmed" : cmStatus == "D" ? "Draft" : cmStatus);
+
+        //    SetEdit(oForm, "ETCUSTMR", rs.Fields.Item("U_CARDCODE").Value);
+        //    SetEdit(oForm, "ETCUSTNM", rs.Fields.Item("U_CARDNAME").Value);
+        //    SetEdit(oForm, "ETSCNO", rs.Fields.Item("U_SCNO").Value);
+        //    SetEdit(oForm, "ETLCNO", rs.Fields.Item("U_LCNO").Value);
+        //    SetEdit(oForm, "ETLCDESC", rs.Fields.Item("U_LCDESC").Value);
+        //    SetEdit(oForm, "ETCURR", rs.Fields.Item("U_CURRENCY").Value);
+
+        //    SetEdit(oForm, "ETBP1BNK", rs.Fields.Item("U_BNK1CODE").Value);
+        //    SetEdit(oForm, "ETBP1BNM", rs.Fields.Item("U_BNK1NAME").Value);
+        //    SetEdit(oForm, "ETBP2BNK", rs.Fields.Item("U_BNK2CODE").Value);
+        //    SetEdit(oForm, "ETBP2BNM", rs.Fields.Item("U_BNK2NAME").Value);
+        //    SetEdit(oForm, "ETHUSBNK", rs.Fields.Item("U_HBNKCODE").Value);
+        //    SetEdit(oForm, "ETHUSBNM", rs.Fields.Item("U_HBNKNAME").Value);
+
+        //    SetEditAmountFormat(oForm, "ETLCVAL", rs.Fields.Item("U_LCVALUE").Value);
+
+        //    SetEditDateFormat(oForm, "ETDOCDAT", rs.Fields.Item("U_DOCDATE").Value);
+        //    SetEditDateFormat(oForm, "ETISUDAT", rs.Fields.Item("U_ISSUEDATE").Value);
+        //    SetEditDateFormat(oForm, "ETSHPDAT", rs.Fields.Item("U_SHIPDATE").Value);
+        //    SetEditDateFormat(oForm, "ETEXPDAT", rs.Fields.Item("U_EXPDATE").Value);
+
+        //    SetEdit(oForm, "ETB2BPER", rs.Fields.Item("U_BTOBLCPER").Value);
+        //    SetEditAmountFormat(oForm, "ETB2BAMT", rs.Fields.Item("U_BTOBLCVALUE").Value);
+
+        //    SetEdit(oForm, "ETLCTRMS", rs.Fields.Item("U_LCTERMS").Value);
+        //    SetEdit(oForm, "ETPYTRMS", rs.Fields.Item("U_PAYTERMS").Value);
+        //    SetEdit(oForm, "ETINTRMS", rs.Fields.Item("U_INCOTRMS").Value);
+
+        //    SetEdit(oForm, "ETAMDNO", rs.Fields.Item("U_AMNDMNT").Value);
+        //    SetEdit(oForm, "ETREMRKS", rs.Fields.Item("U_Remarks").Value);
+        //}
+        private void LoadLCAmendmentHeader(SAPbouiCOM.Form oForm, string docEntry, string docNum, string amendNo, string logInst)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                string safeDocEntry = docEntry.Replace("'", "''");
+                string safeDocNum = docNum.Replace("'", "''");
+                string safeAmendNo = amendNo.Replace("'", "''");
+                string safeLogInst = logInst.Replace("'", "''");
+
+                string sql = $@"
+                                SELECT
+                                    T0.""DocEntry"",
+                                    T0.""DocNum"",
+
+                                    T0.""Series"",
+                                    IFNULL(S.""SeriesName"", TO_NVARCHAR(T0.""Series"")) AS ""SeriesDesc"",
+
+                                    T0.""U_BRANCH"",
+                                    IFNULL(B.""BPLName"", TO_NVARCHAR(T0.""U_BRANCH"")) AS ""BranchDesc"",
+
+                                    T0.""U_MLCSTATUS"",
+                                    CASE
+                                        WHEN T0.""U_MLCSTATUS"" = 'C' THEN 'Confirmed'
+                                        WHEN T0.""U_MLCSTATUS"" = 'D' THEN 'Draft'
+                                        ELSE IFNULL(T0.""U_MLCSTATUS"", '')
+                                    END AS ""MarketingStatusDesc"",
+
+                                    T0.""U_CLCSTATUS"",
+                                    CASE
+                                        WHEN T0.""U_CLCSTATUS"" = 'C' THEN 'Confirmed'
+                                        WHEN T0.""U_CLCSTATUS"" = 'D' THEN 'Draft'
+                                        ELSE IFNULL(T0.""U_CLCSTATUS"", '')
+                                    END AS ""CommercialStatusDesc"",
+
+                                    T0.""U_CARDCODE"",
+                                    T0.""U_CARDNAME"",
+                                    T0.""U_SCNO"",
+                                    T0.""U_LCNO"",
+                                    T0.""U_LCDESC"",
+                                    T0.""U_CURRENCY"",
+
+                                    T0.""U_BNK1CODE"",
+                                    T0.""U_BNK1NAME"",
+                                    T0.""U_BNK2CODE"",
+                                    T0.""U_BNK2NAME"",
+                                    T0.""U_HBNKCODE"",
+                                    T0.""U_HBNKNAME"",
+
+                                    T0.""U_LCVALUE"",
+                                    T0.""U_DOCDATE"",
+                                    T0.""U_ISSUEDATE"",
+                                    T0.""U_SHIPDATE"",
+                                    T0.""U_EXPDATE"",
+                                    T0.""U_BTOBLCPER"",
+                                    T0.""U_BTOBLCVALUE"",
+
+                                    T0.""U_LCTERMS"",
+                                    IFNULL(LV.""Descr"", T0.""U_LCTERMS"") AS ""LCTermsDesc"",
+
+                                    T0.""U_PAYTERMS"",
+                                    IFNULL(P.""PymntGroup"", TO_NVARCHAR(T0.""U_PAYTERMS"")) AS ""PaymentTermsDesc"",
+
+                                    T0.""U_INCOTRMS"",
+                                    IFNULL(I.""Name"", T0.""U_INCOTRMS"") AS ""IncoTermsDesc"",
+
+                                    T0.""U_AMNDMNT"",
+                                    T0.""U_Remarks""
+
+                                FROM ""@AFIL_DH_OLCM"" T0
+
+                                LEFT JOIN ""NNM1"" S
+                                    ON TO_NVARCHAR(T0.""Series"") = TO_NVARCHAR(S.""Series"")
+
+                                LEFT JOIN ""OBPL"" B
+                                    ON TO_NVARCHAR(T0.""U_BRANCH"") = TO_NVARCHAR(B.""BPLId"")
+
+                                LEFT JOIN ""OCTG"" P
+                                    ON TO_NVARCHAR(T0.""U_PAYTERMS"") = TO_NVARCHAR(P.""GroupNum"")
+
+                                LEFT JOIN ""@FIL_MH_INCOTRMS"" I
+                                    ON TO_NVARCHAR(T0.""U_INCOTRMS"") = TO_NVARCHAR(I.""Code"")
+
+                                LEFT JOIN ""CUFD"" FLC
+                                    ON FLC.""TableID"" = '@FIL_DH_OLCM'
+                                    AND FLC.""AliasID"" = 'LCTERMS'
+
+                                LEFT JOIN ""UFD1"" LV
+                                    ON LV.""TableID"" = FLC.""TableID""
+                                    AND LV.""FieldID"" = FLC.""FieldID""
+                                    AND TO_NVARCHAR(LV.""FldValue"") = TO_NVARCHAR(T0.""U_LCTERMS"")
+
+                                WHERE T0.""DocEntry"" = '{safeDocEntry}'
+                                AND T0.""DocNum"" = '{safeDocNum}'
+                                AND T0.""U_AMNDMNT"" = '{safeAmendNo}'
+                                AND T0.""LogInst"" = '{safeLogInst}'";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(sql);
+
+                if (rs.EoF)
+                {
+                    Global.GFunc.ShowError("Export LC amendment header data not found.");
+                    return;
+                }
+
+                // Document
+                SetEdit(oForm, "ETDOCTRY", rs.Fields.Item("DocEntry").Value);
+                SetEdit(oForm, "ETDOCNUM", rs.Fields.Item("DocNum").Value);
+
+                // Former ComboBoxes - show description instead of code
+                SetEdit(oForm, "ETSERIES", rs.Fields.Item("SeriesDesc").Value);
+                SetEdit(oForm, "ETCOMPNY", rs.Fields.Item("BranchDesc").Value);
+                SetEdit(oForm, "ETSTATMR", rs.Fields.Item("MarketingStatusDesc").Value);
+                SetEdit(oForm, "ETSTATCM", rs.Fields.Item("CommercialStatusDesc").Value);
+
+                // Customer / LC
+                SetEdit(oForm, "ETCUSTMR", rs.Fields.Item("U_CARDCODE").Value);
+                SetEdit(oForm, "ETCUSTNM", rs.Fields.Item("U_CARDNAME").Value);
+                SetEdit(oForm, "ETSCNO", rs.Fields.Item("U_SCNO").Value);
+                SetEdit(oForm, "ETLCNO", rs.Fields.Item("U_LCNO").Value);
+                SetEdit(oForm, "ETLCDESC", rs.Fields.Item("U_LCDESC").Value);
+                SetEdit(oForm, "ETCURR", rs.Fields.Item("U_CURRENCY").Value);
+
+                // Banks
+                SetEdit(oForm, "ETBP1BNK", rs.Fields.Item("U_BNK1CODE").Value);
+                SetEdit(oForm, "ETBP1BNM", rs.Fields.Item("U_BNK1NAME").Value);
+                SetEdit(oForm, "ETBP2BNK", rs.Fields.Item("U_BNK2CODE").Value);
+                SetEdit(oForm, "ETBP2BNM", rs.Fields.Item("U_BNK2NAME").Value);
+                SetEdit(oForm, "ETHUSBNK", rs.Fields.Item("U_HBNKCODE").Value);
+                SetEdit(oForm, "ETHUSBNM", rs.Fields.Item("U_HBNKNAME").Value);
+
+                // Amount
+                SetEditAmountFormat(oForm, "ETLCVAL", rs.Fields.Item("U_LCVALUE").Value);
+                SetEdit(oForm, "ETB2BPER", rs.Fields.Item("U_BTOBLCPER").Value);
+                SetEditAmountFormat(oForm, "ETB2BAMT", rs.Fields.Item("U_BTOBLCVALUE").Value);
+
+                // Dates
+                SetEditDateFormat(oForm, "ETDOCDAT", rs.Fields.Item("U_DOCDATE").Value);
+                SetEditDateFormat(oForm, "ETISUDAT", rs.Fields.Item("U_ISSUEDATE").Value);
+                SetEditDateFormat(oForm, "ETSHPDAT", rs.Fields.Item("U_SHIPDATE").Value);
+                SetEditDateFormat(oForm, "ETEXPDAT", rs.Fields.Item("U_EXPDATE").Value);
+
+                // Former ComboBoxes - show description
+                SetEdit(oForm, "ETLCTRMS", rs.Fields.Item("LCTermsDesc").Value);
+                SetEdit(oForm, "ETPYTRMS", rs.Fields.Item("PaymentTermsDesc").Value);
+                SetEdit(oForm, "ETINTRMS", rs.Fields.Item("IncoTermsDesc").Value);
+
+                // Amendment / Remarks
+                SetEdit(oForm, "ETAMDNO", rs.Fields.Item("U_AMNDMNT").Value);
+                SetEdit(oForm, "ETREMRKS", rs.Fields.Item("U_Remarks").Value);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Export LC amendment header load error: " + ex.Message);
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
+        private void LoadLCAmendmentSalesOrderMatrix(SAPbouiCOM.Form oForm, string docEntry, string amendNo, string logInst)
+        {
+            SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+            mtx.Clear();
+
+            string sql = $@"
+                            SELECT
+                                ""LineId"",
+                                ""U_SONO"",
+                                ""U_SOENTRY"",
+                                ""U_CUSTREFNO"",
+                                ""U_STYLENTRY"",
+                                ""U_STYLECODE"",
+                                ""U_STYLENM"",
+                                ""U_QUANTITY"",
+                                ""U_VALUE"",
+                                ""U_AMNDMNT""
+                            FROM ""@AFIL_DR_LCM1""
+                            WHERE ""DocEntry"" = '{docEntry}'
+                            AND ""LogInst"" = '{logInst}'
+                            AND ""U_AMNDMNT"" = '{amendNo}'
+                            ORDER BY ""LineId""";
+
+            SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+            rs.DoQuery(sql);
+
+            int row = 1;
+
+            while (!rs.EoF)
+            {
+                mtx.AddRow();
+
+                SetMatrixValue(mtx, "#", row, rs.Fields.Item("LineId").Value);
+                SetMatrixValue(mtx, "CLSLORDR", row, rs.Fields.Item("U_SONO").Value);
+                SetMatrixValue(mtx, "CLSONTRY", row, rs.Fields.Item("U_SOENTRY").Value);
+                SetMatrixValue(mtx, "CLCUSRNO", row, rs.Fields.Item("U_CUSTREFNO").Value);
+                SetMatrixValue(mtx, "CLSLENTRY", row, rs.Fields.Item("U_STYLENTRY").Value);
+                SetMatrixValue(mtx, "CLSTYLCD", row, rs.Fields.Item("U_STYLECODE").Value);
+                SetMatrixValue(mtx, "CLSTYLDS", row, rs.Fields.Item("U_STYLENM").Value);
+                SetMatrixValue(mtx, "CLTTLQTY", row, rs.Fields.Item("U_QUANTITY").Value);
+                SetMatrixValue(mtx, "CLTTLAMT", row, rs.Fields.Item("U_VALUE").Value);
+                SetMatrixValue(mtx, "CLAMDNO", row, rs.Fields.Item("U_AMNDMNT").Value);
+
+                row++;
+                rs.MoveNext();
+            }
+
+            mtx.AutoResizeColumns();
+        }
+        private void LoadLCAmendmentAttachmentMatrix(SAPbouiCOM.Form oForm, string docEntry, string amendNo, string logInst)
+        {
+            SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+            mtx.Clear();
+
+            string sql = $@"
+                            SELECT
+                                ""LineId"",
+                                ""U_ATCHMENT"",
+                                ""U_REMARKS"",
+                                ""U_AMNDMNT""
+                            FROM ""@AFIL_DR_LCM2""
+                            WHERE ""DocEntry"" = '{docEntry}'
+                            AND ""LogInst"" = '{logInst}'
+                            AND ""U_AMNDMNT"" = '{amendNo}'
+                            ORDER BY ""LineId""";
+
+            SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+            rs.DoQuery(sql);
+
+            int row = 1;
+
+            while (!rs.EoF)
+            {
+                mtx.AddRow();
+
+                SetMatrixValue(mtx, "#", row, rs.Fields.Item("LineId").Value);
+                SetMatrixValue(mtx, "CLATTACH", row, rs.Fields.Item("U_ATCHMENT").Value);
+                SetMatrixValue(mtx, "CLREMRKS", row, rs.Fields.Item("U_REMARKS").Value);
+                SetMatrixValue(mtx, "CLAMDNO", row, rs.Fields.Item("U_AMNDMNT").Value);
+
+                row++;
+                rs.MoveNext();
+            }
+            mtx.AutoResizeColumns();
+        }
+
+        private void SetEdit(SAPbouiCOM.Form oForm, string itemId, object value)
+        {
+            try
+            {
+                ((SAPbouiCOM.EditText)oForm.Items.Item(itemId).Specific).Value = value == null ? "" : value.ToString();
+            }
+            catch { }
+        }
+
+        private void SetEditDateFormat(SAPbouiCOM.Form oForm, string itemId, object value)
+        {
+            try
+            {
+                if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
+                    return;
+
+                DateTime dt;
+                if (!DateTime.TryParse(value.ToString(), out dt))
+                    return;
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item(itemId).Specific).Value = dt.ToString("yyyyMMdd");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Date load error for " + itemId + ": " + ex.Message);
+            }
+        }
+
+        private void SetEditAmountFormat(SAPbouiCOM.Form oForm, string itemId, object value)
+        {
+            try
+            {
+                if (value == null)
+                    return;
+
+                decimal amount;
+                if (!decimal.TryParse(value.ToString(), out amount))
+                    amount = 0;
+
+                ((SAPbouiCOM.EditText)oForm.Items.Item(itemId).Specific).Value = amount.ToString("#,##0.00");
+            }
+            catch { }
+        }
+
+        private void SetMatrixValue(SAPbouiCOM.Matrix mtx, string colId, int row, object value)
+        {
+            try
+            {
+                ((SAPbouiCOM.EditText)mtx.Columns.Item(colId).Cells.Item(row).Specific).Value = value == null ? "" : value.ToString();
+            }
+            catch { }
+        }
 
         private void LoadAmendmentGrid(SAPbouiCOM.Form oForm)
         {
@@ -1297,6 +1752,5 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 Application.SBO_Application.StatusBar.SetText("LC Value calculation error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
-
     }
 }

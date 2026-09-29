@@ -24,7 +24,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
-        
+       
 
         private SAPbouiCOM.Folder TABSODR, TABAMDTL, TABATTCH;
 
@@ -122,6 +122,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.BTNAMND.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.BTNAMND_PressedBefore);
             this.BTNAMND.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.BTNAMND_PressedAfter);
             this.GRDAMDTL = ((SAPbouiCOM.Grid)(this.GetItem("GRDAMDTL").Specific));
+            this.GRDAMDTL.DoubleClickAfter += new SAPbouiCOM._IGridEvents_DoubleClickAfterEventHandler(this.GRDAMDTL_DoubleClickAfter);
             this.LKSCNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
             this.LKCUSTMR = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTMR").Specific));
             this.ETBP1BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP1BNM").Specific));
@@ -137,12 +138,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         public override void OnInitializeFormEvents()
         {
             this.RightClickBefore += new SAPbouiCOM.Framework.FormBase.RightClickBeforeHandler(this.Form_RightClickBefore);
-            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataLoadAfter += new SAPbouiCOM.Framework.FormBase.DataLoadAfterHandler(this.Form_DataLoadAfter);
+            this.DataUpdateAfter += new DataUpdateAfterHandler(this.Form_DataUpdateAfter);
 
         }
 
         private void OnCustomInitialize()
         {
+
+        }
+
+        private void GRDAMDTL_DoubleClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            throw new System.NotImplementedException();
 
         }
 
@@ -153,7 +161,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                
+                int result = Application.SBO_Application.MessageBox("Are you sure you want to create a new amendment?", 1, "OK", "Cancel");
 
+                if (result != 1)
+                {
+                    BubbleEvent = false;
+                    return;
+                }
                 SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
                 SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
@@ -204,8 +219,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 MTXATTCH.FlushToDataSource();
 
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                
             }
             catch (Exception ex)
             {
@@ -216,8 +230,28 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void BTNAMND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+                SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
+                oForm.Items.Item("CBSTATMR").Enabled = true;
+                oForm.Items.Item("CBSTATCM").Enabled = true;
+
+                cbStatCM.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                cbStatMR.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                oForm.Items.Item("CBSTATMR").Enabled = true;
+                oForm.Items.Item("CBSTATCM").Enabled = false;
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Amendment status reset error: " + ex.Message);
+            }
         }
 
 
@@ -247,6 +281,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
             SetStatusFields(oForm);
+            CheckAndLoadAmendmentGrid(oForm);
+        }
+
+        private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             CheckAndLoadAmendmentGrid(oForm);
         }
 

@@ -884,6 +884,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
        
+     
+
         private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
@@ -894,25 +896,47 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return;
 
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
                 string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
 
                 if (string.IsNullOrEmpty(scNo))
                 {
-
                     Global.GFunc.ShowError("Please select Sales Contract first.");
                     BubbleEvent = false;
                     return;
                 }
 
-                SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
-                SAPbouiCOM.ChooseFromList oCFL =oForm.ChooseFromLists.Item(cflArg.ChooseFromListUID);
-                SAPbouiCOM.Conditions oConditions =(SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
-                SAPbouiCOM.Condition oCondition = oConditions.Add();
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
 
+                List<string> usedSOEntries = new List<string>();
+
+                for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+                {
+                    string soEntry = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSONTRY").Cells.Item(i).Specific).Value.Trim();
+
+                    if (!string.IsNullOrWhiteSpace(soEntry) && !usedSOEntries.Contains(soEntry))
+                        usedSOEntries.Add(soEntry);
+                }
+
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflArg.ChooseFromListUID);
+
+                SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(
+                    SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+
+                SAPbouiCOM.Condition oCondition = oConditions.Add();
                 oCondition.Alias = "U_SCNO";
                 oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
                 oCondition.CondVal = scNo;
+
+                foreach (string soEntry in usedSOEntries)
+                {
+                    oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
+
+                    oCondition = oConditions.Add();
+                    oCondition.Alias = "DocEntry";
+                    oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_NOT_EQUAL;
+                    oCondition.CondVal = soEntry;
+                }
 
                 oCFL.SetConditions(oConditions);
             }
@@ -922,6 +946,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 BubbleEvent = false;
             }
         }
+
 
         private void ETHUSBNM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {

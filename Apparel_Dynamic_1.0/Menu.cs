@@ -1511,8 +1511,8 @@ namespace Apparel_Dynamic_1._0
                                     ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
                                 }
                                 Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
-                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETDOCNUM", "ETB2BAMT");
-                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES");
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM");
                                 break;
                             }
                     }
@@ -1710,7 +1710,7 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_EXPLC":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "CBCOMPNY", "CBSTATMR", "CBSTATCM", "ETCUSTNM", "ETLCNO", 
-                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETDOCNUM", "ETB2BAMT");
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
                                 Global.GFunc.SetItemsEnabled(oForm, false, "ETAMDNO", "CBSERIES");
 
                                 break;

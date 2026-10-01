@@ -1370,6 +1370,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return BubbleEvent = false;
                 }
 
+                if (!ValidateDuplicateSalesOrderInMatrix(oForm))
+                    return BubbleEvent = false;
+
+                if (!ValidateSalesOrderSalesContract(oForm))
+                    return BubbleEvent = false;
+
+                if (!ValidateSalesOrderAlreadyUsed(oForm))
+                    return BubbleEvent = false;
+
                 if (!ValidateSalesOrderCurrentValues(oForm))
                     return BubbleEvent = false;
 
@@ -2312,7 +2321,224 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
             oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
         }
+        private bool ValidateDuplicateSalesOrderInMatrix(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
 
+                mtx.FlushToDataSource();
+
+                HashSet<string> usedSOEntries = new HashSet<string>();
+                List<string> duplicateSONos = new List<string>();
+
+                for (int i = 0; i < dbDetail.Size; i++)
+                {
+                    string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+                    string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+                        continue;
+
+                    if (!usedSOEntries.Add(soEntry) && !duplicateSONos.Contains(soNo))
+                        duplicateSONos.Add(soNo);
+                }
+
+                if (duplicateSONos.Count > 0)
+                {
+                    StringBuilder message = new StringBuilder();
+                    message.AppendLine("Duplicate Sales Order found in the matrix.");
+                    message.AppendLine("");
+
+                    foreach (string soNo in duplicateSONos)
+                        message.AppendLine("Sales Order: " + soNo);
+
+                    message.AppendLine("");
+                    message.AppendLine("The same Sales Order cannot be selected more than once.");
+
+                    Application.SBO_Application.MessageBox(message.ToString());
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order duplicate validation error: " + ex.Message);
+                return false;
+            }
+        }
+
+        private bool ValidateSalesOrderSalesContract(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+                SAPbouiCOM.DBDataSource dbHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+
+                mtx.FlushToDataSource();
+
+                string currentSCNo = dbHeader.GetValue("U_SCNO", 0).Trim();
+
+                if (string.IsNullOrWhiteSpace(currentSCNo))
+                    return true;
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                StringBuilder message = new StringBuilder();
+                bool mismatchFound = false;
+
+                for (int i = 0; i < dbDetail.Size; i++)
+                {
+                    string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+                    string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+                        continue;
+
+                    string query = $@"SELECT IFNULL(""U_SCNO"", '') AS ""SCNo"" FROM ORDR WHERE ""DocEntry"" = {soEntry}";
+                    rs.DoQuery(query);
+
+                    if (rs.EoF)
+                        continue;
+
+                    string salesOrderSCNo = Convert.ToString(rs.Fields.Item("SCNo").Value).Trim();
+
+                    if (!string.Equals(currentSCNo, salesOrderSCNo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!mismatchFound)
+                        {
+                            message.AppendLine("Sales Order and Sales Contract mismatch found.");
+                            message.AppendLine("");
+                            message.AppendLine("Selected Sales Contract: " + currentSCNo);
+                            message.AppendLine("");
+                        }
+
+                        message.AppendLine("Sales Order: " + soNo + " | Sales Order SC No: " + (string.IsNullOrWhiteSpace(salesOrderSCNo) ? "Not Assigned" : salesOrderSCNo));
+                        mismatchFound = true;
+                    }
+                }
+
+                if (mismatchFound)
+                {
+                    message.AppendLine("");
+                    message.AppendLine("Please select Sales Orders that belong to the selected Sales Contract.");
+                    Application.SBO_Application.MessageBox(message.ToString());
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order Sales Contract validation error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
+
+        private bool ValidateSalesOrderAlreadyUsed(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+                SAPbouiCOM.DBDataSource dbHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+
+                mtx.FlushToDataSource();
+
+                string currentDocEntry = "";
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    currentDocEntry = dbHeader.GetValue("DocEntry", 0).Trim();
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                HashSet<string> checkedSOEntries = new HashSet<string>();
+                StringBuilder message = new StringBuilder();
+                bool conflictFound = false;
+
+                for (int i = 0; i < dbDetail.Size; i++)
+                {
+                    string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+                    string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+                        continue;
+
+                    if (!checkedSOEntries.Add(soEntry))
+                        continue;
+
+                    string safeSOEntry = soEntry.Replace("'", "''");
+
+                    string query = $@"
+                            SELECT DISTINCT
+                                T1.""U_SONO"",
+                                T0.""DocEntry"",
+                                T0.""DocNum""
+                            FROM ""@FIL_DH_OLCM"" T0
+                            INNER JOIN ""@FIL_DR_LCM1"" T1 ON T0.""DocEntry"" = T1.""DocEntry""
+                            WHERE T1.""U_SOENTRY"" = '{safeSOEntry}'";
+
+                    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(currentDocEntry))
+                        query += $@" AND T0.""DocEntry"" <> {currentDocEntry}";
+
+                    rs.DoQuery(query);
+
+                    while (!rs.EoF)
+                    {
+                        if (!conflictFound)
+                        {
+                            message.AppendLine("The following Sales Order(s) are already used in another Export LC.");
+                            message.AppendLine("");
+                        }
+
+                        string existingSONo = Convert.ToString(rs.Fields.Item("U_SONO").Value).Trim();
+                        string exportLCDocNum = Convert.ToString(rs.Fields.Item("DocNum").Value).Trim();
+
+                        message.AppendLine("Sales Order: " + existingSONo + " | Export LC DocNum: " + exportLCDocNum);
+                        conflictFound = true;
+
+                        rs.MoveNext();
+                    }
+                }
+
+                if (conflictFound)
+                {
+                    message.AppendLine("");
+                    message.AppendLine("Please remove the Sales Order(s) before continuing.");
+                    Application.SBO_Application.MessageBox(message.ToString());
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order usage validation error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
 
         //private bool ValidateSalesOrderCurrentValues(SAPbouiCOM.Form oForm)
         //{

@@ -514,7 +514,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
                                                            "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
-            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM");
+            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR");
 
         }
 
@@ -534,7 +534,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM",
+            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM", "ETCUSTMR",
                                          "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
@@ -547,7 +547,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             CheckAndLoadAmendmentGrid(oForm);
-            //SetLCNoStatus(oForm);
+            SetLCNoStatus(oForm);
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)

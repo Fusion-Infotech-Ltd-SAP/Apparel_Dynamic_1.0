@@ -1512,7 +1512,9 @@ namespace Apparel_Dynamic_1._0
                                 }
                                 Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
                                                              "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
-                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR");
+
+                                Global.GFunc.ReEnableChooseFromList(oForm, "ETCUSTMR", "CFL_OCRD", "CardCode");
                                 break;
                             }
                     }
@@ -1709,7 +1711,7 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_EXPLC":
                             {
-                                Global.GFunc.SetItemsEnabled(oForm, true, "CBCOMPNY", "CBSTATMR", "CBSTATCM", "ETCUSTNM", "ETLCNO", 
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBCOMPNY", "CBSTATMR", "CBSTATCM", "ETCUSTNM", "ETLCNO", "ETCUSTMR",
                                                              "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
                                 Global.GFunc.SetItemsEnabled(oForm, false, "ETAMDNO", "CBSERIES");
 

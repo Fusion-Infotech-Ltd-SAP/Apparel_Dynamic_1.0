@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Apparel_Dynamic_1._0.Helper;
 using Apparel_Dynamic_1._0.Resources.Version;
+using Apparel_Dynamic_1._0.Resources.Master;
 
 namespace Apparel_Dynamic_1._0.Resources.Transaction
 {
@@ -34,6 +35,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         
 
         private SAPbouiCOM.Button BRWSBTN, DISPBTN, DELBTN, ADDButton, CancelButton, BTNLDATA, BTNAMND;
+
+        
 
         private SAPbouiCOM.Grid GRDAMDTL;
 
@@ -106,6 +109,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABAMDTL = ((SAPbouiCOM.Folder)(this.GetItem("TABAMDTL").Specific));
             this.TABATTCH = ((SAPbouiCOM.Folder)(this.GetItem("TABATTCH").Specific));
             this.MTXSLODR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSLODR").Specific));
+            this.MTXSLODR.LinkPressedAfter += new SAPbouiCOM._IMatrixEvents_LinkPressedAfterEventHandler(this.MTXSLODR_LinkPressedAfter);
             this.MTXSLODR.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXSLODR_ChooseFromListAfter);
             this.MTXSLODR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSLODR_ChooseFromListBefore);
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
@@ -127,6 +131,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.GRDAMDTL = ((SAPbouiCOM.Grid)(this.GetItem("GRDAMDTL").Specific));
             this.GRDAMDTL.DoubleClickAfter += new SAPbouiCOM._IGridEvents_DoubleClickAfterEventHandler(this.GRDAMDTL_DoubleClickAfter);
             this.LKSCNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
+            this.LKSCNO.PressedAfter += new SAPbouiCOM._ILinkedButtonEvents_PressedAfterEventHandler(this.LKSCNO_PressedAfter);
             this.LKCUSTMR = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTMR").Specific));
             this.ETBP1BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP1BNM").Specific));
             this.ETBP2BNM = ((SAPbouiCOM.EditText)(this.GetItem("ETBP2BNM").Specific));
@@ -151,6 +156,137 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
 
         }
+
+        private void MTXSLODR_LinkPressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.ColUID != "CLSTYLCD" || pVal.Row <= 0)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.EditText oETStyleNo = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSTYLCD").Cells.Item(pVal.Row).Specific;
+                string styleNo = oETStyleNo.Value.Trim();
+
+                if (string.IsNullOrEmpty(styleNo))
+                {
+                    Global.GFunc.ShowError("Style No. is empty.");
+                    return;
+                }
+
+                StyleMaster styleMaster = new StyleMaster();
+                styleMaster.Show();
+
+                SAPbouiCOM.Form cForm = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+
+                try
+                {
+                    cForm.Freeze(true);
+                    cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                    cForm.Items.Item("ETSLCODE").Enabled = true;
+
+                    SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSLCODE").Specific;
+                    cETSLCODE.Value = styleNo;
+
+                    cForm.Items.Item("1").Click();
+                }
+                finally
+                {
+                    cForm.Freeze(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError(ex.Message);
+            }
+
+        }
+
+
+        private void LKSCNO_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            SAPbouiCOM.EditText ETSMPLCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+            string sampleCode = ETSMPLCD.Value.Trim();
+            SalesContract salescon = new SalesContract();
+            salescon.Show();
+            //styleMaster. = Global.G_UI_Application.Forms.ActiveForm;
+            SAPbouiCOM.Form cForm = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+            try
+            {
+                cForm.Freeze(true);
+                cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                cForm.Items.Item("ETSCNO").Enabled = true;
+                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSCNO").Specific;
+                cETSLCODE.Value = sampleCode;
+                cForm.Items.Item("1").Click();
+                cForm.Items.Item("FOLORDTL").Click();
+                cForm.Freeze(false);
+            }
+            catch (Exception ex)
+            {
+                cForm.Freeze(false);
+            }
+
+        }
+
+        //private void BTNLDATA_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+
+        //    try
+        //    {
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        oForm.Freeze(true);
+
+        //        SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+        //        SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+        //        mtx.FlushToDataSource();
+
+        //        List<SalesOrderMismatch> mismatches = GetSalesOrderMismatches(oForm);
+
+        //        if (mismatches.Count == 0)
+        //        {
+        //            Global.GFunc.ShowSuccess("Sales Order Quantity and Total Value are already up to date.");
+        //            return;
+        //        }
+
+        //        foreach (SalesOrderMismatch item in mismatches)
+        //        {
+        //            dbDetail.SetValue("U_QUANTITY", item.Row, item.CurrentQty.ToString());
+        //            dbDetail.SetValue("U_VALUE", item.Row, item.CurrentValue.ToString());
+        //        }
+
+        //        mtx.LoadFromDataSource();
+
+        //        CalculateLCValue(oForm, mtx);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+        //        StringBuilder message = new StringBuilder();
+        //        message.AppendLine("Latest Sales Order data loaded successfully.");
+        //        message.AppendLine("");
+
+        //        foreach (SalesOrderMismatch item in mismatches)
+        //            message.AppendLine("Sales Order: " + item.SONo);
+
+        //        Application.SBO_Application.MessageBox(message.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Load Sales Order data error: " + ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        if (oForm != null)
+        //            oForm.Freeze(false);
+        //    }
+        //}
+
         private void BTNLDATA_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = null;
@@ -169,12 +305,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 if (mismatches.Count == 0)
                 {
-                    Global.GFunc.ShowSuccess("Sales Order Quantity and Total Value are already up to date.");
+                    Global.GFunc.ShowSuccess("Sales Order data is already up to date.");
                     return;
                 }
 
                 foreach (SalesOrderMismatch item in mismatches)
                 {
+                    dbDetail.SetValue("U_CUSTREFNO", item.Row, item.CurrentCustRefNo);
                     dbDetail.SetValue("U_QUANTITY", item.Row, item.CurrentQty.ToString());
                     dbDetail.SetValue("U_VALUE", item.Row, item.CurrentValue.ToString());
                 }
@@ -397,7 +534,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY");
+            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM",
+                                         "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
             SetStatusFields(oForm);
@@ -1900,10 +2038,17 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             public int Row { get; set; }
             public string SONo { get; set; }
             public string SOEntry { get; set; }
+
+            public string MatrixCustRefNo { get; set; }
+            public string CurrentCustRefNo { get; set; }
+
             public decimal MatrixQty { get; set; }
             public decimal CurrentQty { get; set; }
+
             public decimal MatrixValue { get; set; }
             public decimal CurrentValue { get; set; }
+
+            public bool CustRefMismatch { get; set; }
             public bool QtyMismatch { get; set; }
             public bool ValueMismatch { get; set; }
         }
@@ -1919,6 +2064,106 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return result;
         }
 
+        //private List<SalesOrderMismatch> GetSalesOrderMismatches(SAPbouiCOM.Form oForm)
+        //{
+        //    List<SalesOrderMismatch> mismatches = new List<SalesOrderMismatch>();
+        //    SAPbobsCOM.Recordset rs = null;
+
+        //    try
+        //    {
+        //        SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+        //        SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+        //        mtx.FlushToDataSource();
+
+        //        rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+        //        for (int i = 0; i < dbDetail.Size; i++)
+        //        {
+        //            string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+        //            string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+
+        //            if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+        //                continue;
+
+        //            decimal matrixQty = ParseDecimal(dbDetail.GetValue("U_QUANTITY", i));
+        //            decimal matrixValue = ParseDecimal(dbDetail.GetValue("U_VALUE", i));
+
+        //            string query = $@"
+        //                            SELECT
+        //                                SUM(B.""Quantity"") AS ""Quantity"",
+        //                                CASE
+        //                                    WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+        //                                    ELSE A.""DocTotalFC""
+        //                                END AS ""TotalValue""
+        //                            FROM ORDR A
+        //                            INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+        //                            WHERE A.""DocEntry"" = {soEntry}
+        //                            GROUP BY
+        //                                A.""DocCur"",
+        //                                A.""DocTotal"",
+        //                                A.""DocTotalFC""";
+
+        //            rs.DoQuery(query);
+
+        //            if (rs.EoF)
+        //            {
+        //                mismatches.Add(new SalesOrderMismatch
+        //                {
+        //                    Row = i,
+        //                    SONo = soNo,
+        //                    SOEntry = soEntry,
+        //                    MatrixQty = matrixQty,
+        //                    CurrentQty = 0,
+        //                    MatrixValue = matrixValue,
+        //                    CurrentValue = 0,
+        //                    QtyMismatch = true,
+        //                    ValueMismatch = true
+        //                });
+
+        //                continue;
+        //            }
+
+        //            decimal currentQty = Convert.ToDecimal(rs.Fields.Item("Quantity").Value);
+        //            decimal currentValue = Convert.ToDecimal(rs.Fields.Item("TotalValue").Value);
+
+        //            bool qtyMismatch = Math.Abs(matrixQty - currentQty) > 0.000001M;
+        //            bool valueMismatch = Math.Abs(matrixValue - currentValue) > 0.01M;
+
+        //            if (qtyMismatch || valueMismatch)
+        //            {
+        //                mismatches.Add(new SalesOrderMismatch
+        //                {
+        //                    Row = i,
+        //                    SONo = soNo,
+        //                    SOEntry = soEntry,
+        //                    MatrixQty = matrixQty,
+        //                    CurrentQty = currentQty,
+        //                    MatrixValue = matrixValue,
+        //                    CurrentValue = currentValue,
+        //                    QtyMismatch = qtyMismatch,
+        //                    ValueMismatch = valueMismatch
+        //                });
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Sales Order validation error: " + ex.Message);
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        if (rs != null)
+        //        {
+        //            System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+        //            rs = null;
+        //        }
+        //    }
+
+        //    return mismatches;
+        //}
         private List<SalesOrderMismatch> GetSalesOrderMismatches(SAPbouiCOM.Form oForm)
         {
             List<SalesOrderMismatch> mismatches = new List<SalesOrderMismatch>();
@@ -1941,23 +2186,26 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
                         continue;
 
+                    string matrixCustRefNo = dbDetail.GetValue("U_CUSTREFNO", i).Trim();
                     decimal matrixQty = ParseDecimal(dbDetail.GetValue("U_QUANTITY", i));
                     decimal matrixValue = ParseDecimal(dbDetail.GetValue("U_VALUE", i));
 
                     string query = $@"
-                                    SELECT
-                                        SUM(B.""Quantity"") AS ""Quantity"",
-                                        CASE
-                                            WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
-                                            ELSE A.""DocTotalFC""
-                                        END AS ""TotalValue""
-                                    FROM ORDR A
-                                    INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
-                                    WHERE A.""DocEntry"" = {soEntry}
-                                    GROUP BY
-                                        A.""DocCur"",
-                                        A.""DocTotal"",
-                                        A.""DocTotalFC""";
+                            SELECT
+                                IFNULL(A.""NumAtCard"", '') AS ""CustRefNo"",
+                                SUM(B.""Quantity"") AS ""Quantity"",
+                                CASE
+                                    WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+                                    ELSE A.""DocTotalFC""
+                                END AS ""TotalValue""
+                            FROM ORDR A
+                            INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+                            WHERE A.""DocEntry"" = {soEntry}
+                            GROUP BY
+                                A.""NumAtCard"",
+                                A.""DocCur"",
+                                A.""DocTotal"",
+                                A.""DocTotalFC""";
 
                     rs.DoQuery(query);
 
@@ -1968,10 +2216,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                             Row = i,
                             SONo = soNo,
                             SOEntry = soEntry,
+                            MatrixCustRefNo = matrixCustRefNo,
+                            CurrentCustRefNo = "",
                             MatrixQty = matrixQty,
                             CurrentQty = 0,
                             MatrixValue = matrixValue,
                             CurrentValue = 0,
+                            CustRefMismatch = !string.IsNullOrWhiteSpace(matrixCustRefNo),
                             QtyMismatch = true,
                             ValueMismatch = true
                         });
@@ -1979,23 +2230,28 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         continue;
                     }
 
+                    string currentCustRefNo = Convert.ToString(rs.Fields.Item("CustRefNo").Value).Trim();
                     decimal currentQty = Convert.ToDecimal(rs.Fields.Item("Quantity").Value);
                     decimal currentValue = Convert.ToDecimal(rs.Fields.Item("TotalValue").Value);
 
+                    bool custRefMismatch = !string.Equals(matrixCustRefNo, currentCustRefNo, StringComparison.Ordinal);
                     bool qtyMismatch = Math.Abs(matrixQty - currentQty) > 0.000001M;
                     bool valueMismatch = Math.Abs(matrixValue - currentValue) > 0.01M;
 
-                    if (qtyMismatch || valueMismatch)
+                    if (custRefMismatch || qtyMismatch || valueMismatch)
                     {
                         mismatches.Add(new SalesOrderMismatch
                         {
                             Row = i,
                             SONo = soNo,
                             SOEntry = soEntry,
+                            MatrixCustRefNo = matrixCustRefNo,
+                            CurrentCustRefNo = currentCustRefNo,
                             MatrixQty = matrixQty,
                             CurrentQty = currentQty,
                             MatrixValue = matrixValue,
                             CurrentValue = currentValue,
+                            CustRefMismatch = custRefMismatch,
                             QtyMismatch = qtyMismatch,
                             ValueMismatch = valueMismatch
                         });
@@ -2058,6 +2314,43 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
 
+        //private bool ValidateSalesOrderCurrentValues(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        List<SalesOrderMismatch> mismatches = GetSalesOrderMismatches(oForm);
+
+        //        if (mismatches.Count == 0)
+        //            return true;
+
+        //        StringBuilder message = new StringBuilder();
+        //        message.AppendLine("Sales Order data has changed.");
+        //        message.AppendLine("");
+
+        //        foreach (SalesOrderMismatch item in mismatches)
+        //        {
+        //            message.AppendLine("Sales Order: " + item.SONo);
+
+        //            if (item.QtyMismatch)
+        //                message.AppendLine("Quantity: LC = " + item.MatrixQty.ToString("0.######") + ", Current SO = " + item.CurrentQty.ToString("0.######"));
+
+        //            if (item.ValueMismatch)
+        //                message.AppendLine("Total Value: LC = " + item.MatrixValue.ToString("0.00") + ", Current SO = " + item.CurrentValue.ToString("0.00"));
+
+        //            message.AppendLine("");
+        //        }
+
+        //        message.AppendLine("Please press Load Data to update the changed Sales Order row(s).");
+
+        //        Application.SBO_Application.MessageBox(message.ToString());
+
+        //        return false;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
         private bool ValidateSalesOrderCurrentValues(SAPbouiCOM.Form oForm)
         {
             try
@@ -2074,6 +2367,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 foreach (SalesOrderMismatch item in mismatches)
                 {
                     message.AppendLine("Sales Order: " + item.SONo);
+
+                    if (item.CustRefMismatch)
+                        message.AppendLine("Customer Ref No: LC = " + item.MatrixCustRefNo + ", Current SO = " + item.CurrentCustRefNo);
 
                     if (item.QtyMismatch)
                         message.AppendLine("Quantity: LC = " + item.MatrixQty.ToString("0.######") + ", Current SO = " + item.CurrentQty.ToString("0.######"));
@@ -2095,6 +2391,5 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 return false;
             }
         }
-
     }
 }

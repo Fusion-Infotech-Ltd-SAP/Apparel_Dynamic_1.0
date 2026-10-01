@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using Apparel_Dynamic_1._0.Resources.Transaction;
+using Apparel_Dynamic_1._0.Helper;
+using Apparel_Dynamic_1._0.Resources.Master;
 namespace Apparel_Dynamic_1._0.Resources.Version
 {
     [FormAttribute("Apparel_Dynamic_1._0.Resources.Version.ExportLCAmendment", "Resources/Version/ExportLCAmendment.b1f")]
@@ -18,9 +20,7 @@ namespace Apparel_Dynamic_1._0.Resources.Version
                                       STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, 
                                       STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
-
-
-
+        
 
         private SAPbouiCOM.EditText ETCOMPNY, ETPYTRMS, ETINTRMS, ETLCTRMS, ETSERIES, ETSTATCM, ETSTATMR, 
                                     ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM, ETCUSTMR, ETSCNO, ETLCNO, 
@@ -85,6 +85,7 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.TABSODR = ((SAPbouiCOM.Folder)(this.GetItem("TABSODR").Specific));
             this.TABATTCH = ((SAPbouiCOM.Folder)(this.GetItem("TABATTCH").Specific));
             this.MTXSLODR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSLODR").Specific));
+            this.MTXSLODR.LinkPressedAfter += new SAPbouiCOM._IMatrixEvents_LinkPressedAfterEventHandler(this.MTXSLODR_LinkPressedAfter);
             this.MTXATTCH = ((SAPbouiCOM.Matrix)(this.GetItem("MTXATTCH").Specific));
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.CancelButton = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
@@ -103,6 +104,7 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.ETPYTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETPYTRMS").Specific));
             this.ETINTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETINTRMS").Specific));
             this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
+            this.LinkedButton0.PressedAfter += new SAPbouiCOM._ILinkedButtonEvents_PressedAfterEventHandler(this.LinkedButton0_PressedAfter);
             this.OnCustomInitialize();
 
         }
@@ -117,5 +119,75 @@ namespace Apparel_Dynamic_1._0.Resources.Version
         }
 
         private SAPbouiCOM.LinkedButton LinkedButton0;
+        private void LinkedButton0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            SAPbouiCOM.EditText ETSMPLCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+            string sampleCode = ETSMPLCD.Value.Trim();
+            SalesContract salescon = new SalesContract();
+            salescon.Show();
+            //styleMaster. = Global.G_UI_Application.Forms.ActiveForm;
+            SAPbouiCOM.Form cForm = Application.SBO_Application.Forms.Item("FIL_FRM_SLCNTRCT");
+            try
+            {
+                cForm.Freeze(true);
+                cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                cForm.Items.Item("ETSCNO").Enabled = true;
+                SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSCNO").Specific;
+                cETSLCODE.Value = sampleCode;
+                cForm.Items.Item("1").Click();
+                cForm.Items.Item("FOLORDTL").Click();
+                cForm.Freeze(false);
+            }
+            catch (Exception ex)
+            {
+                cForm.Freeze(false);
+            }
+        }
+        private void MTXSLODR_LinkPressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.ColUID != "CLSTYLCD" || pVal.Row <= 0)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.EditText oETStyleNo = (SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSTYLCD").Cells.Item(pVal.Row).Specific;
+                string styleNo = oETStyleNo.Value.Trim();
+
+                if (string.IsNullOrEmpty(styleNo))
+                {
+                    Global.GFunc.ShowError("Style No. is empty.");
+                    return;
+                }
+
+                StyleMaster styleMaster = new StyleMaster();
+                styleMaster.Show();
+
+                SAPbouiCOM.Form cForm = Application.SBO_Application.Forms.Item("FIL_FRM_STYLMSTR");
+
+                try
+                {
+                    cForm.Freeze(true);
+                    cForm.Mode = SAPbouiCOM.BoFormMode.fm_FIND_MODE;
+                    cForm.Items.Item("ETSLCODE").Enabled = true;
+
+                    SAPbouiCOM.EditText cETSLCODE = (SAPbouiCOM.EditText)cForm.Items.Item("ETSLCODE").Specific;
+                    cETSLCODE.Value = styleNo;
+
+                    cForm.Items.Item("1").Click();
+                }
+                finally
+                {
+                    cForm.Freeze(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError(ex.Message);
+            }
+
+        }
     }
 }

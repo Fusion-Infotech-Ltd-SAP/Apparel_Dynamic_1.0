@@ -447,6 +447,34 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void BTNAMND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+        //        SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+        //        oForm.Items.Item("CBSTATMR").Enabled = true;
+        //        oForm.Items.Item("CBSTATCM").Enabled = true;
+
+        //        cbStatCM.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //        cbStatMR.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+        //        oForm.Items.Item("CBSTATMR").Enabled = true;
+        //        oForm.Items.Item("CBSTATCM").Enabled = false;
+
+        //        SetLCNoStatus(oForm);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Amendment status reset error: " + ex.Message);
+        //    }
+        //}
+
         private void BTNAMND_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
@@ -458,23 +486,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oForm.Items.Item("CBSTATMR").Enabled = true;
                 oForm.Items.Item("CBSTATCM").Enabled = true;
 
-                cbStatCM.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
                 cbStatMR.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-
-                oForm.Items.Item("CBSTATMR").Enabled = true;
-                oForm.Items.Item("CBSTATCM").Enabled = false;
-
-                SetLCNoStatus(oForm);
+                cbStatCM.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
 
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                     oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                ApplyExportLCStatusState(oForm);
             }
             catch (Exception ex)
             {
                 Global.GFunc.ShowError("Amendment status reset error: " + ex.Message);
             }
         }
-
 
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -539,8 +563,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
            
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
-            SetStatusFields(oForm);
-            SetLCNoStatus(oForm);
+            //SetStatusFields(oForm);
+            //SetLCNoStatus(oForm);
+
+            ApplyExportLCStatusState(oForm);
             CheckAndLoadAmendmentGrid(oForm);
         }
 
@@ -548,7 +574,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             CheckAndLoadAmendmentGrid(oForm);
-            SetLCNoStatus(oForm);
+            //SetLCNoStatus(oForm);
+            ApplyExportLCStatusState(oForm);
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
         }
 
@@ -570,25 +597,38 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
 
+        //private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+        //        string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
+
+        //        if (selectedValue == "C")
+        //        {
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+
+        //        SetLCNoStatus(oForm);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Error in CM LostFocus Error: " + ex.Message);
+        //    }
+        //}
+
         private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
-
-                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
-
-                if (selectedValue == "C")
-                {
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
-                }
-
-                SetLCNoStatus(oForm);
+                ApplyExportLCStatusState(oForm);
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Error in CM LostFocus Error: " + ex.Message);
+                Global.GFunc.ShowError("Error in CM LostFocus: " + ex.Message);
             }
         }
 
@@ -599,9 +639,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
                 SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
-                string selectedValue = "";
-                if (oCmb.Selected != null)
-                    selectedValue = oCmb.Selected.Value.Trim();
+                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
 
                 if (selectedValue == "C")
                 {
@@ -609,22 +647,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                     if (string.IsNullOrWhiteSpace(lcNo))
                     {
-                        Global.GFunc.ShowError("Enter LC No before confirming CM Status.");
+                        Global.GFunc.ShowError("Enter LC No before confirming Commercial Status.");
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
                         return;
                     }
 
-                    int result = Application.SBO_Application.MessageBox(
-                        "Are you sure want to confirm?",
-                        1,
-                        "Yes",
-                        "No"
-                    );
+                    int result = Application.SBO_Application.MessageBox("Are you sure want to confirm Commercial Status?", 1, "Yes", "No");
 
                     if (result != 1)
-                    {
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                    }
                 }
             }
             catch (Exception ex)
@@ -632,6 +663,88 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 Global.GFunc.ShowError("Error in CM Status selection: " + ex.Message);
             }
         }
+
+        //private void CBSTATCM_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+        //        string selectedValue = "";
+        //        if (oCmb.Selected != null)
+        //            selectedValue = oCmb.Selected.Value.Trim();
+
+        //        if (selectedValue == "C")
+        //        {
+        //            string lcNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCNO").Specific).Value.Trim();
+
+        //            if (string.IsNullOrWhiteSpace(lcNo))
+        //            {
+        //                Global.GFunc.ShowError("Enter LC No before confirming CM Status.");
+        //                oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //                return;
+        //            }
+
+        //            int result = Application.SBO_Application.MessageBox(
+        //                "Are you sure want to confirm?",
+        //                1,
+        //                "Yes",
+        //                "No"
+        //            );
+
+        //            if (result != 1)
+        //            {
+        //                oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Error in CM Status selection: " + ex.Message);
+        //    }
+        //}
+        //private void CBSTATMR_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+
+        //        string selectedValue = "";
+        //        if (oCmb.Selected != null)
+        //            selectedValue = oCmb.Selected.Value.Trim();
+
+        //        if (selectedValue == "C")
+        //        {
+        //            int result = Application.SBO_Application.MessageBox(
+        //                "Are you sure want to change?",
+        //                1,
+        //                "Yes",
+        //                "No"
+        //            );
+
+        //            if (result == 1)
+        //            {
+        //                oForm.Items.Item("CBSTATCM").Enabled = true;
+        //            }
+        //            else
+        //            {
+        //                oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+        //                oForm.Items.Item("CBSTATCM").Enabled = false;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Error in MR Status selection: " + ex.Message);
+        //    }
+        //}
+
         private void CBSTATMR_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
@@ -639,32 +752,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
                 SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
 
-                string selectedValue = "";
-                if (oCmb.Selected != null)
-                    selectedValue = oCmb.Selected.Value.Trim();
+                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
 
                 if (selectedValue == "C")
                 {
-                    int result = Application.SBO_Application.MessageBox(
-                        "Are you sure want to change?",
-                        1,
-                        "Yes",
-                        "No"
-                    );
+                    int result = Application.SBO_Application.MessageBox("Are you sure want to confirm Marketing Status?", 1, "Yes", "No");
 
-                    if (result == 1)
-                    {
-                        oForm.Items.Item("CBSTATCM").Enabled = true;
-                    }
-                    else
-                    {
+                    if (result != 1)
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                        oForm.Items.Item("CBSTATCM").Enabled = false;
-                    }
-                }
-                else
-                {
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
                 }
             }
             catch (Exception ex)
@@ -678,23 +773,36 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
-
-                string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
-
-                if (selectedValue == "C")
-                {
-                    oForm.Items.Item("CBSTATMR").Enabled = false;
-                    oForm.Items.Item("CBSTATCM").Enabled = true;
-                }
-
-                SetLCNoStatus(oForm);
+                ApplyExportLCStatusState(oForm);
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Error in MR LostFocus Error: " + ex.Message);
+                Global.GFunc.ShowError("Error in MR LostFocus: " + ex.Message);
             }
         }
+
+        //private void CBSTATMR_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+
+        //        string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
+
+        //        if (selectedValue == "C")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = false;
+        //            oForm.Items.Item("CBSTATCM").Enabled = true;
+        //        }
+
+        //        SetLCNoStatus(oForm);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Error in MR LostFocus Error: " + ex.Message);
+        //    }
+        //}
 
         private void ETB2BPER_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -1921,37 +2029,37 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
 
-        private void SetStatusFields(SAPbouiCOM.Form oForm)
-        {
-            try
-            {
-                SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
-                SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+        //private void SetStatusFields(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+        //        SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
-                string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
-                string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+        //        string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+        //        string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
 
-                if (mrStatus == "D" && cmStatus == "D")
-                {
-                    oForm.Items.Item("CBSTATMR").Enabled = true;
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
-                }
-                else if (mrStatus == "C" && cmStatus == "D")
-                {
-                    oForm.Items.Item("CBSTATMR").Enabled = false;
-                    oForm.Items.Item("CBSTATCM").Enabled = true;
-                }
-                else if (mrStatus == "C" && cmStatus == "C")
-                {
-                    oForm.Items.Item("CBSTATMR").Enabled = false;
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Status field control error: " + ex.Message);
-            }
-        }
+        //        if (mrStatus == "D" && cmStatus == "D")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = true;
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+        //        else if (mrStatus == "C" && cmStatus == "D")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = false;
+        //            oForm.Items.Item("CBSTATCM").Enabled = true;
+        //        }
+        //        else if (mrStatus == "C" && cmStatus == "C")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = false;
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Status field control error: " + ex.Message);
+        //    }
+        //}
 
         private void CalculateB2BAmount(SAPbouiCOM.Form oForm)
         {
@@ -2300,32 +2408,90 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return mrStatus == "C" && cmStatus == "C";
         }
 
-        private void SetLCNoStatus(SAPbouiCOM.Form oForm)
+        //private void SetLCNoStatus(SAPbouiCOM.Form oForm)
+        //{
+        //    bool bothConfirmed = IsBothStatusConfirmed(oForm);
+
+        //    string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+        //    int amendNo = 0;
+        //    int.TryParse(amendNoStr, out amendNo);
+
+        //    SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
+
+        //    if (amendNo > 0)
+        //    {
+        //        // Once amendment starts, LC No cannot be changed
+        //        oForm.Items.Item("ETLCNO").Enabled = false;
+
+        //        // Existing LC No remains mandatory
+        //        stLCNo.Caption = "LC No*";
+
+        //        return;
+        //    }
+
+        //    // Original document: Amendment No = 0
+        //    stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
+        //    oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
+        //}
+
+        private void ApplyExportLCStatusState(SAPbouiCOM.Form oForm)
         {
-            bool bothConfirmed = IsBothStatusConfirmed(oForm);
-
-            string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
-
-            int amendNo = 0;
-            int.TryParse(amendNoStr, out amendNo);
-
-            SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
-
-            if (amendNo > 0)
+            try
             {
-                // Once amendment starts, LC No cannot be changed
-                oForm.Items.Item("ETLCNO").Enabled = false;
+                SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+                SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+                SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
 
-                // Existing LC No remains mandatory
-                stLCNo.Caption = "LC No*";
+                string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+                string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+                string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
 
-                return;
+                int amendNo = 0;
+                int.TryParse(amendNoStr, out amendNo);
+
+                bool bothConfirmed = mrStatus == "C" && cmStatus == "C";
+
+                if (mrStatus == "D" && cmStatus == "D")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = true;
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+                else if (mrStatus == "C" && cmStatus == "D")
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = false;
+                    oForm.Items.Item("CBSTATCM").Enabled = true;
+                }
+                else if (bothConfirmed)
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = false;
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+                else
+                {
+                    oForm.Items.Item("CBSTATMR").Enabled = true;
+                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                }
+
+                if (amendNo > 0)
+                {
+                    stLCNo.Caption = "LC No*";
+                    oForm.Items.Item("ETLCNO").Enabled = false;
+                }
+                else
+                {
+                    stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
+                    oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
+                }
+
+                oForm.Items.Item("BTNAMND").Enabled = bothConfirmed && oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE;
             }
-
-            // Original document: Amendment No = 0
-            stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
-            oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Export LC status control error: " + ex.Message);
+            }
         }
+
         private bool ValidateDuplicateSalesOrderInMatrix(SAPbouiCOM.Form oForm)
         {
             try

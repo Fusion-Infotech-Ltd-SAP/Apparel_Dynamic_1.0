@@ -536,6 +536,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM", "ETCUSTMR",
                                          "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
+           
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
 
             SetStatusFields(oForm);
@@ -548,6 +549,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             CheckAndLoadAmendmentGrid(oForm);
             SetLCNoStatus(oForm);
+            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
@@ -2545,42 +2547,65 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             try
             {
+                // Validation is required only while updating an existing Export LC
                 if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
                     return true;
 
-                string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
-                string formAmendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+                string docEntryStr =
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
 
-                if (string.IsNullOrWhiteSpace(docEntry))
+                string formAmendNoStr =
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+                // No existing document
+                if (string.IsNullOrWhiteSpace(docEntryStr))
                     return true;
 
+                // DocEntry must be numeric
+                int docEntry = 0;
+
+                if (!int.TryParse(docEntryStr, out docEntry))
+                {
+                    Global.GFunc.ShowError("Invalid Export LC DocEntry.");
+                    return false;
+                }
+
+                // Current amendment number shown on form
                 int formAmendNo = 0;
                 int.TryParse(formAmendNoStr, out formAmendNo);
 
-                string safeDocEntry = docEntry.Replace("'", "''");
-
                 string query = $@"
                         SELECT
-                            IFNULL(""U_MLCSTATUS"", '') AS ""MRStatus"",
-                            IFNULL(""U_CLCSTATUS"", '') AS ""CMStatus"",
-                            CASE
-                                WHEN IFNULL(""U_AMNDMNT"", '') = '' THEN 0
-                                ELSE TO_INTEGER(""U_AMNDMNT"")
-                            END AS ""AmendmentNo""
+                            IFNULL(TO_NVARCHAR(""U_MLCSTATUS""), '') AS ""MRStatus"",
+                            IFNULL(TO_NVARCHAR(""U_CLCSTATUS""), '') AS ""CMStatus"",
+                            IFNULL(TO_NVARCHAR(""U_AMNDMNT""), '') AS ""AmendmentNo""
                         FROM ""@FIL_DH_OLCM""
-                        WHERE ""DocEntry"" = '{safeDocEntry}'";
+                        WHERE ""DocEntry"" = {docEntry}";
 
-                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(
+                    SAPbobsCOM.BoObjectTypes.BoRecordset);
+
                 rs.DoQuery(query);
 
+                // Existing document not found
                 if (rs.EoF)
                     return true;
 
-                string savedMRStatus = Convert.ToString(rs.Fields.Item("MRStatus").Value).Trim();
-                string savedCMStatus = Convert.ToString(rs.Fields.Item("CMStatus").Value).Trim();
-                int savedAmendNo = Convert.ToInt32(rs.Fields.Item("AmendmentNo").Value);
+                string savedMRStatus =
+                    Convert.ToString(rs.Fields.Item("MRStatus").Value).Trim();
 
-                bool savedBothConfirmed = savedMRStatus == "C" && savedCMStatus == "C";
+                string savedCMStatus =
+                    Convert.ToString(rs.Fields.Item("CMStatus").Value).Trim();
+
+                string savedAmendNoStr =
+                    Convert.ToString(rs.Fields.Item("AmendmentNo").Value).Trim();
+
+                int savedAmendNo = 0;
+                int.TryParse(savedAmendNoStr, out savedAmendNo);
+
+                bool savedBothConfirmed =
+                    savedMRStatus == "C" &&
+                    savedCMStatus == "C";
 
                 if (!savedBothConfirmed)
                     return true;
@@ -2588,9 +2613,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (formAmendNo > savedAmendNo)
                     return true;
 
+                // Existing amendment is already fully confirmed.
+                // User cannot directly update it.
                 if (formAmendNo == savedAmendNo)
                 {
-                    Global.GFunc.ShowError("This Export LC is already confirmed by both Marketing and Commercial. Please amend the form first before updating.");
+                    Global.GFunc.ShowError(
+                        "This Export LC is already confirmed by both Marketing and Commercial. " +
+                        "Please amend the form first before updating.");
+
                     return false;
                 }
 
@@ -2598,7 +2628,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Confirmed Export LC validation error: " + ex.Message);
+                Global.GFunc.ShowError(
+                    "Confirmed Export LC validation error: " + ex.Message);
+
                 return false;
             }
             finally

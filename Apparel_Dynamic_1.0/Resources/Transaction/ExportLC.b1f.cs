@@ -1326,6 +1326,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
             if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
             {
+                if (!ValidateConfirmedAmendmentBeforeUpdate(oForm))
+                    return BubbleEvent = false;
+
                 SAPbouiCOM.DBDataSource oHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
 
                 string branch = oHeader.GetValue("U_BRANCH", 0).Trim();
@@ -2456,13 +2459,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             {
                 SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
                 SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
-                SAPbouiCOM.DBDataSource dbHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
 
                 mtx.FlushToDataSource();
 
-                string currentDocEntry = "";
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
-                    currentDocEntry = dbHeader.GetValue("DocEntry", 0).Trim();
+                string currentDocEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
 
                 rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
@@ -2493,7 +2493,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                             WHERE T1.""U_SOENTRY"" = '{safeSOEntry}'";
 
                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && !string.IsNullOrWhiteSpace(currentDocEntry))
-                        query += $@" AND T0.""DocEntry"" <> {currentDocEntry}";
+                        query += $@" AND T0.""DocEntry"" <> '{currentDocEntry.Replace("'", "''")}'";
 
                     rs.DoQuery(query);
 
@@ -2509,8 +2509,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         string exportLCDocNum = Convert.ToString(rs.Fields.Item("DocNum").Value).Trim();
 
                         message.AppendLine("Sales Order: " + existingSONo + " | Export LC DocNum: " + exportLCDocNum);
-                        conflictFound = true;
 
+                        conflictFound = true;
                         rs.MoveNext();
                     }
                 }
@@ -2528,6 +2528,77 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             catch (Exception ex)
             {
                 Global.GFunc.ShowError("Sales Order usage validation error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
+        }
+        private bool ValidateConfirmedAmendmentBeforeUpdate(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset rs = null;
+
+            try
+            {
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return true;
+
+                string docEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+                string formAmendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(docEntry))
+                    return true;
+
+                int formAmendNo = 0;
+                int.TryParse(formAmendNoStr, out formAmendNo);
+
+                string safeDocEntry = docEntry.Replace("'", "''");
+
+                string query = $@"
+                        SELECT
+                            IFNULL(""U_MLCSTATUS"", '') AS ""MRStatus"",
+                            IFNULL(""U_CLCSTATUS"", '') AS ""CMStatus"",
+                            CASE
+                                WHEN IFNULL(""U_AMNDMNT"", '') = '' THEN 0
+                                ELSE TO_INTEGER(""U_AMNDMNT"")
+                            END AS ""AmendmentNo""
+                        FROM ""@FIL_DH_OLCM""
+                        WHERE ""DocEntry"" = '{safeDocEntry}'";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(query);
+
+                if (rs.EoF)
+                    return true;
+
+                string savedMRStatus = Convert.ToString(rs.Fields.Item("MRStatus").Value).Trim();
+                string savedCMStatus = Convert.ToString(rs.Fields.Item("CMStatus").Value).Trim();
+                int savedAmendNo = Convert.ToInt32(rs.Fields.Item("AmendmentNo").Value);
+
+                bool savedBothConfirmed = savedMRStatus == "C" && savedCMStatus == "C";
+
+                if (!savedBothConfirmed)
+                    return true;
+
+                if (formAmendNo > savedAmendNo)
+                    return true;
+
+                if (formAmendNo == savedAmendNo)
+                {
+                    Global.GFunc.ShowError("This Export LC is already confirmed by both Marketing and Commercial. Please amend the form first before updating.");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Confirmed Export LC validation error: " + ex.Message);
                 return false;
             }
             finally

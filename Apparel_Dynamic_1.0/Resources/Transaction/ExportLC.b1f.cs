@@ -36,7 +36,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.Button BRWSBTN, DISPBTN, DELBTN, ADDButton, CancelButton, BTNLDATA, BTNAMND;
 
-        
+
 
         private SAPbouiCOM.Grid GRDAMDTL;
 
@@ -109,6 +109,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABAMDTL = ((SAPbouiCOM.Folder)(this.GetItem("TABAMDTL").Specific));
             this.TABATTCH = ((SAPbouiCOM.Folder)(this.GetItem("TABATTCH").Specific));
             this.MTXSLODR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSLODR").Specific));
+            this.MTXSLODR.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXSLODR_ValidateAfter);
             this.MTXSLODR.LinkPressedAfter += new SAPbouiCOM._IMatrixEvents_LinkPressedAfterEventHandler(this.MTXSLODR_LinkPressedAfter);
             this.MTXSLODR.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXSLODR_ChooseFromListAfter);
             this.MTXSLODR.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXSLODR_ChooseFromListBefore);
@@ -156,6 +157,28 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
 
         }
+
+        private void MTXSLODR_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                if (pVal.ColUID != "CLSLORDR" || pVal.Row <= 0)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+
+                string soNo = ((SAPbouiCOM.EditText)mtx.Columns.Item("CLSLORDR").Cells.Item(pVal.Row).Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(soNo))
+                    CleanSalesOrderMatrix(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order clear error: " + ex.Message);
+            }
+        }
+
 
         private void MTXSLODR_LinkPressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -2406,6 +2429,47 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
 
             return mrStatus == "C" && cmStatus == "C";
+        }
+
+
+        private void CleanSalesOrderMatrix(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                oForm.Freeze(true);
+                mtx.FlushToDataSource();
+
+                for (int i = db.Size - 1; i >= 0; i--)
+                {
+                    string soNo = db.GetValue("U_SONO", i).Trim();
+
+                    if (string.IsNullOrWhiteSpace(soNo))
+                        db.RemoveRecord(i);
+                }
+
+                for (int i = 0; i < db.Size; i++)
+                    db.SetValue("LineId", i, (i + 1).ToString());
+
+                mtx.LoadFromDataSource();
+
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+                CalculateLCValue(oForm, mtx);
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order matrix cleanup error: " + ex.Message);
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
         }
 
         //private void SetLCNoStatus(SAPbouiCOM.Form oForm)

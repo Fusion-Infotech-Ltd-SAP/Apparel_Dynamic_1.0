@@ -366,6 +366,36 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void GRDAMDTL_DoubleClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //    try
+        //    {
+        //        if (pVal.Row < 0)
+        //            return;
+
+        //        int result = Application.SBO_Application.MessageBox("Are you sure you want to see the Amendment Details?", 1, "OK", "Cancel");
+
+        //        if (result != 1)
+        //            return;
+
+        //        SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
+        //        SAPbouiCOM.DataTable oDT = oGrid.DataTable;
+
+        //        string docEntry = oDT.GetValue("DocEntry", pVal.Row).ToString().Trim();
+        //        string docNum = oDT.GetValue("DocNum", pVal.Row).ToString().Trim();
+        //        string amendNo = oDT.GetValue("Amendment No", pVal.Row).ToString().Trim();
+        //        string logInst = oDT.GetValue("LogInst", pVal.Row).ToString().Trim();
+
+        //        OpenLCAmendmentInNewForm(docEntry, docNum, amendNo, logInst);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Amendment Details Error: " + ex.Message);
+        //    }
+        //}
+
         private void GRDAMDTL_DoubleClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
@@ -375,11 +405,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (pVal.Row < 0)
                     return;
 
-                int result = Application.SBO_Application.MessageBox("Are you sure you want to see the Amendment Details?", 1, "OK", "Cancel");
-
-                if (result != 1)
-                    return;
-
                 SAPbouiCOM.Grid oGrid = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
                 SAPbouiCOM.DataTable oDT = oGrid.DataTable;
 
@@ -387,6 +412,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 string docNum = oDT.GetValue("DocNum", pVal.Row).ToString().Trim();
                 string amendNo = oDT.GetValue("Amendment No", pVal.Row).ToString().Trim();
                 string logInst = oDT.GetValue("LogInst", pVal.Row).ToString().Trim();
+                string currentAmendNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+                if (amendNo == currentAmendNo)
+                {
+                    //Application.SBO_Application.MessageBox();
+                    Global.GFunc.ShowWarning("You are already viewing the current amendment.");
+                    return;
+                }
+
+                int result = Application.SBO_Application.MessageBox("Are you sure you want to see the Amendment Details?", 1, "OK", "Cancel");
+
+                if (result != 1)
+                    return;
 
                 OpenLCAmendmentInNewForm(docEntry, docNum, amendNo, logInst);
             }
@@ -1434,24 +1472,42 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void ETCUSTMR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
-                return;
-            SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
-            SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            if (dt == null || dt.Rows.Count == 0)
-                return;
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
 
-            string Code = dt.GetValue("CardCode", 0).ToString().Trim();
-            string Name = dt.GetValue("CardName", 0).ToString().Trim();
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
 
-            SAPbouiCOM.EditText ETCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTMR").Specific;
-            ETCD.Value = Code;
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
 
-            SAPbouiCOM.EditText ETNM = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTNM").Specific;
-            ETNM.Value = Name;
+                string newCustomerCode = dt.GetValue("CardCode", 0).ToString().Trim();
+                string newCustomerName = dt.GetValue("CardName", 0).ToString().Trim();
 
+                SAPbouiCOM.EditText etCustomer = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTMR").Specific;
+                SAPbouiCOM.EditText etCustomerName = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTNM").Specific;
+                SAPbouiCOM.EditText etSCNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+
+                string oldCustomerCode = etCustomer.Value.Trim();
+
+                if ((oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE) &&
+                    !string.Equals(oldCustomerCode, newCustomerCode, StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(etSCNo.Value))
+                {
+                    etSCNo.Value = "";
+                }
+
+                etCustomer.Value = newCustomerCode;
+                etCustomerName.Value = newCustomerName;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Customer selection error: " + ex.Message);
+            }
         }
         //_____________________________________________________________________________________________________ User Define Function_____________________________
 

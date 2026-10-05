@@ -1098,6 +1098,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void MTXSLODR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
+            SAPbobsCOM.Recordset rs = null;
+
             try
             {
                 if (pVal.ColUID != "CLSLORDR")
@@ -1111,45 +1113,53 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return;
 
                 int docEntry = Convert.ToInt32(dt.GetValue("DocEntry", 0));
+                string customerCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTMR").Specific).Value.Trim();
                 string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
+                string safeCustomerCode = customerCode.Replace("'", "''");
                 string safeSCNo = scNo.Replace("'", "''");
 
                 SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
                 SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
 
                 string qStr = @"
-                                SELECT
-                                    A.""DocNum"",
-                                    A.""DocEntry"",
-                                    A.""NumAtCard"",
-                                    A.""U_STYLECODE"",
-                                    A.""U_STYLENM"",
-                                    A.""U_STYLENTRY"",
-                                    SUM(B.""Quantity"") AS ""Quantity"",
-                                    CASE
-                                        WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
-                                        ELSE A.""DocTotalFC""
-                                    END AS ""TotalValue""
-                                FROM ORDR A
-                                INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
-                                WHERE A.""DocEntry"" = " + docEntry + @" AND A.""U_SCNO"" = '" + safeSCNo + @"'
-                                GROUP BY
-                                    A.""DocNum"",
-                                    A.""DocEntry"",
-                                    A.""NumAtCard"",
-                                    A.""U_STYLECODE"",
-                                    A.""U_STYLENM"",
-                                    A.""U_STYLENTRY"",
-                                    A.""DocCur"",
-                                    A.""DocTotal"",
-                                    A.""DocTotalFC""";
+                        SELECT
+                            A.""DocNum"",
+                            A.""DocEntry"",
+                            A.""NumAtCard"",
+                            A.""U_STYLECODE"",
+                            A.""U_STYLENM"",
+                            A.""U_STYLENTRY"",
+                            SUM(B.""Quantity"") AS ""Quantity"",
+                            CASE
+                                WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+                                ELSE A.""DocTotalFC""
+                            END AS ""TotalValue""
+                        FROM ORDR A
+                        INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+                        WHERE A.""DocEntry"" = " + docEntry + @"
+                        AND A.""CardCode"" = '" + safeCustomerCode + @"'";
 
-                SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                if (!string.IsNullOrWhiteSpace(scNo))
+                    qStr += @" AND A.""U_SCNO"" = '" + safeSCNo + @"'";
+
+                qStr += @"
+                        GROUP BY
+                            A.""DocNum"",
+                            A.""DocEntry"",
+                            A.""NumAtCard"",
+                            A.""U_STYLECODE"",
+                            A.""U_STYLENM"",
+                            A.""U_STYLENTRY"",
+                            A.""DocCur"",
+                            A.""DocTotal"",
+                            A.""DocTotalFC""";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rs.DoQuery(qStr);
 
                 if (rs.EoF)
                 {
-                    Global.GFunc.ShowError("Selected Sales Order data not found.");
+                    Global.GFunc.ShowError("Selected Sales Order does not match the selected Customer or Sales Contract.");
                     return;
                 }
 
@@ -1185,19 +1195,182 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "Sales Order load error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Application.SBO_Application.StatusBar.SetText("Sales Order load error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
             }
         }
 
-       
-     
+        //private void MTXSLODR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        if (pVal.ColUID != "CLSLORDR")
+        //            return;
+
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+        //        SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+        //        if (dt == null || dt.Rows.Count == 0)
+        //            return;
+
+        //        int docEntry = Convert.ToInt32(dt.GetValue("DocEntry", 0));
+        //        string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
+        //        string safeSCNo = scNo.Replace("'", "''");
+
+        //        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+        //        SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+        //        string qStr = @"
+        //                        SELECT
+        //                            A.""DocNum"",
+        //                            A.""DocEntry"",
+        //                            A.""NumAtCard"",
+        //                            A.""U_STYLECODE"",
+        //                            A.""U_STYLENM"",
+        //                            A.""U_STYLENTRY"",
+        //                            SUM(B.""Quantity"") AS ""Quantity"",
+        //                            CASE
+        //                                WHEN A.""DocCur"" = 'BDT' THEN A.""DocTotal""
+        //                                ELSE A.""DocTotalFC""
+        //                            END AS ""TotalValue""
+        //                        FROM ORDR A
+        //                        INNER JOIN RDR1 B ON A.""DocEntry"" = B.""DocEntry""
+        //                        WHERE A.""DocEntry"" = " + docEntry + @" AND A.""U_SCNO"" = '" + safeSCNo + @"'
+        //                        GROUP BY
+        //                            A.""DocNum"",
+        //                            A.""DocEntry"",
+        //                            A.""NumAtCard"",
+        //                            A.""U_STYLECODE"",
+        //                            A.""U_STYLENM"",
+        //                            A.""U_STYLENTRY"",
+        //                            A.""DocCur"",
+        //                            A.""DocTotal"",
+        //                            A.""DocTotalFC""";
+
+        //        SAPbobsCOM.Recordset rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+        //        rs.DoQuery(qStr);
+
+        //        if (rs.EoF)
+        //        {
+        //            Global.GFunc.ShowError("Selected Sales Order data not found.");
+        //            return;
+        //        }
+
+        //        MTXSLODR.FlushToDataSource();
+
+        //        int rowIndex = pVal.Row - 1;
+        //        string amendmentNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+        //        if (oDBDSDetail.Size <= rowIndex)
+        //            oDBDSDetail.InsertRecord(oDBDSDetail.Size);
+
+        //        oDBDSDetail.SetValue("LineId", rowIndex, pVal.Row.ToString());
+        //        oDBDSDetail.SetValue("U_SONO", rowIndex, Convert.ToString(rs.Fields.Item("DocNum").Value));
+        //        oDBDSDetail.SetValue("U_SOENTRY", rowIndex, Convert.ToString(rs.Fields.Item("DocEntry").Value));
+        //        oDBDSDetail.SetValue("U_CUSTREFNO", rowIndex, Convert.ToString(rs.Fields.Item("NumAtCard").Value));
+        //        oDBDSDetail.SetValue("U_STYLECODE", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLECODE").Value));
+        //        oDBDSDetail.SetValue("U_STYLENM", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLENM").Value));
+        //        oDBDSDetail.SetValue("U_STYLENTRY", rowIndex, Convert.ToString(rs.Fields.Item("U_STYLENTRY").Value));
+        //        oDBDSDetail.SetValue("U_QUANTITY", rowIndex, Convert.ToString(rs.Fields.Item("Quantity").Value));
+        //        oDBDSDetail.SetValue("U_VALUE", rowIndex, Convert.ToString(rs.Fields.Item("TotalValue").Value));
+        //        oDBDSDetail.SetValue("U_AMNDMNT", rowIndex, amendmentNo);
+
+        //        oDBDSDetail.Offset = rowIndex;
+        //        MTXSLODR.SetLineData(pVal.Row);
+
+        //        CalculateLCValue(oForm, MTXSLODR);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+        //            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+        //        if (pVal.Row == MTXSLODR.VisualRowCount)
+        //            Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            "Sales Order load error: " + ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
+
+
+
+        //private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        //{
+        //    BubbleEvent = true;
+
+        //    try
+        //    {
+        //        if (pVal.ColUID != "CLSLORDR")
+        //            return;
+
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
+
+        //        if (string.IsNullOrEmpty(scNo))
+        //        {
+        //            Global.GFunc.ShowError("Please select Sales Contract first.");
+        //            BubbleEvent = false;
+        //            return;
+        //        }
+
+        //        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+
+        //        List<string> usedSOEntries = new List<string>();
+
+        //        for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+        //        {
+        //            string soEntry = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSONTRY").Cells.Item(i).Specific).Value.Trim();
+
+        //            if (!string.IsNullOrWhiteSpace(soEntry) && !usedSOEntries.Contains(soEntry))
+        //                usedSOEntries.Add(soEntry);
+        //        }
+
+        //        SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+        //        SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflArg.ChooseFromListUID);
+
+        //        SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(
+        //            SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+
+        //        SAPbouiCOM.Condition oCondition = oConditions.Add();
+        //        oCondition.Alias = "U_SCNO";
+        //        oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+        //        oCondition.CondVal = scNo;
+
+        //        foreach (string soEntry in usedSOEntries)
+        //        {
+        //            oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
+
+        //            oCondition = oConditions.Add();
+        //            oCondition.Alias = "DocEntry";
+        //            oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_NOT_EQUAL;
+        //            oCondition.CondVal = soEntry;
+        //        }
+
+        //        oCFL.SetConditions(oConditions);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Sales Order CFL Error: " + ex.Message);
+        //        BubbleEvent = false;
+        //    }
+        //}
 
         private void MTXSLODR_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
+            SAPbobsCOM.Recordset rs = null;
 
             try
             {
@@ -1205,42 +1378,68 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     return;
 
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                string customerCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTMR").Specific).Value.Trim();
                 string scNo = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific).Value.Trim();
 
-                if (string.IsNullOrEmpty(scNo))
+                if (string.IsNullOrWhiteSpace(customerCode))
                 {
-                    Global.GFunc.ShowError("Please select Sales Contract first.");
+                    Global.GFunc.ShowError("Please select Customer first.");
                     BubbleEvent = false;
                     return;
                 }
 
                 SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
-
-                List<string> usedSOEntries = new List<string>();
+                HashSet<string> excludedSOEntries = new HashSet<string>();
 
                 for (int i = 1; i <= oMatrix.VisualRowCount; i++)
                 {
                     string soEntry = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLSONTRY").Cells.Item(i).Specific).Value.Trim();
 
-                    if (!string.IsNullOrWhiteSpace(soEntry) && !usedSOEntries.Contains(soEntry))
-                        usedSOEntries.Add(soEntry);
+                    if (!string.IsNullOrWhiteSpace(soEntry))
+                        excludedSOEntries.Add(soEntry);
+                }
+
+                string query = @"SELECT DISTINCT T1.""U_SOENTRY"" FROM ""@FIL_DH_OLCM"" T0 INNER JOIN ""@FIL_DR_LCM1"" T1 ON T0.""DocEntry"" = T1.""DocEntry"" WHERE IFNULL(T1.""U_SOENTRY"", 0) <> 0";
+                string currentDocEntry = ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCTRY").Specific).Value.Trim();
+                int currentDocEntryInt;
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && int.TryParse(currentDocEntry, out currentDocEntryInt))
+                    query += $@" AND T0.""DocEntry"" <> {currentDocEntryInt}";
+
+                rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                rs.DoQuery(query);
+
+                while (!rs.EoF)
+                {
+                    string soEntry = Convert.ToString(rs.Fields.Item("U_SOENTRY").Value).Trim();
+
+                    if (!string.IsNullOrWhiteSpace(soEntry))
+                        excludedSOEntries.Add(soEntry);
+
+                    rs.MoveNext();
                 }
 
                 SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflArg.ChooseFromListUID);
-
-                SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(
-                    SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
+                SAPbouiCOM.Conditions oConditions = (SAPbouiCOM.Conditions)Application.SBO_Application.CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_Conditions);
 
                 SAPbouiCOM.Condition oCondition = oConditions.Add();
-                oCondition.Alias = "U_SCNO";
+                oCondition.Alias = "CardCode";
                 oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
-                oCondition.CondVal = scNo;
+                oCondition.CondVal = customerCode;
 
-                foreach (string soEntry in usedSOEntries)
+                if (!string.IsNullOrWhiteSpace(scNo))
                 {
                     oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
+                    oCondition = oConditions.Add();
+                    oCondition.Alias = "U_SCNO";
+                    oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    oCondition.CondVal = scNo;
+                }
 
+                foreach (string soEntry in excludedSOEntries)
+                {
+                    oCondition.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
                     oCondition = oConditions.Add();
                     oCondition.Alias = "DocEntry";
                     oCondition.Operation = SAPbouiCOM.BoConditionOperation.co_NOT_EQUAL;
@@ -1254,8 +1453,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 Global.GFunc.ShowError("Sales Order CFL Error: " + ex.Message);
                 BubbleEvent = false;
             }
+            finally
+            {
+                if (rs != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+                    rs = null;
+                }
+            }
         }
-
 
         private void ETHUSBNM_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -1387,6 +1593,44 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             ETBCD.Value = Code;
 
         }
+        //private void ETSCNO_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+        //            return;
+
+        //        SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+        //        SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+        //        if (dt == null || dt.Rows.Count == 0)
+        //            return;
+
+        //        string SCNo = dt.GetValue("U_SCNO", 0).ToString().Trim();
+
+        //        SAPbouiCOM.EditText ETSCNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+        //        ETSCNO.Value = SCNo;
+
+        //        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+        //        SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+        //        if (MTXSLODR.RowCount == 0)
+        //        {
+        //            Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail, 1, "");
+        //        }
+        //        //Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail,1,"");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText(
+        //            ex.Message,
+        //            SAPbouiCOM.BoMessageTime.bmt_Short,
+        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //}
+
         private void ETSCNO_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
@@ -1402,26 +1646,24 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (dt == null || dt.Rows.Count == 0)
                     return;
 
-                string SCNo = dt.GetValue("U_SCNO", 0).ToString().Trim();
+                string newSCNo = dt.GetValue("U_SCNO", 0).ToString().Trim();
+                SAPbouiCOM.EditText etSCNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+                string oldSCNo = etSCNo.Value.Trim();
 
-                SAPbouiCOM.EditText ETSCNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
-                ETSCNO.Value = SCNo;
+                if (!string.Equals(oldSCNo, newSCNo, StringComparison.OrdinalIgnoreCase))
+                    ClearSalesOrderMatrix(oForm);
 
-                SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
-                SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+                etSCNo.Value = newSCNo;
 
-                if (MTXSLODR.RowCount == 0)
-                {
-                    Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail, 1, "");
-                }
-                //Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail,1,"");
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                if (mtx.RowCount == 0)
+                    Global.GFunc.SetNewLine(mtx, dbDetail, 1, "");
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Application.SBO_Application.StatusBar.SetText(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
             }
         }
 
@@ -1470,6 +1712,46 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void ETCUSTMR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+        //            return;
+
+        //        SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+        //        SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+        //        if (dt == null || dt.Rows.Count == 0)
+        //            return;
+
+        //        string newCustomerCode = dt.GetValue("CardCode", 0).ToString().Trim();
+        //        string newCustomerName = dt.GetValue("CardName", 0).ToString().Trim();
+
+        //        SAPbouiCOM.EditText etCustomer = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTMR").Specific;
+        //        SAPbouiCOM.EditText etCustomerName = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTNM").Specific;
+        //        SAPbouiCOM.EditText etSCNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
+
+        //        string oldCustomerCode = etCustomer.Value.Trim();
+
+        //        if ((oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE) &&
+        //            !string.Equals(oldCustomerCode, newCustomerCode, StringComparison.OrdinalIgnoreCase) &&
+        //            !string.IsNullOrWhiteSpace(etSCNo.Value))
+        //        {
+        //            etSCNo.Value = "";
+        //        }
+
+        //        etCustomer.Value = newCustomerCode;
+        //        etCustomerName.Value = newCustomerName;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Customer selection error: " + ex.Message);
+        //    }
+        //}
+
         private void ETCUSTMR_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
@@ -1493,16 +1775,22 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.EditText etSCNo = (SAPbouiCOM.EditText)oForm.Items.Item("ETSCNO").Specific;
 
                 string oldCustomerCode = etCustomer.Value.Trim();
+                bool customerChanged = !string.IsNullOrWhiteSpace(oldCustomerCode) && !string.Equals(oldCustomerCode, newCustomerCode, StringComparison.OrdinalIgnoreCase);
 
-                if ((oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE) &&
-                    !string.Equals(oldCustomerCode, newCustomerCode, StringComparison.OrdinalIgnoreCase) &&
-                    !string.IsNullOrWhiteSpace(etSCNo.Value))
+                if ((oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE) && customerChanged)
                 {
                     etSCNo.Value = "";
+                    ClearSalesOrderMatrix(oForm);
                 }
 
                 etCustomer.Value = newCustomerCode;
                 etCustomerName.Value = newCustomerName;
+
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                if (mtx.RowCount == 0)
+                    Global.GFunc.SetNewLine(mtx, dbDetail, 1, "");
             }
             catch (Exception ex)
             {
@@ -1522,7 +1810,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 string branch = oHeader.GetValue("U_BRANCH", 0).Trim();
                 string customer = oHeader.GetValue("U_CARDCODE", 0).Trim();
-                string scNo = oHeader.GetValue("U_SCNO", 0).Trim();
                 string lcNo = oHeader.GetValue("U_LCNO", 0).Trim();
 
                 if (branch == "")
@@ -1538,12 +1825,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 {
                     Global.GFunc.ShowError("Enter Customer Code");
                     oForm.ActiveItem = "ETCUSTMR";
-                    return BubbleEvent = false;
-                }
-                else if (scNo == "")
-                {
-                    Global.GFunc.ShowError("Enter Sales Contract No");
-                    oForm.ActiveItem = "ETSCNO";
                     return BubbleEvent = false;
                 }
                 else if (bothConfirmed && string.IsNullOrWhiteSpace(lcNo))
@@ -2488,6 +2769,34 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         }
 
 
+        private void ClearSalesOrderMatrix(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                oForm.Freeze(true);
+                mtx.FlushToDataSource();
+
+                for (int i = dbDetail.Size - 1; i >= 0; i--)
+                    dbDetail.RemoveRecord(i);
+
+                mtx.LoadFromDataSource();
+                Global.GFunc.SetNewLine(mtx, dbDetail, 1, "");
+                CalculateLCValue(oForm, mtx);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Sales Order matrix clear error: " + ex.Message);
+            }
+            finally
+            {
+                oForm.Freeze(false);
+            }
+        }
+
+
         private void CleanSalesOrderMatrix(SAPbouiCOM.Form oForm)
         {
             try
@@ -2673,10 +2982,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 mtx.FlushToDataSource();
 
+                string currentCustomer = dbHeader.GetValue("U_CARDCODE", 0).Trim();
                 string currentSCNo = dbHeader.GetValue("U_SCNO", 0).Trim();
-
-                if (string.IsNullOrWhiteSpace(currentSCNo))
-                    return true;
 
                 rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
@@ -2691,33 +2998,42 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
                         continue;
 
-                    string query = $@"SELECT IFNULL(""U_SCNO"", '') AS ""SCNo"" FROM ORDR WHERE ""DocEntry"" = {soEntry}";
+                    string query = $@"SELECT IFNULL(""CardCode"", '') AS ""CardCode"", IFNULL(""U_SCNO"", '') AS ""SCNo"" FROM ORDR WHERE ""DocEntry"" = {soEntry}";
                     rs.DoQuery(query);
 
                     if (rs.EoF)
                         continue;
 
+                    string salesOrderCustomer = Convert.ToString(rs.Fields.Item("CardCode").Value).Trim();
                     string salesOrderSCNo = Convert.ToString(rs.Fields.Item("SCNo").Value).Trim();
 
-                    if (!string.Equals(currentSCNo, salesOrderSCNo, StringComparison.OrdinalIgnoreCase))
+                    bool customerMismatch = !string.Equals(currentCustomer, salesOrderCustomer, StringComparison.OrdinalIgnoreCase);
+                    bool scMismatch = !string.IsNullOrWhiteSpace(currentSCNo) && !string.Equals(currentSCNo, salesOrderSCNo, StringComparison.OrdinalIgnoreCase);
+
+                    if (customerMismatch || scMismatch)
                     {
                         if (!mismatchFound)
                         {
-                            message.AppendLine("Sales Order and Sales Contract mismatch found.");
-                            message.AppendLine("");
-                            message.AppendLine("Selected Sales Contract: " + currentSCNo);
+                            message.AppendLine("Sales Order validation failed.");
                             message.AppendLine("");
                         }
 
-                        message.AppendLine("Sales Order: " + soNo + " | Sales Order SC No: " + (string.IsNullOrWhiteSpace(salesOrderSCNo) ? "Not Assigned" : salesOrderSCNo));
+                        message.AppendLine("Sales Order: " + soNo);
+
+                        if (customerMismatch)
+                            message.AppendLine("Customer: Export LC = " + currentCustomer + ", Sales Order = " + salesOrderCustomer);
+
+                        if (scMismatch)
+                            message.AppendLine("Sales Contract: Export LC = " + currentSCNo + ", Sales Order = " + (string.IsNullOrWhiteSpace(salesOrderSCNo) ? "Not Assigned" : salesOrderSCNo));
+
+                        message.AppendLine("");
                         mismatchFound = true;
                     }
                 }
 
                 if (mismatchFound)
                 {
-                    message.AppendLine("");
-                    message.AppendLine("Please select Sales Orders that belong to the selected Sales Contract.");
+                    message.AppendLine("Please select Sales Orders that match the Export LC header.");
                     Application.SBO_Application.MessageBox(message.ToString());
                     return false;
                 }
@@ -2726,7 +3042,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch (Exception ex)
             {
-                Global.GFunc.ShowError("Sales Order Sales Contract validation error: " + ex.Message);
+                Global.GFunc.ShowError("Sales Order Customer/Sales Contract validation error: " + ex.Message);
                 return false;
             }
             finally
@@ -2738,6 +3054,84 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 }
             }
         }
+
+        //private bool ValidateSalesOrderSalesContract(SAPbouiCOM.Form oForm)
+        //{
+        //    SAPbobsCOM.Recordset rs = null;
+
+        //    try
+        //    {
+        //        SAPbouiCOM.Matrix mtx = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+        //        SAPbouiCOM.DBDataSource dbDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+        //        SAPbouiCOM.DBDataSource dbHeader = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+
+        //        mtx.FlushToDataSource();
+
+        //        string currentSCNo = dbHeader.GetValue("U_SCNO", 0).Trim();
+
+        //        if (string.IsNullOrWhiteSpace(currentSCNo))
+        //            return true;
+
+        //        rs = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+        //        StringBuilder message = new StringBuilder();
+        //        bool mismatchFound = false;
+
+        //        for (int i = 0; i < dbDetail.Size; i++)
+        //        {
+        //            string soNo = dbDetail.GetValue("U_SONO", i).Trim();
+        //            string soEntry = dbDetail.GetValue("U_SOENTRY", i).Trim();
+
+        //            if (string.IsNullOrWhiteSpace(soNo) || string.IsNullOrWhiteSpace(soEntry))
+        //                continue;
+
+        //            string query = $@"SELECT IFNULL(""U_SCNO"", '') AS ""SCNo"" FROM ORDR WHERE ""DocEntry"" = {soEntry}";
+        //            rs.DoQuery(query);
+
+        //            if (rs.EoF)
+        //                continue;
+
+        //            string salesOrderSCNo = Convert.ToString(rs.Fields.Item("SCNo").Value).Trim();
+
+        //            if (!string.Equals(currentSCNo, salesOrderSCNo, StringComparison.OrdinalIgnoreCase))
+        //            {
+        //                if (!mismatchFound)
+        //                {
+        //                    message.AppendLine("Sales Order and Sales Contract mismatch found.");
+        //                    message.AppendLine("");
+        //                    message.AppendLine("Selected Sales Contract: " + currentSCNo);
+        //                    message.AppendLine("");
+        //                }
+
+        //                message.AppendLine("Sales Order: " + soNo + " | Sales Order SC No: " + (string.IsNullOrWhiteSpace(salesOrderSCNo) ? "Not Assigned" : salesOrderSCNo));
+        //                mismatchFound = true;
+        //            }
+        //        }
+
+        //        if (mismatchFound)
+        //        {
+        //            message.AppendLine("");
+        //            message.AppendLine("Please select Sales Orders that belong to the selected Sales Contract.");
+        //            Application.SBO_Application.MessageBox(message.ToString());
+        //            return false;
+        //        }
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Sales Order Sales Contract validation error: " + ex.Message);
+        //        return false;
+        //    }
+        //    finally
+        //    {
+        //        if (rs != null)
+        //        {
+        //            System.Runtime.InteropServices.Marshal.ReleaseComObject(rs);
+        //            rs = null;
+        //        }
+        //    }
+        //}
 
         private bool ValidateSalesOrderAlreadyUsed(SAPbouiCOM.Form oForm)
         {
@@ -2827,6 +3221,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 }
             }
         }
+
         private bool ValidateConfirmedAmendmentBeforeUpdate(SAPbouiCOM.Form oForm)
         {
             SAPbobsCOM.Recordset rs = null;

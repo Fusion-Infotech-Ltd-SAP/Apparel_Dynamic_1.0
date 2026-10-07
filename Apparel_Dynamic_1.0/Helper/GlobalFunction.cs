@@ -47,6 +47,42 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
+        public void LoadUserBranches(SAPbouiCOM.Form oForm, string comboId)
+        {
+            try
+            {
+                int userSign = Global.oComp.UserSignature;
+
+                string sql = $@"
+                                SELECT DISTINCT
+                                    T0.""BPLId"",
+                                    T0.""BPLName""
+                                FROM ""OBPL"" T0
+                                INNER JOIN ""USR6"" T1
+                                    ON T0.""BPLId"" = T1.""BPLId""
+                                WHERE T1.""UserID"" = {userSign}
+                                ORDER BY T0.""BPLName""";
+
+                SAPbouiCOM.ComboBox oCombo =
+                    (SAPbouiCOM.ComboBox)oForm.Items.Item(comboId).Specific;
+
+                Global.GFunc.setComboBoxValue(oCombo, sql);
+
+                if (oCombo.ValidValues.Count == 1)
+                {
+                    oCombo.Select(
+                        oCombo.ValidValues.Item(0).Value,
+                        SAPbouiCOM.BoSearchKey.psk_ByValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    "LoadUserBranches Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+        }
 
         public void ResetMatrixCellsEditable(SAPbouiCOM.Matrix matrix, string codeColumnId)
         {
@@ -263,30 +299,69 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
-        public  void AddLineIfLastRowHasValue(
-           SAPbouiCOM.Form oForm,
-           string matrixID,
-           string dbTable,
-           string columnName
-           )
+        //public  void AddLineIfLastRowHasValue(
+        //   SAPbouiCOM.Form oForm,
+        //   string matrixID,
+        //   string dbTable,
+        //   string columnName
+        //   )
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
+        //        SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
+        //        matrix.FlushToDataSource();
+        //        int dbRowCount = db.Size;
+        //        if (dbRowCount == 0)
+        //        {
+        //            Global.GFunc.SetNewLine(matrix, db, 1, "");
+        //            return;
+        //        }
+        //        int lastDbRow = dbRowCount - 1;
+        //        string lastValue = db.GetValue(columnName, lastDbRow).Trim();
+        //        if (!string.IsNullOrEmpty(lastValue) && !lastValue.Equals("0.0"))
+        //        {
+        //            Global.GFunc.SetNewLine(matrix, db, dbRowCount + 1, "");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.MessageBox("AddLineIfLastRowHasValue Error: " + ex.Message);
+        //    }
+        //}
+
+        public void AddLineIfLastRowHasValue(SAPbouiCOM.Form oForm, string matrixID, string dbTable, string columnName)
         {
             try
             {
                 SAPbouiCOM.Matrix matrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixID).Specific;
                 SAPbouiCOM.DBDataSource db = oForm.DataSources.DBDataSources.Item(dbTable);
+
                 matrix.FlushToDataSource();
-                int dbRowCount = db.Size;
-                if (dbRowCount == 0)
+
+                // Case 1: DataSource has no row at all
+                if (db.Size == 0)
                 {
                     Global.GFunc.SetNewLine(matrix, db, 1, "");
                     return;
                 }
-                int lastDbRow = dbRowCount - 1;
+
+                int lastDbRow = db.Size - 1;
                 string lastValue = db.GetValue(columnName, lastDbRow).Trim();
-                if (!string.IsNullOrEmpty(lastValue) && !lastValue.Equals("0.0"))
+
+                // Case 2: DataSource has a blank row but matrix is visually empty
+                if (string.IsNullOrWhiteSpace(lastValue) || lastValue == "0" || lastValue == "0.0" || lastValue == "0.00")
                 {
-                    Global.GFunc.SetNewLine(matrix, db, dbRowCount + 1, "");
+                    matrix.LoadFromDataSource();
+
+                    if (matrix.VisualRowCount == 0)
+                        Global.GFunc.SetNewLine(matrix, db, 1, "");
+
+                    return;
                 }
+
+                // Case 3: Last row contains data, so create one blank row
+                Global.GFunc.SetNewLine(matrix, db, db.Size + 1, "");
             }
             catch (Exception ex)
             {

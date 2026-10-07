@@ -637,11 +637,26 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     string orderTypeCode = rs.Fields.Item("U_OTYPECODE").Value.ToString().Trim();
                     int existingRow = FindCPMRow(db, orderTypeCode);
 
+                    //if (existingRow < 0)
+                    //{
+                    //    int row = db.Size;
+
+                    //    db.InsertRecord(row);
+                    //    db.SetValue("LineId", row, (row + 1).ToString());
+                    //    db.SetValue("U_OTYPECODE", row, orderTypeCode);
+                    //    db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
+                    //    db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
+                    //}
                     if (existingRow < 0)
                     {
-                        int row = db.Size;
+                        int row = FindEmptyCPMRow(db);
 
-                        db.InsertRecord(row);
+                        if (row < 0)
+                        {
+                            row = db.Size;
+                            db.InsertRecord(row);
+                        }
+
                         db.SetValue("LineId", row, (row + 1).ToString());
                         db.SetValue("U_OTYPECODE", row, orderTypeCode);
                         db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
@@ -650,9 +665,15 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                     rs.MoveNext();
                 }
-
+                RemoveEmptyCPMRows(db);
+                ReArrangeCPMLineIds(db);
                 cpmMatrix.LoadFromDataSource();
                 cpmMatrix.AutoResizeColumns();
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                {
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                }
 
                 Global.GFunc.ShowSuccess("CPM data loaded successfully.");
             }
@@ -675,6 +696,36 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     Global.GFunc.ShowError($"BTNLDCPM_PressedAfter Finally Error: {ex.Message}");
                 }
             }
+        }
+        private void ReArrangeCPMLineIds(SAPbouiCOM.DBDataSource db)
+        {
+            for (int i = 0; i < db.Size; i++)
+            {
+                db.SetValue("LineId", i, (i + 1).ToString());
+            }
+        }
+        private void RemoveEmptyCPMRows(SAPbouiCOM.DBDataSource db)
+        {
+            for (int i = db.Size - 1; i >= 0; i--)
+            {
+                string orderTypeCode = db.GetValue("U_OTYPECODE", i).Trim();
+
+                if (string.IsNullOrWhiteSpace(orderTypeCode))
+                    db.RemoveRecord(i);
+            }
+        }
+
+        private int FindEmptyCPMRow(SAPbouiCOM.DBDataSource db)
+        {
+            for (int i = 0; i < db.Size; i++)
+            {
+                string orderTypeCode = db.GetValue("U_OTYPECODE", i).Trim();
+
+                if (string.IsNullOrWhiteSpace(orderTypeCode))
+                    return i;
+            }
+
+            return -1;
         }
 
         private int FindCPMRow(SAPbouiCOM.DBDataSource db, string orderTypeCode)

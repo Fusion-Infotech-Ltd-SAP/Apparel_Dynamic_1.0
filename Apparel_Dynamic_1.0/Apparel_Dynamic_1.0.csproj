@@ -134,6 +134,9 @@
     <Compile Include="Resources\Transaction\CAD.b1f.cs">
       <DependentUpon>CAD.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Transaction\ExportLC.b1f.cs">
+      <DependentUpon>ExportLC.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Transaction\OTT.b1f.cs">
       <DependentUpon>OTT.b1f</DependentUpon>
     </Compile>
@@ -142,6 +145,9 @@
     </Compile>
     <Compile Include="Resources\Transaction\SamplePreCosting.b1f.cs">
       <DependentUpon>SamplePreCosting.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Version\ExportLCAmendment.b1f.cs">
+      <DependentUpon>ExportLCAmendment.b1f</DependentUpon>
     </Compile>
     <Compile Include="Resources\Version\SalesContractAmendLog.b1f.cs">
       <DependentUpon>SalesContractAmendLog.b1f</DependentUpon>
@@ -235,6 +241,9 @@
     <None Include="Resources\Transaction\CAD.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
+    <None Include="Resources\Transaction\ExportLC.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
     <None Include="Resources\Transaction\OTT.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
@@ -242,6 +251,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Transaction\SamplePreCosting.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Version\ExportLCAmendment.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Version\SalesContractAmendLog.b1f">

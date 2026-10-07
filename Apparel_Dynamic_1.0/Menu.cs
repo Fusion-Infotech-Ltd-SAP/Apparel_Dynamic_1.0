@@ -915,6 +915,94 @@ namespace Apparel_Dynamic_1._0
                         }
                     }
                 }
+                //Export LC
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_COM_EXP")
+                {
+                    string formUID = "FIL_FRM_EXPLC";
+
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText(
+                            "Form is already open.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short,
+                            SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                        return;
+                    }
+
+                    SAPbouiCOM.Form oForm = null;
+
+                    try
+                    {
+                        ExportLC activeForm = new ExportLC();
+                        activeForm.Show();
+
+                        oForm = Application.SBO_Application.Forms.Item("FIL_FRM_EXPLC");
+                        oForm.Freeze(true);
+
+                        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                        SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+                        SAPbouiCOM.Grid GRDAMDTL = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
+
+                        MTXSLODR.AutoResizeColumns();
+                        MTXATTCH.AutoResizeColumns();
+                        //GRDAMDTL.AutoResizeColumns();
+
+                        // Series Initialization
+                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                        {
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH =oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm,oDBH,today,"FIL_D_OLCM");
+
+                            //Amendment No
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+
+                            // Branch combo
+                            LoadUserBranches(oForm, "CBCOMPNY");
+                            SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                            oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                            //Load Payment Terms
+                            string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+                            SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+                            Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+                            //Load FOB
+                            string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+                            SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+                            Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                            //Currencey Load
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+                        }
+
+                        
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Global.GFunc.ShowError("Failed to open Export form.\n" + ex.Message);
+                    }
+                    finally
+                    {
+                        if (oForm != null)
+                        {
+                            try
+                            {
+                                oForm.Freeze(false);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
                 //___________________________________________________________Standard______________________________________________
                 //ADD
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1282")
@@ -1386,6 +1474,49 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, false, "ETDESC");
                                 break;
                             }
+                        case "FIL_FRM_EXPLC":
+                            {
+
+                                // Series Initialization
+                                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                                {
+                                    Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                                    string today = DateTime.Now.ToString("yyyyMMdd");
+                                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+                                    oDBH.SetValue("U_DOCDATE", 0, today);
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                                    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
+
+                                    //Amendment No
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+
+                                    // Branch combo
+                                    LoadUserBranches(oForm, "CBCOMPNY");
+                                    SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                                    oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                                    //Load Payment Terms
+                                    string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+                                    SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+                                    Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+                                    //Load FOB
+                                    string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+                                    SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+                                    Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                                    //Currencey Load
+                                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+                                }
+                                Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR");
+
+                                Global.GFunc.ReEnableChooseFromList(oForm, "ETCUSTMR", "CFL_OCRD", "CardCode");
+                                break;
+                            }
                     }
                 }
                 //Find Mode
@@ -1576,6 +1707,14 @@ namespace Apparel_Dynamic_1._0
                         case "FIL_FRM_SAM":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETDESC");
+                                break;
+                            }
+                        case "FIL_FRM_EXPLC":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "CBCOMPNY", "CBSTATMR", "CBSTATCM", "ETCUSTNM", "ETLCNO", "ETCUSTMR",
+                                                             "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
+                                Global.GFunc.SetItemsEnabled(oForm, false, "ETAMDNO", "CBSERIES");
+
                                 break;
                             }
                     }
@@ -2134,11 +2273,11 @@ namespace Apparel_Dynamic_1._0
 
                                         oForm.Freeze(true);
 
-                                        SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
-                                        SAPbouiCOM.Matrix MTXCDCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
+                                        SAPbouiCOM.Matrix MTXMRCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                                        SAPbouiCOM.Matrix MTXCDCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
 
-                                        SAPbouiCOM.DBDataSource dbMRCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
-                                        SAPbouiCOM.DBDataSource dbCDCON =oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
+                                        SAPbouiCOM.DBDataSource dbMRCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
+                                        SAPbouiCOM.DBDataSource dbCDCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
 
                                         // ==========================================
                                         // MTXMRCON
@@ -2148,7 +2287,7 @@ namespace Apparel_Dynamic_1._0
 
                                         for (int i = 0; i < dbMRCON.Size; i++)
                                         {
-                                            dbMRCON.SetValue("LineId",i,(i + 1).ToString());
+                                            dbMRCON.SetValue("LineId", i, (i + 1).ToString());
                                         }
 
                                         MTXMRCON.LoadFromDataSource();
@@ -2161,8 +2300,8 @@ namespace Apparel_Dynamic_1._0
 
                                         for (int i = dbCDCON.Size - 1; i >= 0; i--)
                                         {
-                                            string itemCode =dbCDCON.GetValue("U_ITEMCODE", i).Trim();
-                                            string position =dbCDCON.GetValue("U_POSITION", i).Trim();
+                                            string itemCode = dbCDCON.GetValue("U_ITEMCODE", i).Trim();
+                                            string position = dbCDCON.GetValue("U_POSITION", i).Trim();
 
                                             if (itemCode == _cadDeletedItemCode && position == _cadDeletedPosition)
                                             {
@@ -2175,7 +2314,7 @@ namespace Apparel_Dynamic_1._0
                                         // ==========================================
                                         for (int i = 0; i < dbCDCON.Size; i++)
                                         {
-                                            dbCDCON.SetValue("LineId",i,(i + 1).ToString());
+                                            dbCDCON.SetValue("LineId", i, (i + 1).ToString());
                                         }
 
                                         MTXCDCON.LoadFromDataSource();
@@ -2189,7 +2328,7 @@ namespace Apparel_Dynamic_1._0
                                         // Form must know there are unsaved changes
                                         if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                                         {
-                                            oForm.Mode =SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
                                         }
 
                                         _cadDeletedItemCode = "";
@@ -2198,11 +2337,77 @@ namespace Apparel_Dynamic_1._0
                                     }
                                     catch (Exception ex)
                                     {
-                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " +ex.Message);
+                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " + ex.Message);
                                     }
                                     finally
                                     {
                                         oForm.Freeze(false);
+                                    }
+
+                                    break;
+                                }
+
+                            case "FIL_FRM_EXPLC":
+                                {
+                                    try
+                                    {
+                                        oForm.Freeze(true);
+
+                                        SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
+                                        SAPbouiCOM.DBDataSource oDBDSDetail = oForm.DataSources.DBDataSources.Item("@FIL_DR_LCM1");
+
+                                        MTXSLODR.FlushToDataSource();
+
+                                        for (int i = oDBDSDetail.Size - 1; i >= 0; i--)
+                                        {
+                                            string soNo = oDBDSDetail.GetValue("U_SONO", i).Trim();
+                                            if (string.IsNullOrWhiteSpace(soNo))
+                                                oDBDSDetail.RemoveRecord(i);
+                                        }
+
+                                        for (int i = 0; i < oDBDSDetail.Size; i++)
+                                            oDBDSDetail.SetValue("LineId", i, (i + 1).ToString());
+
+                                        MTXSLODR.LoadFromDataSource();
+
+                                        if (oDBDSDetail.Size == 0)
+                                            Global.GFunc.SetNewLine(MTXSLODR, oDBDSDetail, 1, "");
+                                        else
+                                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+                                        decimal totalLCValue = 0;
+
+                                        for (int i = 1; i <= MTXSLODR.VisualRowCount; i++)
+                                        {
+                                            string soNo = ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLSLORDR").Cells.Item(i).Specific).Value.Trim();
+                                            if (string.IsNullOrWhiteSpace(soNo))
+                                                continue;
+
+                                            string value = ((SAPbouiCOM.EditText)MTXSLODR.Columns.Item("CLTTLAMT").Cells.Item(i).Specific).Value.Trim();
+
+                                            if (decimal.TryParse(value, out decimal rowValue))
+                                                totalLCValue += rowValue;
+                                        }
+
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value = totalLCValue.ToString("0.00");
+
+                                        string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
+                                        decimal.TryParse(b2bPerStr, out decimal b2bPercent);
+
+                                        decimal b2bAmount = (totalLCValue * b2bPercent) / 100;
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BAMT").Specific).Value = b2bAmount.ToString("0.00");
+
+                                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Global.GFunc.ShowError("Export LC - Sales Order Tab row delete error: " + ex.Message);
+                                    }
+                                    finally
+                                    {
+                                        if (oForm != null)
+                                            oForm.Freeze(false);
                                     }
 
                                     break;

@@ -44,6 +44,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_STP", "APP_STP_LEADTIME", "Lead Time", 16, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_PARAMSTR", "Parameter Master", 17, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_INCOTRMS", "Inco Terms", 18, 1, false);
+                CreateMainMenu("APP_STP", "APP_STP_CSTEMNT", "Cost Element", 19, 1, false);
 
 
                 //Apparel ->  Master
@@ -400,6 +401,20 @@ namespace Apparel_Dynamic_1._0
                         return;
                     }
                     IncoTerms activeForm = new IncoTerms();
+                    activeForm.Show();
+                }
+                //Cost Element
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_CSTEMNT")
+                {
+                    string formUID = "FIL_FRM_CSTEMNT";
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                        return;
+                    }
+                    CostElement activeForm = new CostElement();
                     activeForm.Show();
                 }
 
@@ -1458,6 +1473,11 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_CSTEMNT":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
                         case "FIL_FRM_OCSTPRM":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSCOD");
@@ -1700,6 +1720,11 @@ namespace Apparel_Dynamic_1._0
                                 break;
                             }
                         case "FIL_FRM_INCOTRMS":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_CSTEMNT":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;

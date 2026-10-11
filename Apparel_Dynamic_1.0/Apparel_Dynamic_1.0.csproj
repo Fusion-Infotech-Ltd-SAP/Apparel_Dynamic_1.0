@@ -143,6 +143,9 @@
     <Compile Include="Resources\Transaction\OTT.b1f.cs">
       <DependentUpon>OTT.b1f</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Transaction\ProcurementCosting.b1f.cs">
+      <DependentUpon>ProcurementCosting.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Transaction\SalesContract.b1f.cs">
       <DependentUpon>SalesContract.b1f</DependentUpon>
     </Compile>
@@ -251,6 +254,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Transaction\OTT.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Transaction\ProcurementCosting.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Resources\Transaction\SalesContract.b1f">

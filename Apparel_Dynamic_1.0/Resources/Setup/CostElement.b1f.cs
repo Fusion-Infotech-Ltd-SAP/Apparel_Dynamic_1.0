@@ -90,48 +90,23 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE || oForm.Mode == SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE) return;
+
+                string code = ETCODE.Value.Trim();
+                string UCode = Global.GFunc.ToUpperCase(code);
+
+                if (ETCODE.Value != UCode) ETCODE.Value = UCode;
+                if (string.IsNullOrEmpty(UCode)) return;
+
+                if (!ValidateCostElementCode(oForm, UCode, out string err))
                 {
-                    // Get the entered Code
-                    string code = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value.Trim();
-                    string UCode = Global.GFunc.ToUpperCase(code);
-                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = UCode;
-
-                    if (!string.IsNullOrEmpty(UCode))
-                    {
-
-                        if (!IsValidCode(UCode, out string err))
-                        {
-                            Application.SBO_Application.StatusBar.SetText(err,
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
-                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = "";
-                            return;
-                        }
-
-                        SAPbobsCOM.Recordset oRS =
-                            (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-
-                        string query = $@"SELECT 1 FROM ""@FIL_MH_CSTELEMT"" WHERE ""Code"" = '{UCode.Replace("'", "''")}'";
-                        oRS.DoQuery(query);
-
-                        if (!oRS.EoF)
-                        {
-                            Application.SBO_Application.StatusBar.SetText("Code already exists!",
-                                SAPbouiCOM.BoMessageTime.bmt_Short,
-                                SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-
-                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETCODE").Specific).Value = "";
-                        }
-                    }
+                    Global.GFunc.ShowError(err);
+                    ETCODE.Value = "";
                 }
             }
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText("Error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                Global.GFunc.ShowError(ex.Message);
             }
         }
 
@@ -160,23 +135,58 @@ namespace Apparel_Dynamic_1._0.Resources.Setup
             return true;
         }
 
+        private bool ValidateCostElementCode(SAPbouiCOM.Form oForm, string code, out string errorMessage)
+        {
+            errorMessage = "";
+
+            if (!IsValidCode(code, out errorMessage)) return false;
+
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE && IsDuplicateCode(code))
+            {
+                errorMessage = "Cost Element Code already exists.";
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsDuplicateCode(string code)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+
+            try
+            {
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                string query = $@"SELECT 1 FROM ""@FIL_MH_CSTELEMT"" WHERE UPPER(""Code"") = '{code.ToUpperInvariant().Replace("'", "''")}'";
+                oRS.DoQuery(query);
+
+                return !oRS.EoF;
+            }
+            finally
+            {
+                if (oRS != null) System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+            }
+        }
 
         private bool ValidateForm(ref SAPbouiCOM.Form oForm, ref bool BubbleEvent)
         {
-            string code = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSTELEMT").GetValue("Code", 0);
-            string name = oForm.DataSources.DBDataSources.Item("@FIL_MH_CSTELEMT").GetValue("Name", 0);
-            if (code == "")
+            string code = ETCODE.Value.Trim().ToUpperInvariant();
+            string name = ETNAME.Value.Trim();
+
+            if (!ValidateCostElementCode(oForm, code, out string errorMessage))
             {
-                Global.GFunc.ShowError("Enter Size Code");
-                oForm.ActiveItem = "ETCODE";
+                Global.GFunc.ShowError(errorMessage);
+                if (oForm.Items.Item("ETCODE").Enabled) oForm.ActiveItem = "ETCODE";
                 return BubbleEvent = false;
             }
-            else if (name == "")
+
+            if (string.IsNullOrWhiteSpace(name))
             {
-                Global.GFunc.ShowError("Enter Size Name");
+                Global.GFunc.ShowError("Enter Cost Element Name.");
                 oForm.ActiveItem = "ETNAME";
                 return BubbleEvent = false;
             }
+
             return BubbleEvent;
         }
     }

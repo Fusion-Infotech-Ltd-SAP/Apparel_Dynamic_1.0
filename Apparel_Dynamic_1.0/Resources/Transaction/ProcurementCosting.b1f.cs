@@ -76,6 +76,20 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.StaticText17 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_56").Specific));
             this.EditText17 = ((SAPbouiCOM.EditText)(this.GetItem("Item_57").Specific));
             this.EditText18 = ((SAPbouiCOM.EditText)(this.GetItem("Item_58").Specific));
+            this.Matrix2 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_35").Specific));
+            this.Matrix3 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_59").Specific));
+            this.Matrix4 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_60").Specific));
+            this.Matrix5 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_61").Specific));
+            this.StaticText18 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_62").Specific));
+            this.EditText19 = ((SAPbouiCOM.EditText)(this.GetItem("Item_63").Specific));
+            this.Matrix6 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_64").Specific));
+            this.EditText20 = ((SAPbouiCOM.EditText)(this.GetItem("Item_65").Specific));
+            this.StaticText19 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_66").Specific));
+            this.Button3 = ((SAPbouiCOM.Button)(this.GetItem("Item_67").Specific));
+            this.Matrix7 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_68").Specific));
+            this.Matrix8 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_69").Specific));
+            this.Grid1 = ((SAPbouiCOM.Grid)(this.GetItem("Item_70").Specific));
+            this.Matrix9 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_71").Specific));
             this.OnCustomInitialize();
 
         }
@@ -151,5 +165,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private SAPbouiCOM.StaticText StaticText17;
         private SAPbouiCOM.EditText EditText17;
         private SAPbouiCOM.EditText EditText18;
+        private SAPbouiCOM.Matrix Matrix2;
+        private SAPbouiCOM.Matrix Matrix3;
+        private SAPbouiCOM.Matrix Matrix4;
+        private SAPbouiCOM.Matrix Matrix5;
+        private SAPbouiCOM.StaticText StaticText18;
+        private SAPbouiCOM.EditText EditText19;
+        private SAPbouiCOM.Matrix Matrix6;
+        private SAPbouiCOM.EditText EditText20;
+        private SAPbouiCOM.StaticText StaticText19;
+        private SAPbouiCOM.Button Button3;
+        private SAPbouiCOM.Matrix Matrix7;
+        private SAPbouiCOM.Matrix Matrix8;
+        private SAPbouiCOM.Grid Grid1;
+        private SAPbouiCOM.Matrix Matrix9;
     }
 }

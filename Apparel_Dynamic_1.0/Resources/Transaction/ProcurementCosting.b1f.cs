@@ -31,6 +31,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_10").Specific));
             this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_11").Specific));
             this.StaticText12 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_12").Specific));
+
             this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("Item_13").Specific));
             this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("Item_14").Specific));
             this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("Item_15").Specific));
@@ -47,10 +48,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.EditText12 = ((SAPbouiCOM.EditText)(this.GetItem("Item_26").Specific));
             this.EditText13 = ((SAPbouiCOM.EditText)(this.GetItem("Item_27").Specific));
             this.EditText14 = ((SAPbouiCOM.EditText)(this.GetItem("Item_28").Specific));
+
             this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_29").Specific));
             this.LinkedButton1 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_30").Specific));
             this.LinkedButton2 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_31").Specific));
             this.LinkedButton3 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_32").Specific));
+
             this.EditText15 = ((SAPbouiCOM.EditText)(this.GetItem("Item_33").Specific));
             this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_36").Specific));
@@ -64,6 +67,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.Folder7 = ((SAPbouiCOM.Folder)(this.GetItem("Item_44").Specific));
             this.Folder8 = ((SAPbouiCOM.Folder)(this.GetItem("Item_45").Specific));
             this.Folder9 = ((SAPbouiCOM.Folder)(this.GetItem("Item_46").Specific));
+
             this.StaticText13 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_47").Specific));
             this.EditText16 = ((SAPbouiCOM.EditText)(this.GetItem("Item_48").Specific));
             this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_49").Specific));
@@ -90,13 +94,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.Matrix8 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_69").Specific));
             this.Grid1 = ((SAPbouiCOM.Grid)(this.GetItem("Item_70").Specific));
             this.Matrix9 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_71").Specific));
+            this.Button4 = ((SAPbouiCOM.Button)(this.GetItem("Item_72").Specific));
             this.OnCustomInitialize();
 
         }
 
-        /// <summary>
-        /// Initialize form event. Called by framework before form creation.
-        /// </summary>
         public override void OnInitializeFormEvents()
         {
         }
@@ -179,5 +181,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private SAPbouiCOM.Matrix Matrix8;
         private SAPbouiCOM.Grid Grid1;
         private SAPbouiCOM.Matrix Matrix9;
+        private SAPbouiCOM.Button Button4;
     }
 }

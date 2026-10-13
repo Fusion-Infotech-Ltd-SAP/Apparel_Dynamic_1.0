@@ -18,43 +18,40 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         /// </summary>
         public override void OnInitializeComponent()
         {
-            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
-            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_1").Specific));
-            this.StaticText2 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_2").Specific));
-            this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_3").Specific));
-            this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_4").Specific));
-            this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_5").Specific));
-            this.StaticText6 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_6").Specific));
-            this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_7").Specific));
-            this.StaticText8 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_8").Specific));
-            this.StaticText9 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_9").Specific));
-            this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_10").Specific));
-            this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_11").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
+            this.StaticText1 = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
+            this.StaticText2 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
+            this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTNM").Specific));
+            this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("STDRFTNO").Specific));
+            this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("STCADNO").Specific));
+            this.StaticText6 = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCNUM").Specific));
+            this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDAT").Specific));
+            this.StaticText8 = ((SAPbouiCOM.StaticText)(this.GetItem("STVERSON").Specific));
+            this.StaticText9 = ((SAPbouiCOM.StaticText)(this.GetItem("STODRQTY").Specific));
+            this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("STOLRNCE").Specific));
+            this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("STTLQTY").Specific));
             this.StaticText12 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_12").Specific));
-
-            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("Item_13").Specific));
-            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("Item_14").Specific));
-            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("Item_15").Specific));
-            this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("Item_16").Specific));
-            this.EditText4 = ((SAPbouiCOM.EditText)(this.GetItem("Item_17").Specific));
-            this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("Item_18").Specific));
-            this.EditText6 = ((SAPbouiCOM.EditText)(this.GetItem("Item_19").Specific));
-            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("Item_20").Specific));
-            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("Item_21").Specific));
-            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("Item_22").Specific));
-            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_23").Specific));
-            this.EditText10 = ((SAPbouiCOM.EditText)(this.GetItem("Item_24").Specific));
-            this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("Item_25").Specific));
-            this.EditText12 = ((SAPbouiCOM.EditText)(this.GetItem("Item_26").Specific));
-            this.EditText13 = ((SAPbouiCOM.EditText)(this.GetItem("Item_27").Specific));
-            this.EditText14 = ((SAPbouiCOM.EditText)(this.GetItem("Item_28").Specific));
-
-            this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_29").Specific));
-            this.LinkedButton1 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_30").Specific));
-            this.LinkedButton2 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_31").Specific));
-            this.LinkedButton3 = ((SAPbouiCOM.LinkedButton)(this.GetItem("Item_32").Specific));
-
-            this.EditText15 = ((SAPbouiCOM.EditText)(this.GetItem("Item_33").Specific));
+            this.EditText0 = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
+            this.EditText1 = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
+            this.EditText2 = ((SAPbouiCOM.EditText)(this.GetItem("ETSLNTRY").Specific));
+            this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTCD").Specific));
+            this.EditText4 = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
+            this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("ETDRFTNO").Specific));
+            this.EditText6 = ((SAPbouiCOM.EditText)(this.GetItem("ETDFNTRY").Specific));
+            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("ETCADNO").Specific));
+            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("ETCDNTRY").Specific));
+            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
+            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCNUM").Specific));
+            this.EditText10 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDAT").Specific));
+            this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("ETVERSON").Specific));
+            this.EditText12 = ((SAPbouiCOM.EditText)(this.GetItem("ETODRQTY").Specific));
+            this.EditText13 = ((SAPbouiCOM.EditText)(this.GetItem("ETOLRNCE").Specific));
+            this.EditText14 = ((SAPbouiCOM.EditText)(this.GetItem("ETTLQTY").Specific));
+            this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
+            this.LinkedButton1 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
+            this.LinkedButton2 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
+            this.LinkedButton3 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
+            this.EditText15 = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
             this.Folder0 = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_36").Specific));
             this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_37").Specific));
@@ -67,7 +64,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.Folder7 = ((SAPbouiCOM.Folder)(this.GetItem("Item_44").Specific));
             this.Folder8 = ((SAPbouiCOM.Folder)(this.GetItem("Item_45").Specific));
             this.Folder9 = ((SAPbouiCOM.Folder)(this.GetItem("Item_46").Specific));
-
             this.StaticText13 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_47").Specific));
             this.EditText16 = ((SAPbouiCOM.EditText)(this.GetItem("Item_48").Specific));
             this.Matrix0 = ((SAPbouiCOM.Matrix)(this.GetItem("Item_49").Specific));

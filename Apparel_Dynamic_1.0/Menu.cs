@@ -1021,7 +1021,7 @@ namespace Apparel_Dynamic_1._0
                 // Procurement Costing 
                 else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_MRD_CST")
                 {
-                    string formUID = "FIL_FRM_PROCSTING";
+                    string formUID = "FIL_FRM_PRECSTING";
 
                     if (IsFormOpen(formUID))
                     {
@@ -1040,69 +1040,10 @@ namespace Apparel_Dynamic_1._0
                     {
                         ProcurementCosting activeForm = new ProcurementCosting();
                         activeForm.Show();
-
-                        oForm = Application.SBO_Application.Forms.Item("FIL_FRM_PROCSTING");
-                        oForm.Freeze(true);
-
-                        //SAPbouiCOM.Matrix MTXSLODR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSLODR").Specific;
-                        //SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
-                        //SAPbouiCOM.Grid GRDAMDTL = (SAPbouiCOM.Grid)oForm.Items.Item("GRDAMDTL").Specific;
-
-                        //MTXSLODR.AutoResizeColumns();
-                        //MTXATTCH.AutoResizeColumns();
-                        ////GRDAMDTL.AutoResizeColumns();
-
-                        //// Series Initialization
-                        //if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                        //{
-                        //    Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
-                        //    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
-
-                        //    string today = DateTime.Now.ToString("yyyyMMdd");
-                        //    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
-                        //    oDBH.SetValue("U_DOCDATE", 0, today);
-                        //    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
-                        //    UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
-
-                        //    //Amendment No
-                        //    ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
-
-                        //    // Branch combo
-                        //    LoadUserBranches(oForm, "CBCOMPNY");
-                        //    SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
-                        //    oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
-
-                        //    //Load Payment Terms
-                        //    string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
-                        //    SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
-                        //    Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
-
-                        //    //Load FOB
-                        //    string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
-                        //    SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
-                        //    Global.GFunc.setComboBoxValue(CBINTRMS, fob);
-
-                        //    //Currencey Load
-                        //    ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
-                        //}
-
-
-
                     }
                     catch (Exception ex)
                     {
-                        Global.GFunc.ShowError("Failed to open Export form.\n" + ex.Message);
-                    }
-                    finally
-                    {
-                        if (oForm != null)
-                        {
-                            try
-                            {
-                                oForm.Freeze(false);
-                            }
-                            catch { }
-                        }
+                        Application.SBO_Application.MessageBox("Procurement Costing Error:\n" + ex.ToString());
                     }
                 }
 

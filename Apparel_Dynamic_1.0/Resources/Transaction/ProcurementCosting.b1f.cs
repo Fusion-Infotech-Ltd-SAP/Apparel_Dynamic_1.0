@@ -29,7 +29,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.Grid GRDFAB, GRDVRSN;
 
-        private SAPbouiCOM.Button BTNOK, BTNCANCEL, BTNLDFAB, BTNLDCEL, BTNSAVE;
+        private SAPbouiCOM.Button ADDButton, BTNCANCEL, BTNLDFAB, BTNLDCEL, BTNSAVE;
 
 
         public override void OnInitializeComponent()
@@ -139,7 +139,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             #region Button
 
-            this.BTNOK = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
+            this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
             this.BTNLDCEL = ((SAPbouiCOM.Button)(this.GetItem("BTNLDCEL").Specific));

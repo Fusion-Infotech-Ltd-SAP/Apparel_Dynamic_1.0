@@ -1040,6 +1040,29 @@ namespace Apparel_Dynamic_1._0
                     {
                         ProcurementCosting activeForm = new ProcurementCosting();
                         activeForm.Show();
+
+                        oForm = Application.SBO_Application.Forms.Item(formUID);
+
+                        SAPbouiCOM.Matrix MTXFOB = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXFOB").Specific;
+                        SAPbouiCOM.Matrix MTXCOLOR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
+                        SAPbouiCOM.Matrix MTXTRMS = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXTRMS").Specific;
+                        SAPbouiCOM.Matrix MTXOTCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                        SAPbouiCOM.Matrix MTXPRCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXPRCST").Specific;
+                        SAPbouiCOM.Matrix MTXCSTEL = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSTEL").Specific;
+                        SAPbouiCOM.Matrix MTXCOMSN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOMSN").Specific;
+                        SAPbouiCOM.Matrix MTXSUMRY = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSUMRY").Specific;
+                        SAPbouiCOM.Grid GRDFAB = (SAPbouiCOM.Grid)oForm.Items.Item("GRDFAB").Specific;
+
+                        MTXFOB.AutoResizeColumns();
+                        MTXCOLOR.AutoResizeColumns();
+                        MTXTRMS.AutoResizeColumns();
+                        MTXOTCST.AutoResizeColumns();
+                        MTXPRCST.AutoResizeColumns();
+                        MTXCSTEL.AutoResizeColumns();
+                        MTXCOMSN.AutoResizeColumns();
+                        MTXSUMRY.AutoResizeColumns();
+                        
+                        GRDFAB.AutoResizeColumns();
                     }
                     catch (Exception ex)
                     {

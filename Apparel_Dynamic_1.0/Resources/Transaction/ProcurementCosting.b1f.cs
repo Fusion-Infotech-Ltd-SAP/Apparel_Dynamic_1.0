@@ -17,6 +17,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.StaticText STSTYLCD, STYLDESC, STCUSTCD, STCUSTNM, STDRFTNO, STCADNO, STDOCNUM, STDOCDAT, STVERSON, STODRQTY, STOLRNCE, STTLQTY, STFOB, STREMRKS, STCOLOR, STCONTNT, STSLFOB, STSLCLR, STLPRCST, STTLCSEL;
 
+       
+
         private SAPbouiCOM.EditText ETSTYLCD, ETYLDESC, ETSLNTRY, ETCUSTCD, ETCUSTNM, ETDRFTNO, ETDFNTRY, ETCADNO, ETCDNTRY, ETDOCNUM, ETDOCDAT, ETVERSON, ETODRQTY, ETOLRNCE, ETTLQTY, ETDOCTRY, ETREMRKS, ETSLFOB, ETSLCLR, ETLPRCST, ETTLCSEL;
 
         private SAPbouiCOM.ComboBox CBSERIES;
@@ -141,6 +143,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
+            this.ResizeAfter += new ResizeAfterHandler(this.Form_ResizeAfter);
+
         }
 
 
@@ -150,5 +154,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+
+
+        private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            
+
+        }
     }
 }

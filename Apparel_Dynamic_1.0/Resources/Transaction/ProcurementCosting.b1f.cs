@@ -154,12 +154,206 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
-
-
         private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
         {
-            
+            SAPbouiCOM.Form oForm = null;
+            bool frozen = false;
 
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+                frozen = true;
+
+                // Original B1F: form = 1014 x 470, folder container Item_34 = 976 x 277.
+                SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
+                tabArea.Width = Math.Max(760, oForm.Width - 38);
+                // Reserve space for the Add/Cancel buttons and Remarks (outside the tab).
+                // ClientHeight excludes the window title bar; Height does not.
+                int footerHeight = Math.Max(oForm.Items.Item("ETREMRKS").Height, oForm.Items.Item("1").Height);
+                int footerTop = oForm.ClientHeight - footerHeight - 12;
+                tabArea.Height = Math.Max(210, footerTop - tabArea.Top - 6);
+
+                int areaLeft = tabArea.Left;
+                int areaTop = tabArea.Top;
+                int areaRight = areaLeft + tabArea.Width;
+                int areaBottom = areaTop + tabArea.Height;
+                int widthDifference = tabArea.Width - 976;
+
+                // The first row: FOB + Color + selection controls.
+                int fobLeft = areaLeft + 17;
+                int matrixTop = areaTop + 42;
+                int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
+                int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
+                int rightLabelLeft = areaRight - 287;
+                int rightEditLeft = rightLabelLeft + 86;
+                int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
+                int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
+                int colorLeft = fobLeft + fobWidth + fobColorGap;
+                int colorWidth = rightLabelLeft - colorRightGap - colorLeft;
+
+                SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
+                fobItem.Left = fobLeft;
+                fobItem.Top = matrixTop;
+                fobItem.Width = fobWidth;
+                fobItem.Height = rowHeight;
+
+                SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
+                colorItem.Left = colorLeft;
+                colorItem.Top = matrixTop - 1;
+                colorItem.Width = colorWidth;
+                colorItem.Height = rowHeight + 1;
+
+                oForm.Items.Item("STFOB").Left = fobLeft;
+                oForm.Items.Item("STFOB").Top = areaTop + 25;
+                oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
+                oForm.Items.Item("STCOLOR").Top = areaTop + 24;
+
+                // Keep FOB/Color selection fields and Load Fabrics button on the right.
+                oForm.Items.Item("STSLFOB").Left = rightLabelLeft;
+                oForm.Items.Item("STSLCLR").Left = rightLabelLeft + 1;
+                oForm.Items.Item("ETSLFOB").Left = rightEditLeft;
+                oForm.Items.Item("ETSLCLR").Left = rightEditLeft;
+                oForm.Items.Item("BTNLDFAB").Left = areaRight - 228;
+
+                // The second row begins below the first row, never inside it.
+                int contentTop = matrixTop + rowHeight + 5;
+                int gridTop = contentTop + 19;
+                int saveTop = areaBottom - 35;
+                int gridHeight = saveTop - gridTop - 8;
+
+                oForm.Items.Item("STCONTNT").Left = fobLeft;
+                oForm.Items.Item("STCONTNT").Top = contentTop;
+
+                SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
+                gridItem.Left = fobLeft;
+                gridItem.Top = gridTop;
+                gridItem.Width = tabArea.Width - 35;
+                gridItem.Height = gridHeight;
+
+                SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
+                saveItem.Left = areaLeft + 39;
+                saveItem.Top = saveTop;
+
+                // Place footer items within the usable client area, below the tab.
+                oForm.Items.Item("1").Top = footerTop;
+                oForm.Items.Item("2").Top = footerTop;
+                oForm.Items.Item("STREMRKS").Top = footerTop + 2;
+                oForm.Items.Item("ETREMRKS").Top = footerTop;
+
+                MTXFOB.AutoResizeColumns();
+                MTXCOLOR.AutoResizeColumns();
+                GRDFAB.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                if (frozen && oForm != null) oForm.Freeze(false);
+            }
         }
+
+        //private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+        //    bool frozen = false;
+
+        //    try
+        //    {
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        oForm.Freeze(true);
+        //        frozen = true;
+
+        //        SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
+        //        tabArea.Width = Math.Max(760, oForm.Width - 38);
+        //        tabArea.Height = Math.Max(210, oForm.Height - 193);
+
+        //        int areaLeft = tabArea.Left;
+        //        int areaTop = tabArea.Top;
+        //        int areaRight = areaLeft + tabArea.Width;
+        //        int areaBottom = areaTop + tabArea.Height;
+        //        int widthDifference = tabArea.Width - 976;
+
+        //        // FOB and Color layout
+        //        int fobLeft = areaLeft + 17;
+        //        int matrixTop = areaTop + 42;
+        //        int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
+        //        int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
+
+        //        int rightLabelLeft = areaRight - 287;
+        //        int rightEditLeft = rightLabelLeft + 86;
+        //        int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
+        //        int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
+
+        //        int colorLeft = fobLeft + fobWidth + fobColorGap;
+        //        int colorWidth = rightLabelLeft - colorRightGap - colorLeft;
+
+        //        SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
+        //        fobItem.Left = fobLeft;
+        //        fobItem.Top = matrixTop;
+        //        fobItem.Width = fobWidth;
+        //        fobItem.Height = rowHeight;
+
+        //        SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
+        //        colorItem.Left = colorLeft;
+        //        colorItem.Top = matrixTop - 1;
+        //        colorItem.Width = colorWidth;
+        //        colorItem.Height = rowHeight + 1;
+
+        //        oForm.Items.Item("STFOB").Left = fobLeft;
+        //        oForm.Items.Item("STFOB").Top = areaTop + 25;
+
+        //        oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
+        //        oForm.Items.Item("STCOLOR").Top = areaTop + 24;
+
+        //        // Right-side selection controls
+        //        oForm.Items.Item("STSLFOB").Left = rightLabelLeft;
+        //        oForm.Items.Item("STSLCLR").Left = rightLabelLeft + 1;
+        //        oForm.Items.Item("ETSLFOB").Left = rightEditLeft;
+        //        oForm.Items.Item("ETSLCLR").Left = rightEditLeft;
+        //        oForm.Items.Item("BTNLDFAB").Left = areaRight - 228;
+
+        //        // Content label and Fabrics grid
+        //        int contentTop = matrixTop + rowHeight + 5;
+        //        int gridTop = contentTop + 19;
+        //        int saveTop = areaBottom - 35;
+        //        int gridHeight = saveTop - gridTop - 8;
+
+        //        oForm.Items.Item("STCONTNT").Left = fobLeft;
+        //        oForm.Items.Item("STCONTNT").Top = contentTop;
+
+        //        SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
+        //        gridItem.Left = fobLeft;
+        //        gridItem.Top = gridTop;
+        //        gridItem.Width = tabArea.Width - 35;
+        //        gridItem.Height = gridHeight;
+
+        //        // Save button always stays below the grid
+        //        SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
+        //        saveItem.Left = areaLeft + 39;
+        //        saveItem.Top = saveTop;
+
+        //        // Keep form buttons and Remarks below the tab
+        //        oForm.Items.Item("1").Top = areaBottom + 6;
+        //        oForm.Items.Item("2").Top = areaBottom + 6;
+        //        oForm.Items.Item("STREMRKS").Top = areaBottom + 8;
+        //        oForm.Items.Item("ETREMRKS").Top = areaBottom + 7;
+
+        //        // Adjust column widths
+        //        MTXFOB.AutoResizeColumns();
+        //        MTXCOLOR.AutoResizeColumns();
+        //        GRDFAB.AutoResizeColumns();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+        //    }
+        //    finally
+        //    {
+        //        if (frozen && oForm != null) oForm.Freeze(false);
+        //    }
+        //}
     }
 }

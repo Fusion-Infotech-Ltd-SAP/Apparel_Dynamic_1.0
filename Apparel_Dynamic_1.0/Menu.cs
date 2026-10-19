@@ -2468,6 +2468,7 @@ namespace Apparel_Dynamic_1._0
                                         }
 
                                         ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value = totalLCValue.ToString("0.00");
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETPIVLUE").Specific).Value = totalLCValue.ToString("0.00");
 
                                         string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
                                         decimal.TryParse(b2bPerStr, out decimal b2bPercent);

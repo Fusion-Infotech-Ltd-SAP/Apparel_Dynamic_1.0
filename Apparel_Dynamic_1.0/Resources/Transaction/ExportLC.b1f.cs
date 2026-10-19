@@ -16,7 +16,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
         }
 
-        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
+        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STPIVLUE, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
         
 
@@ -24,7 +24,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
        
 
-        private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
+        private SAPbouiCOM.EditText ETBP1BNM, ETPIVLUE, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
         
 
@@ -141,6 +141,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
             this.STREMRKS = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
             this.ETREMRKS = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
+            this.ETPIVLUE = ((SAPbouiCOM.EditText)(this.GetItem("ETPIVLUE").Specific));
+            this.STPIVLUE = ((SAPbouiCOM.StaticText)(this.GetItem("STPIVLUE").Specific));
             this.OnCustomInitialize();
 
         }
@@ -2059,6 +2061,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                                     T0.""U_HBNKNAME"",
 
                                     T0.""U_LCVALUE"",
+                                    T0.""U_PIVALUE"",
                                     T0.""U_DOCDATE"",
                                     T0.""U_ISSUEDATE"",
                                     T0.""U_SHIPDATE"",
@@ -2143,6 +2146,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 // Amount
                 SetEditAmountFormat(oForm, "ETLCVAL", rs.Fields.Item("U_LCVALUE").Value);
+                SetEditAmountFormat(oForm, "ETPIVLUE", rs.Fields.Item("U_PIVALUE").Value);
                 SetEdit(oForm, "ETB2BPER", rs.Fields.Item("U_BTOBLCPER").Value);
                 SetEditAmountFormat(oForm, "ETB2BAMT", rs.Fields.Item("U_BTOBLCVALUE").Value);
 
@@ -2506,6 +2510,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
                 ETLCVAL.Value = totalLCValue.ToString("0.00");
+                SAPbouiCOM.EditText ETPIVLUE = (SAPbouiCOM.EditText)oForm.Items.Item("ETPIVLUE").Specific;
+                ETPIVLUE.Value = totalLCValue.ToString("0.00");
 
                 CalculateB2BAmount(oForm);
             }
@@ -3401,5 +3407,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 return false;
             }
         }
+
+        private SAPbouiCOM.EditText EditText0;
+        private SAPbouiCOM.StaticText StaticText0;
     }
 }

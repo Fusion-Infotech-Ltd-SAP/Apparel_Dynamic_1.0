@@ -36,7 +36,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //     StaticText
+            //      StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -55,8 +55,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //     EditText
+            //      EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
+            this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
             this.ETSLNTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETSLNTRY").Specific));
             this.ETCUSTCD = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTCD").Specific));
@@ -76,12 +77,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //      LinkedButton
+            //       LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //     Folder
+            //      Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -92,7 +93,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //     Matrix
+            //      Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
@@ -103,10 +104,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXSUMRY = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSUMRY").Specific));
             this.MTXCOMSN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOMSN").Specific));
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //     Grid
+            //      Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //     Button
+            //      Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -132,6 +133,32 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void OnCustomInitialize()
         {
+
+        }
+
+
+        private void ETSTYLCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
+            SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+            SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+            if (dt == null || dt.Rows.Count == 0)
+                return;
+
+            string styleCode = dt.GetValue("U_STYLECODE", 0).ToString();
+            string styleDesc = dt.GetValue("U_STYLENM", 0).ToString();
+            string stylEntry = dt.GetValue("DocEntry", 0).ToString();
+
+            SAPbouiCOM.EditText ETSTYLCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETSTYLCD").Specific;
+            ETSTYLCD.Value = styleCode;
+
+            SAPbouiCOM.EditText ETYLDESC = (SAPbouiCOM.EditText)oForm.Items.Item("ETYLDESC").Specific;
+            ETYLDESC.Value = styleDesc;
+
+            SAPbouiCOM.EditText ETSLNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLNTRY").Specific;
+            ETSLNTRY.Value = stylEntry;
 
         }
 
@@ -335,105 +362,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        //private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
-        //{
-        //    SAPbouiCOM.Form oForm = null;
-        //    bool frozen = false;
-
-        //    try
-        //    {
-        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-        //        oForm.Freeze(true);
-        //        frozen = true;
-
-        //        SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
-        //        tabArea.Width = Math.Max(760, oForm.Width - 38);
-        //        tabArea.Height = Math.Max(210, oForm.Height - 193);
-
-        //        int areaLeft = tabArea.Left;
-        //        int areaTop = tabArea.Top;
-        //        int areaRight = areaLeft + tabArea.Width;
-        //        int areaBottom = areaTop + tabArea.Height;
-        //        int widthDifference = tabArea.Width - 976;
-
-        //        // FOB and Color layout
-        //        int fobLeft = areaLeft + 17;
-        //        int matrixTop = areaTop + 42;
-        //        int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
-        //        int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
-
-        //        int rightLabelLeft = areaRight - 287;
-        //        int rightEditLeft = rightLabelLeft + 86;
-        //        int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
-        //        int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
-
-        //        int colorLeft = fobLeft + fobWidth + fobColorGap;
-        //        int colorWidth = rightLabelLeft - colorRightGap - colorLeft;
-
-        //        SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
-        //        fobItem.Left = fobLeft;
-        //        fobItem.Top = matrixTop;
-        //        fobItem.Width = fobWidth;
-        //        fobItem.Height = rowHeight;
-
-        //        SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
-        //        colorItem.Left = colorLeft;
-        //        colorItem.Top = matrixTop - 1;
-        //        colorItem.Width = colorWidth;
-        //        colorItem.Height = rowHeight + 1;
-
-        //        oForm.Items.Item("STFOB").Left = fobLeft;
-        //        oForm.Items.Item("STFOB").Top = areaTop + 25;
-
-        //        oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
-        //        oForm.Items.Item("STCOLOR").Top = areaTop + 24;
-
-        //        // Right-side selection controls
-        //        oForm.Items.Item("STSLFOB").Left = rightLabelLeft;
-        //        oForm.Items.Item("STSLCLR").Left = rightLabelLeft + 1;
-        //        oForm.Items.Item("ETSLFOB").Left = rightEditLeft;
-        //        oForm.Items.Item("ETSLCLR").Left = rightEditLeft;
-        //        oForm.Items.Item("BTNLDFAB").Left = areaRight - 228;
-
-        //        // Content label and Fabrics grid
-        //        int contentTop = matrixTop + rowHeight + 5;
-        //        int gridTop = contentTop + 19;
-        //        int saveTop = areaBottom - 35;
-        //        int gridHeight = saveTop - gridTop - 8;
-
-        //        oForm.Items.Item("STCONTNT").Left = fobLeft;
-        //        oForm.Items.Item("STCONTNT").Top = contentTop;
-
-        //        SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
-        //        gridItem.Left = fobLeft;
-        //        gridItem.Top = gridTop;
-        //        gridItem.Width = tabArea.Width - 35;
-        //        gridItem.Height = gridHeight;
-
-        //        // Save button always stays below the grid
-        //        SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
-        //        saveItem.Left = areaLeft + 39;
-        //        saveItem.Top = saveTop;
-
-        //        // Keep form buttons and Remarks below the tab
-        //        oForm.Items.Item("1").Top = areaBottom + 6;
-        //        oForm.Items.Item("2").Top = areaBottom + 6;
-        //        oForm.Items.Item("STREMRKS").Top = areaBottom + 8;
-        //        oForm.Items.Item("ETREMRKS").Top = areaBottom + 7;
-
-        //        // Adjust column widths
-        //        MTXFOB.AutoResizeColumns();
-        //        MTXCOLOR.AutoResizeColumns();
-        //        GRDFAB.AutoResizeColumns();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //    }
-        //    finally
-        //    {
-        //        if (frozen && oForm != null) oForm.Freeze(false);
-        //    }
-        //}
+//_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
+       
     }
 }

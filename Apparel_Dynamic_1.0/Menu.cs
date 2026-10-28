@@ -1051,6 +1051,7 @@ namespace Apparel_Dynamic_1._0
                         SAPbouiCOM.Matrix MTXCSTEL = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSTEL").Specific;
                         SAPbouiCOM.Matrix MTXCOMSN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOMSN").Specific;
                         SAPbouiCOM.Matrix MTXSUMRY = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSUMRY").Specific;
+                        SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
                         SAPbouiCOM.Grid GRDFAB = (SAPbouiCOM.Grid)oForm.Items.Item("GRDFAB").Specific;
 
                         MTXFOB.AutoResizeColumns();
@@ -1061,8 +1062,29 @@ namespace Apparel_Dynamic_1._0
                         MTXCSTEL.AutoResizeColumns();
                         MTXCOMSN.AutoResizeColumns();
                         MTXSUMRY.AutoResizeColumns();
+                        MTXATTCH.AutoResizeColumns();
                         
                         GRDFAB.AutoResizeColumns();
+
+                        // Series Initialization
+                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                        {
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPCS");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OPCS");
+
+                            //Version
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "0";
+
+
+                        }
+
+
                     }
                     catch (Exception ex)
                     {

@@ -1056,7 +1056,7 @@ namespace Apparel_Dynamic_1._0
 
                         MTXFOB.AutoResizeColumns();
                         MTXCOLOR.AutoResizeColumns();
-                        MTXTRMS.AutoResizeColumns();
+                        //MTXTRMS.AutoResizeColumns();
                         MTXOTCST.AutoResizeColumns();
                         MTXPRCST.AutoResizeColumns();
                         MTXCSTEL.AutoResizeColumns();
@@ -1079,9 +1079,20 @@ namespace Apparel_Dynamic_1._0
                             UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OPCS");
 
                             //Version
-                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "0";
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1";
+
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXFOB", "@FIL_DR_PCSFOB", "U_FOB");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXTRMS", "@FIL_DR_PCSTA", "U_ITEMCODE");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCOMSN", "@FIL_DR_PCSCOMSN", "U_CARDCODE");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXATTCH", "@FIL_DR_PCSATCH", "U_ATCHMENT");
 
 
+                            // Load Price List for Trims
+                            string priceListQuery = @"SELECT ""ListNum"", ""ListName"" FROM OPLN ORDER BY ""ListNum""";
+                            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXTRMS").Specific;
+                            SAPbouiCOM.Column CLPRILST = oMatrix.Columns.Item("CLPRILST");
+                            Global.GFunc.setMatrixComboBoxValue(CLPRILST, priceListQuery);
+                            MTXTRMS.AutoResizeColumns();
                         }
 
 

@@ -22,6 +22,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETSTYLCD, ETYLDESC, ETSLNTRY, ETCUSTCD, ETCUSTNM, ETDRFTNO, ETDFNTRY, ETCADNO, ETCDNTRY, ETDOCNUM, ETDOCDAT, ETVERSON, ETODRQTY, ETOLRNCE, ETTLQTY, ETDOCTRY, ETREMRKS, ETLPRCST, ETTLCSEL;
 
+
+
         private SAPbouiCOM.ComboBox CBSERIES;
 
         private SAPbouiCOM.LinkedButton LKSTYLCD, LKCUSTCD, LKCADNO, LKDRFTNO;
@@ -37,7 +39,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //       StaticText
+            //        StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -56,7 +58,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //       EditText
+            //        EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
@@ -66,6 +68,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETCUSTCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETCUSTCD_ChooseFromListBefore);
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
             this.ETDRFTNO = ((SAPbouiCOM.EditText)(this.GetItem("ETDRFTNO").Specific));
+            this.ETDRFTNO.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETDRFTNO_ChooseFromListAfter);
+            this.ETDRFTNO.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETDRFTNO_ChooseFromListBefore);
             this.ETDFNTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDFNTRY").Specific));
             this.ETCADNO = ((SAPbouiCOM.EditText)(this.GetItem("ETCADNO").Specific));
             this.ETCDNTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETCDNTRY").Specific));
@@ -80,12 +84,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //        LinkedButton
+            //         LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //       Folder
+            //        Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -96,7 +100,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //       Matrix
+            //        Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
@@ -107,10 +111,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXSUMRY = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSUMRY").Specific));
             this.MTXCOMSN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOMSN").Specific));
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //       Grid
+            //        Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //       Button
+            //        Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -164,6 +168,112 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     oForm.Freeze(false);
             }
         }
+
+
+        //_____________________________________________________________________CFL__________________________________________________________
+
+
+
+        private void ETDRFTNO_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                    return;
+
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
+
+                string docNum = dt.GetValue("DocNum", 0).ToString().Trim();
+                string docEntry = dt.GetValue("DocEntry", 0).ToString().Trim();
+                string styleCode = dt.GetValue("U_STYLECODE", 0).ToString().Trim();
+               
+
+                SAPbouiCOM.EditText ETDRFTNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETDRFTNO").Specific;
+                ETDRFTNO.Value = docNum;
+
+                SAPbouiCOM.EditText ETDFNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETDFNTRY").Specific;
+                ETDFNTRY.Value = docEntry;
+
+                SAPbouiCOM.EditText ETCADNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETCADNO").Specific;
+                SAPbouiCOM.EditText ETCDNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETCDNTRY").Specific;
+
+                ETCADNO.Value = "";
+                ETCDNTRY.Value = "";
+
+                string safeStyleCode = styleCode.Replace("'", "''");
+               
+
+                string query = $@"SELECT TOP 1 ""DocNum"", ""DocEntry"" FROM ""@FIL_DH_CADFABCN"" WHERE ""U_STYLECODE"" = '{safeStyleCode}' AND ""U_SQNO"" = '{docNum}' ORDER BY ""DocEntry"" DESC";
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                oRS.DoQuery(query);
+
+                if (!oRS.EoF)
+                {
+                    ETCADNO.Value = oRS.Fields.Item("DocNum").Value.ToString();
+                    ETCDNTRY.Value = oRS.Fields.Item("DocEntry").Value.ToString();
+                }
+                else
+                {
+                    Global.GFunc.ShowWarning("No CAD Fabric Consumption record found for the selected Draft.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Draft ChooseFromListAfter Error: {ex.Message}");
+            }
+            finally
+            {
+                if (oRS != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+            }
+        }
+
+        private void ETDRFTNO_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+            try
+            {
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                string cflUID = cflArg.ChooseFromListUID;
+
+                if (cflUID == "CFL_DRFT")
+                {
+                    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                    string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSTYLCD").Specific).Value.Trim();
+                    string customerCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTCD").Specific).Value.Trim();
+
+                    SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflUID);
+                    SAPbouiCOM.Conditions oCons = new SAPbouiCOM.Conditions();
+
+                    SAPbouiCOM.Condition oCon1 = oCons.Add();
+                    oCon1.Alias = "U_STYLECODE";
+                    oCon1.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    oCon1.CondVal = styleCode;
+                    oCon1.Relationship = SAPbouiCOM.BoConditionRelationship.cr_AND;
+
+                    SAPbouiCOM.Condition oCon2 = oCons.Add();
+                    oCon2.Alias = "CardCode";
+                    oCon2.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    oCon2.CondVal = customerCode;
+
+                    oCFL.SetConditions(oCons);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Error filtering Draft CFL: {ex.Message}");
+                BubbleEvent = false;
+            }
+        }
+
 
         private void ETCUSTCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -242,205 +352,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
-        //private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
-        //{
-        //    SAPbouiCOM.Form oForm = null;
-        //    bool frozen = false;
+      
 
-        //    try
-        //    {
-        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-        //        oForm.Freeze(true);
-        //        frozen = true;
-
-        //        // Original B1F: form = 1014 x 470, folder container Item_34 = 976 x 277.
-        //        SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
-        //        tabArea.Width = Math.Max(760, oForm.Width - 38);
-        //        // Reserve space for the Add/Cancel buttons and Remarks (outside the tab).
-        //        // ClientHeight excludes the window title bar; Height does not.
-        //        int footerHeight = Math.Max(oForm.Items.Item("ETREMRKS").Height, oForm.Items.Item("1").Height);
-        //        int footerTop = oForm.ClientHeight - footerHeight - 12;
-        //        tabArea.Height = Math.Max(210, footerTop - tabArea.Top - 6);
-
-        //        int areaLeft = tabArea.Left;
-        //        int areaTop = tabArea.Top;
-        //        int areaRight = areaLeft + tabArea.Width;
-        //        int areaBottom = areaTop + tabArea.Height;
-        //        int widthDifference = tabArea.Width - 976;
-
-        //        // The first row: FOB + Color + selection controls.
-        //        int fobLeft = areaLeft + 17;
-        //        int matrixTop = areaTop + 42;
-        //        int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
-        //        int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
-        //        int rightLabelLeft = areaRight - 287;
-        //        int rightEditLeft = rightLabelLeft + 86;
-        //        int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
-        //        int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
-        //        int colorLeft = fobLeft + fobWidth + fobColorGap;
-        //        int colorWidth = rightLabelLeft - colorRightGap - colorLeft;
-
-        //        SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
-        //        fobItem.Left = fobLeft;
-        //        fobItem.Top = matrixTop;
-        //        fobItem.Width = fobWidth;
-        //        fobItem.Height = rowHeight;
-
-        //        SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
-        //        colorItem.Left = colorLeft;
-        //        colorItem.Top = matrixTop - 1;
-        //        colorItem.Width = colorWidth;
-        //        colorItem.Height = rowHeight + 1;
-
-        //        oForm.Items.Item("STFOB").Left = fobLeft;
-        //        oForm.Items.Item("STFOB").Top = areaTop + 25;
-        //        oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
-        //        oForm.Items.Item("STCOLOR").Top = areaTop + 24;
-
-        //        // Keep FOB/Color selection fields and Load Fabrics button on the right.
-        //        oForm.Items.Item("STSLFOB").Left = rightLabelLeft;
-        //        oForm.Items.Item("STSLCLR").Left = rightLabelLeft + 1;
-        //        oForm.Items.Item("ETSLFOB").Left = rightEditLeft;
-        //        oForm.Items.Item("ETSLCLR").Left = rightEditLeft;
-        //        oForm.Items.Item("BTNLDFAB").Left = areaRight - 228;
-
-        //        // The second row begins below the first row, never inside it.
-        //        int contentTop = matrixTop + rowHeight + 5;
-        //        int gridTop = contentTop + 19;
-        //        int saveTop = areaBottom - 35;
-        //        int gridHeight = saveTop - gridTop - 8;
-
-        //        oForm.Items.Item("STCONTNT").Left = fobLeft;
-        //        oForm.Items.Item("STCONTNT").Top = contentTop;
-
-        //        SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
-        //        gridItem.Left = fobLeft;
-        //        gridItem.Top = gridTop;
-        //        gridItem.Width = tabArea.Width - 35;
-        //        gridItem.Height = gridHeight;
-
-        //        SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
-        //        saveItem.Left = areaLeft + 39;
-        //        saveItem.Top = saveTop;
-
-        //        // Place footer items within the usable client area, below the tab.
-        //        oForm.Items.Item("1").Top = footerTop;
-        //        oForm.Items.Item("2").Top = footerTop;
-        //        oForm.Items.Item("STREMRKS").Top = footerTop + 2;
-        //        oForm.Items.Item("ETREMRKS").Top = footerTop;
-
-        //        MTXFOB.AutoResizeColumns();
-        //        MTXCOLOR.AutoResizeColumns();
-        //        GRDFAB.AutoResizeColumns();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-        //    }
-        //    finally
-        //    {
-        //        if (frozen && oForm != null) oForm.Freeze(false);
-        //    }
-        //}
-
-        private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
-        {
-            SAPbouiCOM.Form oForm = null;
-            bool frozen = false;
-
-            try
-            {
-                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                oForm.Freeze(true);
-                frozen = true;
-
-                // Original B1F: form = 1014 x 470, folder container Item_34 = 976 x 277.
-                SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
-                tabArea.Width = Math.Max(760, oForm.Width - 38);
-
-                // Reserve space for the Add/Cancel buttons and Remarks (outside the tab).
-                // ClientHeight excludes the window title bar; Height does not.
-                int footerHeight = Math.Max(oForm.Items.Item("ETREMRKS").Height, oForm.Items.Item("1").Height);
-                int footerTop = oForm.ClientHeight - footerHeight - 12;
-                tabArea.Height = Math.Max(210, footerTop - tabArea.Top - 6);
-
-                int areaLeft = tabArea.Left;
-                int areaTop = tabArea.Top;
-                int areaRight = areaLeft + tabArea.Width;
-                int areaBottom = areaTop + tabArea.Height;
-                int widthDifference = tabArea.Width - 976;
-
-                // The first row: FOB + Color.
-                int fobLeft = areaLeft + 17;
-                int matrixTop = areaTop + 42;
-                int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
-                int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
-                int colorBoundary = areaRight - 287;
-                int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
-                int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
-                int colorLeft = fobLeft + fobWidth + fobColorGap;
-                int colorWidth = colorBoundary - colorRightGap - colorLeft;
-
-                SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
-                fobItem.Left = fobLeft;
-                fobItem.Top = matrixTop;
-                fobItem.Width = fobWidth;
-                fobItem.Height = rowHeight;
-
-                SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
-                colorItem.Left = colorLeft;
-                colorItem.Top = matrixTop - 1;
-                colorItem.Width = colorWidth;
-                colorItem.Height = rowHeight + 1;
-
-                oForm.Items.Item("STFOB").Left = fobLeft;
-                oForm.Items.Item("STFOB").Top = areaTop + 25;
-                oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
-                oForm.Items.Item("STCOLOR").Top = areaTop + 24;
-
-                // The second row begins below the first row, never inside it.
-                int contentTop = matrixTop + rowHeight + 5;
-                int gridTop = contentTop + 19;
-                int saveTop = areaBottom - 35;
-                int gridHeight = saveTop - gridTop - 8;
-
-                oForm.Items.Item("STCONTNT").Left = fobLeft;
-                oForm.Items.Item("STCONTNT").Top = contentTop;
-
-                SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
-                gridItem.Left = fobLeft;
-                gridItem.Top = gridTop;
-                gridItem.Width = tabArea.Width - 35;
-                gridItem.Height = gridHeight;
-
-                SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
-                saveItem.Left = areaLeft + 39;
-                saveItem.Top = saveTop;
-
-                // Load Fabrics button: bottom-right, aligned with Save button.
-                SAPbouiCOM.Item loadFabricsItem = oForm.Items.Item("BTNLDFAB");
-                loadFabricsItem.Left = areaRight - loadFabricsItem.Width - 28;
-                loadFabricsItem.Top = saveTop;
-
-                // Place footer items within the usable client area, below the tab.
-                oForm.Items.Item("1").Top = footerTop;
-                oForm.Items.Item("2").Top = footerTop;
-                oForm.Items.Item("STREMRKS").Top = footerTop + 2;
-                oForm.Items.Item("ETREMRKS").Top = footerTop;
-
-                MTXFOB.AutoResizeColumns();
-                MTXCOLOR.AutoResizeColumns();
-                GRDFAB.AutoResizeColumns();
-            }
-            catch (Exception ex)
-            {
-                Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-            }
-            finally
-            {
-                if (frozen && oForm != null) oForm.Freeze(false);
-            }
-        }
+       
 
         //_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
 
@@ -579,5 +493,109 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             throw new Exception($"Matrix column '{columnUID}' not found.");
         }
+
+
+
+
+        //_________________________________________________________________________Form Resize ______________________________________________
+        private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+            bool frozen = false;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+                frozen = true;
+
+                // Original B1F: form = 1014 x 470, folder container Item_34 = 976 x 277.
+                SAPbouiCOM.Item tabArea = oForm.Items.Item("Item_34");
+                tabArea.Width = Math.Max(760, oForm.Width - 38);
+
+                // Reserve space for the Add/Cancel buttons and Remarks (outside the tab).
+                // ClientHeight excludes the window title bar; Height does not.
+                int footerHeight = Math.Max(oForm.Items.Item("ETREMRKS").Height, oForm.Items.Item("1").Height);
+                int footerTop = oForm.ClientHeight - footerHeight - 12;
+                tabArea.Height = Math.Max(210, footerTop - tabArea.Top - 6);
+
+                int areaLeft = tabArea.Left;
+                int areaTop = tabArea.Top;
+                int areaRight = areaLeft + tabArea.Width;
+                int areaBottom = areaTop + tabArea.Height;
+                int widthDifference = tabArea.Width - 976;
+
+                // The first row: FOB + Color.
+                int fobLeft = areaLeft + 17;
+                int matrixTop = areaTop + 42;
+                int rowHeight = Math.Max(45, (int)Math.Round(tabArea.Height * 61.0 / 277.0));
+                int fobWidth = Math.Max(120, 150 + (int)Math.Round(widthDifference * 0.20));
+                int colorBoundary = areaRight - 287;
+                int fobColorGap = tabArea.Width >= 850 ? 64 : 25;
+                int colorRightGap = tabArea.Width >= 850 ? 129 : 50;
+                int colorLeft = fobLeft + fobWidth + fobColorGap;
+                int colorWidth = colorBoundary - colorRightGap - colorLeft;
+
+                SAPbouiCOM.Item fobItem = oForm.Items.Item("MTXFOB");
+                fobItem.Left = fobLeft;
+                fobItem.Top = matrixTop;
+                fobItem.Width = fobWidth;
+                fobItem.Height = rowHeight;
+
+                SAPbouiCOM.Item colorItem = oForm.Items.Item("MTXCOLOR");
+                colorItem.Left = colorLeft;
+                colorItem.Top = matrixTop - 1;
+                colorItem.Width = colorWidth;
+                colorItem.Height = rowHeight + 1;
+
+                oForm.Items.Item("STFOB").Left = fobLeft;
+                oForm.Items.Item("STFOB").Top = areaTop + 25;
+                oForm.Items.Item("STCOLOR").Left = colorLeft + 3;
+                oForm.Items.Item("STCOLOR").Top = areaTop + 24;
+
+                // The second row begins below the first row, never inside it.
+                int contentTop = matrixTop + rowHeight + 5;
+                int gridTop = contentTop + 19;
+                int saveTop = areaBottom - 35;
+                int gridHeight = saveTop - gridTop - 8;
+
+                oForm.Items.Item("STCONTNT").Left = fobLeft;
+                oForm.Items.Item("STCONTNT").Top = contentTop;
+
+                SAPbouiCOM.Item gridItem = oForm.Items.Item("GRDFAB");
+                gridItem.Left = fobLeft;
+                gridItem.Top = gridTop;
+                gridItem.Width = tabArea.Width - 35;
+                gridItem.Height = gridHeight;
+
+                SAPbouiCOM.Item saveItem = oForm.Items.Item("BTNSAVE");
+                saveItem.Left = areaLeft + 39;
+                saveItem.Top = saveTop;
+
+                // Load Fabrics button: bottom-right, aligned with Save button.
+                SAPbouiCOM.Item loadFabricsItem = oForm.Items.Item("BTNLDFAB");
+                loadFabricsItem.Left = areaRight - loadFabricsItem.Width - 28;
+                loadFabricsItem.Top = saveTop;
+
+                // Place footer items within the usable client area, below the tab.
+                oForm.Items.Item("1").Top = footerTop;
+                oForm.Items.Item("2").Top = footerTop;
+                oForm.Items.Item("STREMRKS").Top = footerTop + 2;
+                oForm.Items.Item("ETREMRKS").Top = footerTop;
+
+                MTXFOB.AutoResizeColumns();
+                MTXCOLOR.AutoResizeColumns();
+                GRDFAB.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText("Procurement Costing resize error: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                if (frozen && oForm != null) oForm.Freeze(false);
+            }
+        }
+
     }
 }

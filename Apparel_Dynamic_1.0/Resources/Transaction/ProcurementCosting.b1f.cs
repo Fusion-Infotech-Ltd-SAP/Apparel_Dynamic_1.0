@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Apparel_Dynamic_1._0.Helper;
 
 namespace Apparel_Dynamic_1._0.Resources.Transaction
 {
@@ -36,7 +37,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //      StaticText
+            //       StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -55,12 +56,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //      EditText
+            //       EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
             this.ETSLNTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETSLNTRY").Specific));
             this.ETCUSTCD = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTCD").Specific));
+            this.ETCUSTCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETCUSTCD_ChooseFromListAfter);
+            this.ETCUSTCD.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETCUSTCD_ChooseFromListBefore);
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
             this.ETDRFTNO = ((SAPbouiCOM.EditText)(this.GetItem("ETDRFTNO").Specific));
             this.ETDFNTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDFNTRY").Specific));
@@ -77,12 +80,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //       LinkedButton
+            //        LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //      Folder
+            //       Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -93,7 +96,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //      Matrix
+            //       Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
@@ -104,10 +107,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXSUMRY = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSUMRY").Specific));
             this.MTXCOMSN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOMSN").Specific));
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //      Grid
+            //       Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //      Button
+            //       Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -125,7 +128,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeFormEvents()
         {
-            this.ResizeAfter += new ResizeAfterHandler(this.Form_ResizeAfter);
+            this.ResizeAfter += new SAPbouiCOM.Framework.FormBase.ResizeAfterHandler(this.Form_ResizeAfter);
+            this.DataLoadAfter += new DataLoadAfterHandler(this.Form_DataLoadAfter);
 
         }
 
@@ -136,6 +140,82 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+        private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+            bool frozen = false;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                oForm.Freeze(true);
+                frozen = true;
+
+                RefreshOtherCostMatrixEditability(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Procurement Costing DataLoadAfter Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen)
+                    oForm.Freeze(false);
+            }
+        }
+
+        private void ETCUSTCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_FIND_MODE)
+                return;
+
+            SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+            SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+            if (dt == null || dt.Rows.Count == 0)
+                return;
+
+            string cusCode = dt.GetValue("CardCode", 0).ToString();
+            string cusDesc = dt.GetValue("CardName", 0).ToString();
+            
+
+            SAPbouiCOM.EditText ETCUSTCD = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTCD").Specific;
+            ETCUSTCD.Value = cusCode;
+
+            SAPbouiCOM.EditText ETCUSTNM = (SAPbouiCOM.EditText)oForm.Items.Item("ETCUSTNM").Specific;
+            ETCUSTNM.Value = cusDesc;
+
+            LoadOtherCostParameters(oForm, cusCode);
+        }
+
+        private void ETCUSTCD_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            // Customer Code CFL Select Before 
+            BubbleEvent = true;
+            try
+            {
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+                string cflUID = cflArg.ChooseFromListUID;
+
+                if (cflUID == "CFL_OCRD")
+                {
+                    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                    SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item(cflUID);
+                    SAPbouiCOM.Conditions oCons = new SAPbouiCOM.Conditions();
+                    SAPbouiCOM.Condition oCon1 = oCons.Add();
+                    oCon1.Alias = "CardType";
+                    oCon1.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    oCon1.CondVal = "C";
+                    oCFL.SetConditions(oCons);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Error filtering Customer CFL:  {ex.Message}");
+                BubbleEvent = false;
+            }
+        }
 
         private void ETSTYLCD_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -362,7 +442,142 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-//_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
-       
+        //_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
+
+        private void LoadOtherCostParameters(SAPbouiCOM.Form oForm, string customerCode)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+            bool frozen = false;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(customerCode))
+                    return;
+
+                string safeCustomerCode = customerCode.Replace("'", "''");
+                string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                SAPbouiCOM.DBDataSource oDBDataSource = oForm.DataSources.DBDataSources.Item("@FIL_DR_PCSOTCST");
+
+                string query = $@"
+                                SELECT
+                                    R.""U_PRMCODE"",
+                                    R.""U_BASEDON"",
+                                    R.""U_EDITABLE"",
+                                    R.""U_PRCNTG"",
+                                    R.""U_VALUE""
+                                FROM ""@FIL_MH_CSOTHCST"" H
+                                INNER JOIN ""@FIL_MR_CSOTHCST"" R ON H.""Code"" = R.""Code""
+                                WHERE H.""Code"" = '{safeCustomerCode}'
+                                AND IFNULL(R.""U_PRMCODE"", '') <> ''
+                                ORDER BY R.""LineId""";
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                oRS.DoQuery(query);
+
+                if (oRS.RecordCount == 0)
+                {
+                    oForm.Freeze(true);
+                    frozen = true;
+
+                    oMatrix.Clear();
+                    oDBDataSource.Clear();
+
+                    Global.GFunc.ShowError($"No Other Cost Parameters found for customer '{customerCode}'.");
+                    return;
+                }
+
+                oForm.Freeze(true);
+                frozen = true;
+
+                oMatrix.Clear();
+                oDBDataSource.Clear();
+
+                int row = 0;
+
+                while (!oRS.EoF)
+                {
+                    oDBDataSource.InsertRecord(row);
+
+                    oDBDataSource.SetValue("LineId", row, (row + 1).ToString());
+                    oDBDataSource.SetValue("U_PARAMTR", row, Convert.ToString(oRS.Fields.Item("U_PRMCODE").Value).Trim());
+                    oDBDataSource.SetValue("U_BASEDON", row, Convert.ToString(oRS.Fields.Item("U_BASEDON").Value).Trim());
+                    oDBDataSource.SetValue("U_EDITABLE", row, Convert.ToString(oRS.Fields.Item("U_EDITABLE").Value).Trim());
+                    oDBDataSource.SetValue("U_PRCNTG", row, Convert.ToString(oRS.Fields.Item("U_PRCNTG").Value).Trim());
+                    oDBDataSource.SetValue("U_VALUE", row, Convert.ToString(oRS.Fields.Item("U_VALUE").Value).Trim());
+                    oDBDataSource.SetValue("U_VERSION", row, version);
+
+                    row++;
+                    oRS.MoveNext();
+                }
+
+                oMatrix.LoadFromDataSource();
+                RefreshOtherCostMatrixEditability(oForm);
+
+                Application.SBO_Application.StatusBar.SetText($"{row} Other Cost Parameters loaded successfully.", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Load Other Cost Parameters Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen)
+                    oForm.Freeze(false);
+
+                if (oRS != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+            }
+        }
+
+        private void RefreshOtherCostMatrixEditability(SAPbouiCOM.Form oForm)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+
+                int paramColumn = GetOtherCostColumnIndex(oMatrix, "CLPARAM");
+                int basedOnColumn = GetOtherCostColumnIndex(oMatrix, "CLBASDON");
+                int editableColumn = GetOtherCostColumnIndex(oMatrix, "CLEDITBL");
+                int percentageColumn = GetOtherCostColumnIndex(oMatrix, "CLPERCN");
+                int valueColumn = GetOtherCostColumnIndex(oMatrix, "CLVALUE");
+                int versionColumn = GetOtherCostColumnIndex(oMatrix, "CLVERSN");
+
+                for (int row = 1; row <= oMatrix.RowCount; row++)
+                {
+                    string basedOn = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLBASDON").Cells.Item(row).Specific).Value.Trim();
+                    string editable = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLEDITBL").Cells.Item(row).Specific).Value.Trim();
+
+                    bool isEditable = editable.Equals("Y", StringComparison.OrdinalIgnoreCase);
+                    bool isPercentage = basedOn.Equals("P", StringComparison.OrdinalIgnoreCase) || basedOn.Equals("Percentage", StringComparison.OrdinalIgnoreCase);
+                    bool isValue = basedOn.Equals("V", StringComparison.OrdinalIgnoreCase) || basedOn.Equals("Value", StringComparison.OrdinalIgnoreCase);
+
+                    bool enablePercentage = isEditable && isPercentage;
+                    bool enableValue = isEditable && isValue;
+
+                    oMatrix.CommonSetting.SetCellEditable(row, paramColumn, false);
+                    oMatrix.CommonSetting.SetCellEditable(row, basedOnColumn, false);
+                    oMatrix.CommonSetting.SetCellEditable(row, editableColumn, false);
+                    oMatrix.CommonSetting.SetCellEditable(row, percentageColumn, enablePercentage);
+                    oMatrix.CommonSetting.SetCellEditable(row, valueColumn, enableValue);
+                    oMatrix.CommonSetting.SetCellEditable(row, versionColumn, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Refresh Other Cost Matrix Editability Error: {ex.Message}");
+            }
+        }
+
+        private int GetOtherCostColumnIndex(SAPbouiCOM.Matrix oMatrix, string columnUID)
+        {
+            for (int i = 1; i <= oMatrix.Columns.Count; i++)
+            {
+                if (oMatrix.Columns.Item(i).UniqueID == columnUID)
+                    return i;
+            }
+
+            throw new Exception($"Matrix column '{columnUID}' not found.");
+        }
     }
 }

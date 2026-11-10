@@ -22,7 +22,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETSTYLCD, ETYLDESC, ETSLNTRY, ETCUSTCD, ETCUSTNM, ETDRFTNO, ETDFNTRY, ETCADNO, ETCDNTRY, ETDOCNUM, ETDOCDAT, ETVERSON, ETODRQTY, ETOLRNCE, ETTLQTY, ETDOCTRY, ETREMRKS, ETLPRCST, ETTLCSEL;
 
-        
+
 
         private SAPbouiCOM.ComboBox CBSERIES;
 
@@ -39,7 +39,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //          StaticText
+            //           StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -58,7 +58,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //          EditText
+            //           EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
@@ -84,12 +84,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //           LinkedButton
+            //            LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //          Folder
+            //           Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -100,7 +100,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //          Matrix
+            //           Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
@@ -110,11 +110,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXCSTEL = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSTEL").Specific));
             this.MTXSUMRY = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSUMRY").Specific));
             this.MTXCOMSN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOMSN").Specific));
+            this.MTXCOMSN.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXCOMSN_ChooseFromListAfter);
+            this.MTXCOMSN.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXCOMSN_ChooseFromListBefore);
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //          Grid
+            //           Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //          Button
+            //           Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -385,7 +387,102 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         //_____________________________________________________________________CFL__________________________________________________________
 
+        private void MTXCOMSN_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+            bool frozen = false;
 
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                if (pVal.ColUID != "CLBPCODE" || pVal.Row <= 0)
+                    return;
+
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+
+                if (cflArg.ChooseFromListUID != "CFLOCRD2")
+                    return;
+
+                SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
+                if (dt == null || dt.Rows.Count == 0)
+                    return;
+
+                string cardCode = Convert.ToString(dt.GetValue("CardCode", 0)).Trim();
+                string cardName = Convert.ToString(dt.GetValue("CardName", 0)).Trim();
+                string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOMSN").Specific;
+                SAPbouiCOM.DBDataSource oDBDataSource = oForm.DataSources.DBDataSources.Item("@FIL_DR_PCSCOMSN");
+
+                oForm.Freeze(true);
+                frozen = true;
+
+                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLBPCODE").Cells.Item(pVal.Row).Specific).Value = cardCode;
+                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLBPNAME").Cells.Item(pVal.Row).Specific).Value = cardName;
+                ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLVERSN").Cells.Item(pVal.Row).Specific).Value = version;
+
+                oMatrix.FlushToDataSource();
+
+                bool isLastRow = pVal.Row == oMatrix.VisualRowCount;
+
+                if (isLastRow)
+                {
+                    int newRow = oDBDataSource.Size;
+
+                    oDBDataSource.InsertRecord(newRow);
+                    oDBDataSource.SetValue("LineId", newRow, (newRow + 1).ToString());
+                    oDBDataSource.SetValue("U_CARDCODE", newRow, "");
+                    oDBDataSource.SetValue("U_CARDNAME", newRow, "");
+                    oDBDataSource.SetValue("U_PRCNTG", newRow, "");
+                    oDBDataSource.SetValue("U_VERSION", newRow, "");
+
+                    oMatrix.LoadFromDataSource();
+                }
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Vendor CFL Selection Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen && oForm != null)
+                    oForm.Freeze(false);
+            }
+        }
+
+        private void MTXCOMSN_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
+        {
+            BubbleEvent = true;
+
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg = (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
+
+                if (cflArg.ChooseFromListUID == "CFLOCRD2" && pVal.ColUID == "CLBPCODE")
+                {
+                    SAPbouiCOM.ChooseFromList oCFL = oForm.ChooseFromLists.Item("CFLOCRD2");
+                    SAPbouiCOM.Conditions oCons = new SAPbouiCOM.Conditions();
+
+                    SAPbouiCOM.Condition oCon = oCons.Add();
+                    oCon.Alias = "CardType";
+                    oCon.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL;
+                    oCon.CondVal = "S";
+
+                    oCFL.SetConditions(oCons);
+                }
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Vendor CFL Filter Error: {ex.Message}");
+                BubbleEvent = false;
+            }
+        }
 
         private void ETDRFTNO_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {

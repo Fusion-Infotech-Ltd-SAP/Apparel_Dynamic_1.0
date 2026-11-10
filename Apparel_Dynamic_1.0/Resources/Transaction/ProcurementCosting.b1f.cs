@@ -405,6 +405,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 string docNum = dt.GetValue("DocNum", 0).ToString().Trim();
                 string docEntry = dt.GetValue("DocEntry", 0).ToString().Trim();
                 string styleCode = dt.GetValue("U_STYLECODE", 0).ToString().Trim();
+                string totalQty = dt.GetValue("U_TOTALQTY", 0).ToString().Trim();
                
 
                 SAPbouiCOM.EditText ETDRFTNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETDRFTNO").Specific;
@@ -412,6 +413,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 SAPbouiCOM.EditText ETDFNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETDFNTRY").Specific;
                 ETDFNTRY.Value = docEntry;
+
+                SAPbouiCOM.EditText ETODRQTY = (SAPbouiCOM.EditText)oForm.Items.Item("ETODRQTY").Specific;
+                ETODRQTY.Value = totalQty;
 
                 SAPbouiCOM.EditText ETCADNO = (SAPbouiCOM.EditText)oForm.Items.Item("ETCADNO").Specific;
                 SAPbouiCOM.EditText ETCDNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETCDNTRY").Specific;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Apparel_Dynamic_1._0.Helper;
+using System.Globalization;
 
 namespace Apparel_Dynamic_1._0.Resources.Transaction
 {
@@ -191,6 +192,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 decimal totalQty = orderQty + (orderQty * toleranceRate / 100);
 
                 ETTLQTY.Value = totalQty.ToString("0.##");
+
+                LoadProcessCosting(oForm);
             }
             catch (Exception ex)
             {
@@ -559,6 +562,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 {
                     ETCADNO.Value = oRS.Fields.Item("DocNum").Value.ToString();
                     ETCDNTRY.Value = oRS.Fields.Item("DocEntry").Value.ToString();
+                    LoadProcessCosting(oForm);
                 }
                 else
                 {
@@ -691,6 +695,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SAPbouiCOM.EditText ETSLNTRY = (SAPbouiCOM.EditText)oForm.Items.Item("ETSLNTRY").Specific;
             ETSLNTRY.Value = stylEntry;
 
+            //LoadProcessCosting(oForm);
+
         }
 
 
@@ -698,6 +704,207 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
 
         //_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
+
+        private void LoadProcessCosting(SAPbouiCOM.Form oForm)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+            bool frozen = false;
+
+            try
+            {
+                string styleCode = ((SAPbouiCOM.EditText)oForm.Items.Item("ETSTYLCD").Specific).Value.Trim();
+                string totalQtyText = ((SAPbouiCOM.EditText)oForm.Items.Item("ETTLQTY").Specific).Value.Trim();
+                string version = ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(styleCode))
+                {
+                    Global.GFunc.ShowError("Please select a Style Code first.");
+                    return;
+                }
+
+                if (!decimal.TryParse(totalQtyText, out decimal totalQty) || totalQty <= 0)
+                {
+                    Global.GFunc.ShowError("Please enter a valid Total Quantity greater than zero.");
+                    return;
+                }
+
+                string safeStyleCode = styleCode.Replace("'", "''");
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                string masterQuery = $@"
+                                    SELECT C.""DocEntry"", C.""DocNum""
+                                    FROM ""@FIL_DH_OPSM"" O
+                                    INNER JOIN ""@FIL_DH_CPM"" C ON C.""U_BRAND"" = O.""U_BRAND""
+                                        AND C.""U_PRDGRP"" = O.""U_PRGROUP""
+                                        AND C.""U_RSTGECODE"" = O.""U_ROUTESTAGE""
+                                    WHERE O.""U_STYLECODE"" = '{safeStyleCode}'
+                                    ORDER BY C.""DocEntry"" DESC";
+
+                oRS.DoQuery(masterQuery);
+
+                if (oRS.RecordCount == 0)
+                {
+                    Global.GFunc.ShowError($"No CPM Master found for Style '{styleCode}'. Please configure the CPM Master first.");
+                    return;
+                }
+
+                if (oRS.RecordCount > 1)
+                {
+                    Global.GFunc.ShowError($"Multiple CPM Masters found for Style '{styleCode}'. Please verify the Brand, Product Group and Route Stage configuration.");
+                    return;
+                }
+
+                int cpmDocEntry = Convert.ToInt32(oRS.Fields.Item("DocEntry").Value);
+
+                string qtyQuery = $@"
+                                    SELECT ""LineId"", ""U_MINQTY"", ""U_MAXQTY""
+                                    FROM ""@FIL_DR_CPMD""
+                                    WHERE ""DocEntry"" = {cpmDocEntry}
+                                        AND {totalQty.ToString(System.Globalization.CultureInfo.InvariantCulture)} BETWEEN ""U_MINQTY"" AND ""U_MAXQTY""
+                                    ORDER BY ""LineId""";
+
+                oRS.DoQuery(qtyQuery);
+
+                if (oRS.RecordCount == 0)
+                {
+                    Global.GFunc.ShowError($"No CPM quantity range found for Total Quantity {totalQty:0.####}. Please check the Min Qty and Max Qty configuration in CPM Master.");
+                    return;
+                }
+
+                if (oRS.RecordCount > 1)
+                {
+                    Global.GFunc.ShowError($"Multiple CPM quantity ranges match Total Quantity {totalQty:0.####}. Please correct the overlapping quantity ranges in CPM Master.");
+                    return;
+                }
+
+                int cpmLineId = Convert.ToInt32(oRS.Fields.Item("LineId").Value);
+
+                string processQuery = $@"
+                                        SELECT
+                                            S.""LineId"" AS ""StageLineId"",
+                                            S.""U_STAGECODE"" AS ""StageCode"",
+                                            S.""U_STAGENAME"" AS ""StageName"",
+                                            S.""U_SAM"" AS ""SAMValue"",
+                                            R.""U_SAMCODE"" AS ""SAMRangeCode"",
+                                            CASE UPPER(TRIM(IFNULL(R.""U_SAMCODE"", '')))
+                                                WHEN 'SAM RANGE 1' THEN D.""U_CPM1""
+                                                WHEN 'SAM RANGE 2' THEN D.""U_CPM2""
+                                                WHEN 'SAM RANGE 3' THEN D.""U_CPM3""
+                                                WHEN 'SAM RANGE 4' THEN D.""U_CPM4""
+                                                WHEN 'SAM RANGE 5' THEN D.""U_CPM5""
+                                                WHEN 'SAM RANGE 6' THEN D.""U_CPM6""
+                                                WHEN 'SAM RANGE 7' THEN D.""U_CPM7""
+                                                WHEN 'SAM RANGE 8' THEN D.""U_CPM8""
+                                                WHEN 'SAM RANGE 9' THEN D.""U_CPM9""
+                                                WHEN 'SAM RANGE 10' THEN D.""U_CPM10""
+                                                ELSE NULL
+                                            END AS ""CPMValue""
+                                        FROM ""@FIL_MR_SAM"" S
+                                        LEFT JOIN ""@FIL_DR_SAMRNG"" R ON R.""DocEntry"" = {cpmDocEntry}
+                                            AND S.""U_SAM"" BETWEEN R.""U_SAMFROM"" AND R.""U_SAMTO""
+                                        INNER JOIN ""@FIL_DR_CPMD"" D ON D.""DocEntry"" = {cpmDocEntry}
+                                            AND D.""LineId"" = {cpmLineId}
+                                        WHERE S.""Code"" = '{safeStyleCode}'
+                                        ORDER BY S.""LineId""";
+
+                oRS.DoQuery(processQuery);
+
+                if (oRS.RecordCount == 0)
+                {
+                    Global.GFunc.ShowError($"No SAM stage data found for Style '{styleCode}'. Please configure the SAM Master first.");
+                    return;
+                }
+
+                List<Tuple<string, string, string, string>> processRows = new List<Tuple<string, string, string, string>>();
+                HashSet<string> processedStages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                while (!oRS.EoF)
+                {
+                    string stageLineId = Convert.ToString(oRS.Fields.Item("StageLineId").Value).Trim();
+                    string stageCode = Convert.ToString(oRS.Fields.Item("StageCode").Value).Trim();
+                    string stageName = Convert.ToString(oRS.Fields.Item("StageName").Value).Trim();
+                    string samText = Convert.ToString(oRS.Fields.Item("SAMValue").Value).Trim();
+                    string samRangeCode = Convert.ToString(oRS.Fields.Item("SAMRangeCode").Value).Trim();
+                    object cpmObject = oRS.Fields.Item("CPMValue").Value;
+
+                    if (string.IsNullOrWhiteSpace(stageCode) || string.IsNullOrWhiteSpace(stageName))
+                    {
+                        Global.GFunc.ShowError($"Stage Code or Stage Name is missing in SAM Master at Line {stageLineId}.");
+                        return;
+                    }
+
+                    if (!decimal.TryParse(samText, out decimal samValue))
+                    {
+                        Global.GFunc.ShowError($"Invalid SAM value for Stage '{stageName}' ({stageCode}).");
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(samRangeCode))
+                    {
+                        Global.GFunc.ShowError($"No SAM Range found for Stage '{stageName}' ({stageCode}), SAM {samValue:0.####}. Please configure the corresponding SAM Range in CPM Master.");
+                        return;
+                    }
+
+                    if (!processedStages.Add(stageLineId))
+                    {
+                        Global.GFunc.ShowError($"Multiple SAM Ranges match Stage '{stageName}' ({stageCode}), SAM {samValue:0.####}. Please correct the overlapping SAM Ranges in CPM Master.");
+                        return;
+                    }
+
+                    if (cpmObject == null || cpmObject == DBNull.Value || !decimal.TryParse(Convert.ToString(cpmObject), out decimal cpmValue))
+                    {
+                        Global.GFunc.ShowError($"Invalid or missing CPM value for Stage '{stageName}' ({stageCode}) in {samRangeCode}.");
+                        return;
+                    }
+
+                    processRows.Add(Tuple.Create(stageCode, stageName, samValue.ToString(), cpmValue.ToString()));
+                    oRS.MoveNext();
+                }
+
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXPRCST").Specific;
+                SAPbouiCOM.DBDataSource oDBDataSource = oForm.DataSources.DBDataSources.Item("@FIL_DR_PCSPRCST");
+
+                oForm.Freeze(true);
+                frozen = true;
+
+                oMatrix.Clear();
+                oDBDataSource.Clear();
+
+                for (int i = 0; i < processRows.Count; i++)
+                {
+                    oDBDataSource.InsertRecord(i);
+                    oDBDataSource.SetValue("LineId", i, (i + 1).ToString());
+                    oDBDataSource.SetValue("U_STAGECODE", i, processRows[i].Item1);
+                    oDBDataSource.SetValue("U_STAGENAME", i, processRows[i].Item2);
+                    oDBDataSource.SetValue("U_SAM", i, processRows[i].Item3);
+                    oDBDataSource.SetValue("U_CPM", i, processRows[i].Item4);
+                    oDBDataSource.SetValue("U_VERSION", i, version);
+                }
+
+                oMatrix.LoadFromDataSource();
+                oMatrix.AutoResizeColumns();
+
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                Global.GFunc.ShowSuccess($"{processRows.Count} Process Costing stages loaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Load Process Costing Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen && oForm != null)
+                    oForm.Freeze(false);
+
+                if (oRS != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+            }
+        }
+
+
 
         private void LoadCostElements(SAPbouiCOM.Form oForm)
         {

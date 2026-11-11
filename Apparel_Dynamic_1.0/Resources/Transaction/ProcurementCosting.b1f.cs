@@ -455,6 +455,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+
         private void MTXCOMSN_ChooseFromListBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;

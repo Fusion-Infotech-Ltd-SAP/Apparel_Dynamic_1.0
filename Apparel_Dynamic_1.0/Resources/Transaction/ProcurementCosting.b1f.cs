@@ -33,14 +33,14 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.Matrix MTXFOB, MTXATTCH, MTXCOLOR, MTXTMFAB, MTXTRMS, MTXOTCST, MTXPRCST, MTXCSTEL, MTXSUMRY, MTXCOMSN, MTXTMTRM;
 
-        private SAPbouiCOM.Grid GRDFAB, GRDVRSN;
+        private SAPbouiCOM.Grid GRDFAB, GRDVRSN, GRDAVGDT;
 
         private SAPbouiCOM.Button ADDButton, BTNCANCEL, BTNLDFAB, BTNLDCEL, BTNSAVE, BTVRSN, BRWSBTN, DISPBTN, DELBTN;
 
 
         public override void OnInitializeComponent()
         {
-            //             StaticText
+            //              StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -59,7 +59,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //             EditText
+            this.STAVGDTL = ((SAPbouiCOM.StaticText)(this.GetItem("STAVGDTL").Specific));
+            //              EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
@@ -86,12 +87,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //              LinkedButton
+            //               LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //             Folder
+            //              Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -102,7 +103,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //             Matrix
+            //              Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
@@ -117,10 +118,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXCOMSN.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXCOMSN_ChooseFromListAfter);
             this.MTXCOMSN.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXCOMSN_ChooseFromListBefore);
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //             Grid
+            //              Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //             Button
+            this.GRDAVGDT = ((SAPbouiCOM.Grid)(this.GetItem("GRDAVGDT").Specific));
+            //              Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -136,6 +138,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.DISPBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.DISPBTN_PressedAfter);
             this.DELBTN = ((SAPbouiCOM.Button)(this.GetItem("DELBTN").Specific));
             this.DELBTN.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.DELBTN_PressedAfter);
+            
+           
             this.OnCustomInitialize();
 
         }
@@ -937,6 +941,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oMatrix.LoadFromDataSource();
                 oMatrix.AutoResizeColumns();
 
+                CalculateMatrixTotal(oForm, "MTXPRCST", "CLCOST", "ETLPRCST");
+
                 if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                     oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
 
@@ -1310,6 +1316,37 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 MTXFOB.AutoResizeColumns();
                 MTXCOLOR.AutoResizeColumns();
                 GRDFAB.AutoResizeColumns();
+
+                // Summary Tab Resize
+                SAPbouiCOM.Item summaryMatrix = oForm.Items.Item("MTXSUMRY");
+                SAPbouiCOM.Item averageLabel = oForm.Items.Item("STAVGDTL");
+                SAPbouiCOM.Item averageGrid = oForm.Items.Item("GRDAVGDT");
+
+                int summaryLeft = areaLeft + 25;
+                int summaryWidth = Math.Max(100, tabArea.Width - 54);
+                int summaryTop = areaTop + 47;
+                int summaryBottom = areaBottom - 17;
+                int summaryAvailableHeight = Math.Max(100, summaryBottom - summaryTop);
+
+                int summaryMatrixHeight = Math.Max(55, (int)Math.Round((summaryAvailableHeight - 50) * 0.65));
+                int averageLabelTop = summaryTop + summaryMatrixHeight + 12;
+                int averageGridTop = averageLabelTop + averageLabel.Height + 10;
+                int averageGridHeight = Math.Max(20, summaryBottom - averageGridTop);
+
+                summaryMatrix.Left = summaryLeft;
+                summaryMatrix.Top = summaryTop;
+                summaryMatrix.Width = summaryWidth;
+                summaryMatrix.Height = summaryMatrixHeight;
+
+                averageLabel.FromPane = 7;
+                averageLabel.ToPane = 7;
+                averageLabel.Left = summaryLeft + 3;
+                averageLabel.Top = averageLabelTop;
+
+                averageGrid.Left = summaryLeft;
+                averageGrid.Top = averageGridTop;
+                averageGrid.Width = summaryWidth;
+                averageGrid.Height = averageGridHeight;
             }
             catch (Exception ex)
             {
@@ -1321,5 +1358,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        private SAPbouiCOM.Grid Grid0;
+        private SAPbouiCOM.StaticText STAVGDTL;
     }
 }

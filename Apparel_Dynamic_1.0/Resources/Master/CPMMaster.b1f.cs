@@ -647,9 +647,28 @@ namespace Apparel_Dynamic_1._0.Resources.Master
                     //    db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
                     //    db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
                     //}
-                    if (existingRow < 0)
+                    //new changes
+                    //if (existingRow < 0)
+                    //{
+                    //    int row = FindEmptyCPMRow(db);
+
+                    //    if (row < 0)
+                    //    {
+                    //        row = db.Size;
+                    //        db.InsertRecord(row);
+                    //    }
+
+                    //    db.SetValue("LineId", row, (row + 1).ToString());
+                    //    db.SetValue("U_OTYPECODE", row, orderTypeCode);
+                    //    db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
+                    //    db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
+                    //}
+                    //new update 
+                    int row = existingRow;
+
+                    if (row < 0)
                     {
-                        int row = FindEmptyCPMRow(db);
+                        row = FindEmptyCPMRow(db);
 
                         if (row < 0)
                         {
@@ -659,9 +678,10 @@ namespace Apparel_Dynamic_1._0.Resources.Master
 
                         db.SetValue("LineId", row, (row + 1).ToString());
                         db.SetValue("U_OTYPECODE", row, orderTypeCode);
-                        db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
-                        db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
                     }
+
+                    db.SetValue("U_MINQTY", row, rs.Fields.Item("U_MINQTY").Value.ToString());
+                    db.SetValue("U_MAXQTY", row, rs.Fields.Item("U_MAXQTY").Value.ToString());
 
                     rs.MoveNext();
                 }

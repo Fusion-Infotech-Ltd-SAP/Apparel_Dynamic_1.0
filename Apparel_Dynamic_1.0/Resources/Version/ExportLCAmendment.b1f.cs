@@ -15,14 +15,14 @@ namespace Apparel_Dynamic_1._0.Resources.Version
         {
         }
 
-        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, 
+        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, STPIVLUE,
                                       STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, 
                                       STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, 
                                       STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
-        
 
-        private SAPbouiCOM.EditText ETCOMPNY, ETPYTRMS, ETINTRMS, ETLCTRMS, ETSERIES, ETSTATCM, ETSTATMR, 
+
+        private SAPbouiCOM.EditText ETCOMPNY, ETPYTRMS, ETINTRMS, ETLCTRMS, ETSERIES, ETSTATCM, ETSTATMR, ETPIVLUE,
                                     ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM, ETCUSTMR, ETSCNO, ETLCNO, 
                                     ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, 
                                     ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
@@ -105,12 +105,16 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             this.ETINTRMS = ((SAPbouiCOM.EditText)(this.GetItem("ETINTRMS").Specific));
             this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSCNO").Specific));
             this.LinkedButton0.PressedAfter += new SAPbouiCOM._ILinkedButtonEvents_PressedAfterEventHandler(this.LinkedButton0_PressedAfter);
+            this.ETPIVLUE = ((SAPbouiCOM.EditText)(this.GetItem("ETPIVLUE").Specific));
+            this.STPIVLUE = ((SAPbouiCOM.StaticText)(this.GetItem("STPIVLUE").Specific));
             this.OnCustomInitialize();
 
         }
 
         public override void OnInitializeFormEvents()
         {
+           
+
         }
 
         private void OnCustomInitialize()
@@ -189,5 +193,8 @@ namespace Apparel_Dynamic_1._0.Resources.Version
             }
 
         }
+
+        private SAPbouiCOM.EditText EditText0;
+        private SAPbouiCOM.StaticText StaticText0;
     }
 }

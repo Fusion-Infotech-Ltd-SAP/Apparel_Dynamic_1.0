@@ -1441,19 +1441,19 @@ namespace Apparel_Dynamic_1._0.Modules
                     //}
                     //Test
 
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == false && Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
-                    {
-                        try
-                        {
-                            Global.G_Form.Freeze(true);
-                            LoadGrid(ref Global.G_Form, false);
-                            Global.G_Form.Freeze(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Global.G_Form.Freeze(false);
-                        }
-                    }
+                    //else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED && pVal.ItemUID == "1" && pVal.BeforeAction == false && Global.G_Form.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                    //{
+                    //    try
+                    //    {
+                    //        Global.G_Form.Freeze(true);
+                    //        //LoadGrid(ref Global.G_Form, false);
+                    //        Global.G_Form.Freeze(false);
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        Global.G_Form.Freeze(false);
+                    //    }
+                    //}
 
                 }
 

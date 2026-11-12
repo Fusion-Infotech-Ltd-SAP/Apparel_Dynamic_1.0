@@ -23,7 +23,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.EditText ETSTYLCD, ETYLDESC, ETSLNTRY, ETCUSTCD, ETCUSTNM, ETDRFTNO, ETDFNTRY, ETCADNO, ETCDNTRY, ETDOCNUM, ETDOCDAT, ETVERSON, ETODRQTY, ETOLRNCE, ETTLQTY, ETDOCTRY, ETREMRKS, ETLPRCST, ETTLCSEL;
 
-        
+
+
         private SAPbouiCOM.ComboBox CBSERIES;
 
         private SAPbouiCOM.LinkedButton LKSTYLCD, LKCUSTCD, LKCADNO, LKDRFTNO;
@@ -39,7 +40,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         public override void OnInitializeComponent()
         {
-            //            StaticText
+            //             StaticText
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STYLDESC = ((SAPbouiCOM.StaticText)(this.GetItem("STYLDESC").Specific));
             this.STCUSTCD = ((SAPbouiCOM.StaticText)(this.GetItem("STCUSTCD").Specific));
@@ -58,7 +59,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STCONTNT = ((SAPbouiCOM.StaticText)(this.GetItem("STCONTNT").Specific));
             this.STLPRCST = ((SAPbouiCOM.StaticText)(this.GetItem("STLPRCST").Specific));
             this.STTLCSEL = ((SAPbouiCOM.StaticText)(this.GetItem("STTLCSEL").Specific));
-            //            EditText
+            //             EditText
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
             this.ETYLDESC = ((SAPbouiCOM.EditText)(this.GetItem("ETYLDESC").Specific));
@@ -85,12 +86,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETLPRCST = ((SAPbouiCOM.EditText)(this.GetItem("ETLPRCST").Specific));
             this.ETTLCSEL = ((SAPbouiCOM.EditText)(this.GetItem("ETTLCSEL").Specific));
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
-            //             LinkedButton
+            //              LinkedButton
             this.LKSTYLCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLCD").Specific));
             this.LKCUSTCD = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCUSTCD").Specific));
             this.LKCADNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKCADNO").Specific));
             this.LKDRFTNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTNO").Specific));
-            //            Folder
+            //             Folder
             this.TABFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABFAB").Specific));
             this.TABTRMS = ((SAPbouiCOM.Folder)(this.GetItem("TABTRMS").Specific));
             this.TABOTCST = ((SAPbouiCOM.Folder)(this.GetItem("TABOTCST").Specific));
@@ -101,23 +102,25 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.TABVRSN = ((SAPbouiCOM.Folder)(this.GetItem("TABVRSN").Specific));
             this.TABTMFAB = ((SAPbouiCOM.Folder)(this.GetItem("TABTMFAB").Specific));
             this.TABTPTRM = ((SAPbouiCOM.Folder)(this.GetItem("TABTPTRM").Specific));
-            //            Matrix
+            //             Matrix
             this.MTXFOB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXFOB").Specific));
             this.MTXCOLOR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOLOR").Specific));
             this.MTXTMFAB = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMFAB").Specific));
             this.MTXTRMS = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTRMS").Specific));
             this.MTXOTCST = ((SAPbouiCOM.Matrix)(this.GetItem("MTXOTCST").Specific));
             this.MTXPRCST = ((SAPbouiCOM.Matrix)(this.GetItem("MTXPRCST").Specific));
+            this.MTXPRCST.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXPRCST_ValidateAfter);
             this.MTXCSTEL = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCSTEL").Specific));
+            this.MTXCSTEL.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.MTXCSTEL_ValidateAfter);
             this.MTXSUMRY = ((SAPbouiCOM.Matrix)(this.GetItem("MTXSUMRY").Specific));
             this.MTXCOMSN = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCOMSN").Specific));
             this.MTXCOMSN.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXCOMSN_ChooseFromListAfter);
             this.MTXCOMSN.ChooseFromListBefore += new SAPbouiCOM._IMatrixEvents_ChooseFromListBeforeEventHandler(this.MTXCOMSN_ChooseFromListBefore);
             this.MTXTMTRM = ((SAPbouiCOM.Matrix)(this.GetItem("MTXTMTRM").Specific));
-            //            Grid
+            //             Grid
             this.GRDFAB = ((SAPbouiCOM.Grid)(this.GetItem("GRDFAB").Specific));
             this.GRDVRSN = ((SAPbouiCOM.Grid)(this.GetItem("GRDVRSN").Specific));
-            //            Button
+            //             Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.BTNCANCEL = ((SAPbouiCOM.Button)(this.GetItem("2").Specific));
             this.BTNLDFAB = ((SAPbouiCOM.Button)(this.GetItem("BTNLDFAB").Specific));
@@ -175,6 +178,30 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     oForm.Freeze(false);
             }
         }
+
+        //_______________________________________________________Validate After_____________________________________________________
+        private void MTXCSTEL_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            if (pVal.ColUID != "CLAMT" || pVal.Row <= 0)
+                return;
+
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            CalculateMatrixTotal(oForm, "MTXCSTEL", "CLAMT", "ETTLCSEL");
+        }
+
+        private void MTXPRCST_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            if (pVal.ColUID != "CLCOST" || pVal.Row <= 0)
+                return;
+
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+            CalculateMatrixTotal(oForm, "MTXPRCST", "CLCOST", "ETLPRCST");
+        }
+
+
+
         //________________________________________________________Lost Focus________________________________________________________
         private void ETOLRNCE_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -704,6 +731,31 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
 
         //_________________________________________________________User Define Function___________________________________________________________________________________________________________________________
+
+        private void CalculateMatrixTotal(SAPbouiCOM.Form oForm, string matrixUID, string columnUID, string totalFieldUID)
+        {
+            try
+            {
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item(matrixUID).Specific;
+                SAPbouiCOM.EditText oTotalField = (SAPbouiCOM.EditText)oForm.Items.Item(totalFieldUID).Specific;
+
+                decimal total = 0;
+
+                for (int i = 1; i <= oMatrix.RowCount; i++)
+                {
+                    string value = ((SAPbouiCOM.EditText)oMatrix.Columns.Item(columnUID).Cells.Item(i).Specific).Value.Trim();
+
+                    if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal amount))
+                        total += amount;
+                }
+
+                oTotalField.Value = total.ToString("0.00", CultureInfo.CurrentCulture);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"Matrix Total Calculation Error: {ex.Message}");
+            }
+        }
 
         private void LoadProcessCosting(SAPbouiCOM.Form oForm)
         {

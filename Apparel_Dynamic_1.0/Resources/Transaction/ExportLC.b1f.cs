@@ -16,7 +16,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         {
         }
 
-        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
+        private SAPbouiCOM.StaticText STSTATMR, STREMRKS, STPIVLUE, STSTATCM, STCOMPNY, STCUSTMR, STSCNO, STLCNO, STLCDESC, STCURR, STBP1BNK, STBP2BNK, STHUSBNK, STLCVAL, STDOCNUM, STDOCDAT, STISUDAT, STSHPDAT, STEXPDAT, STB2BPER, STB2BAMT, STLCTRMS, STPYTRMS, STINTRMS, STAMDNO;
 
         
 
@@ -24,7 +24,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
        
 
-        private SAPbouiCOM.EditText ETBP1BNM, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
+        private SAPbouiCOM.EditText ETBP1BNM, ETPIVLUE, ETREMRKS, ETBP2BNM, ETHUSBNM, ETCUSTNM,ETCUSTMR, ETSCNO, ETLCNO, ETDOCTRY, ETDOCNUM, ETLCDESC, ETCURR, ETBP1BNK, ETBP2BNK, ETHUSBNK, ETLCVAL, ETDOCDAT, ETISUDAT, ETSHPDAT, ETEXPDAT, ETB2BPER, ETB2BAMT, ETAMDNO;
 
         
 
@@ -141,6 +141,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETCUSTNM = ((SAPbouiCOM.EditText)(this.GetItem("ETCUSTNM").Specific));
             this.STREMRKS = ((SAPbouiCOM.StaticText)(this.GetItem("STREMRKS").Specific));
             this.ETREMRKS = ((SAPbouiCOM.EditText)(this.GetItem("ETREMRKS").Specific));
+            this.ETPIVLUE = ((SAPbouiCOM.EditText)(this.GetItem("ETPIVLUE").Specific));
+            this.STPIVLUE = ((SAPbouiCOM.StaticText)(this.GetItem("STPIVLUE").Specific));
             this.OnCustomInitialize();
 
         }
@@ -561,46 +563,97 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //    // Series Initialization
+        //    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+        //    {
+        //        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+        //        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+        //        string today = DateTime.Now.ToString("yyyyMMdd");
+        //        SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
+        //        oDBH.SetValue("U_DOCDATE", 0, today);
+        //        ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+        //        Global.GFunc.UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
+
+        //        //Amendment No
+        //        ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+
+        //        // Branch combo
+        //        Global.GFunc.LoadUserBranches(oForm, "CBCOMPNY");
+        //        SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+        //        oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+        //        //Load Payment Terms
+        //        string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+        //        SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+        //        Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+        //        //Load FOB
+        //        string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+        //        SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+        //        Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+        //        //Currencey Load
+        //        ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+        //    }
+        //    Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
+        //                                                   "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
+        //    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR");
+
+        //}
+
         private void ADDButton_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            // Series Initialization
-            if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+            try
             {
-                Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
-                Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-                string today = DateTime.Now.ToString("yyyyMMdd");
-                SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
-                oDBH.SetValue("U_DOCDATE", 0, today);
-                ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
-                Global.GFunc.UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
+                if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                {
+                    Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
-                //Amendment No
-                ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
+                    string today = DateTime.Now.ToString("yyyyMMdd");
+                    SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OLCM");
 
-                // Branch combo
-                Global.GFunc.LoadUserBranches(oForm, "CBCOMPNY");
-                SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
-                oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+                    oDBH.SetValue("U_DOCDATE", 0, today);
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
 
-                //Load Payment Terms
-                string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
-                SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
-                Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+                    Global.GFunc.UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OLCM");
 
-                //Load FOB
-                string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
-                SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
-                Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value = "0";
 
-                //Currencey Load
-                ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+                    Global.GFunc.LoadUserBranches(oForm, "CBCOMPNY");
+                    SAPbouiCOM.ComboBox oCombo = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBCOMPNY").Specific;
+                    oCombo.Select(oCombo.ValidValues.Item(0).Value, SAPbouiCOM.BoSearchKey.psk_ByValue);
+
+                    string payTerms = @"SELECT ""GroupNum"", ""PymntGroup"" FROM ""OCTG""";
+                    SAPbouiCOM.ComboBox CBPYTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBPYTRMS").Specific;
+                    Global.GFunc.setComboBoxValue(CBPYTRMS, payTerms);
+
+                    string fob = @"SELECT ""Code"", ""Name"" FROM ""@FIL_MH_INCOTRMS"" WHERE ""U_ACTIVE"" = 'Y'";
+                    SAPbouiCOM.ComboBox CBINTRMS = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBINTRMS").Specific;
+                    Global.GFunc.setComboBoxValue(CBINTRMS, fob);
+
+                    ((SAPbouiCOM.EditText)oForm.Items.Item("ETCURR").Specific).Value = "USD";
+
+                    Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM", "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
+                    Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR", "CBSTATMR");
+
+                    ApplyExportLCStatusState(oForm);
+                }
+                else if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                {
+                    ApplyExportLCStatusState(oForm);
+                }
             }
-            Global.GFunc.SetItemsEnabled(oForm, false, "CBSTATCM", "ETCUSTNM",
-                                                           "ETLCVAL", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK", "ETDOCNUM", "ETB2BAMT");
-            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETHUSBNM", "ETCUSTMR");
-
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Export LC button state error: " + ex.Message);
+            }
         }
 
         private void ADDButton_PressedBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
@@ -615,29 +668,73 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         }
 
+        //private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+        //    Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM", "ETCUSTMR",
+        //                                 "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
+
+        //    Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+        //    //SetStatusFields(oForm);
+        //    //SetLCNoStatus(oForm);
+
+        //    ApplyExportLCStatusState(oForm);
+        //    CheckAndLoadAmendmentGrid(oForm);
+        //}
+
         private void Form_DataLoadAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            try
+            {
+                if (!pVal.ActionSuccess)
+                    return;
 
-            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM", "ETCUSTMR",
-                                         "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
-           
-            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
 
-            //SetStatusFields(oForm);
-            //SetLCNoStatus(oForm);
+                Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "CBCOMPNY", "ETCUSTNM", "ETCUSTMR", "ETLCVAL", "ETB2BAMT", "ETBP1BNM", "ETBP2BNM", "ETHUSBNK");
 
-            ApplyExportLCStatusState(oForm);
-            CheckAndLoadAmendmentGrid(oForm);
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+                CheckAndLoadAmendmentGrid(oForm);
+
+                ApplyExportLCStatusState(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Export LC data load state error: " + ex.Message);
+            }
         }
+
+        //private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //    CheckAndLoadAmendmentGrid(oForm);
+        //    //SetLCNoStatus(oForm);
+        //    ApplyExportLCStatusState(oForm);
+        //    Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+        //}
 
         private void Form_DataUpdateAfter(ref SAPbouiCOM.BusinessObjectInfo pVal)
         {
-            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            CheckAndLoadAmendmentGrid(oForm);
-            //SetLCNoStatus(oForm);
-            ApplyExportLCStatusState(oForm);
-            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+            try
+            {
+                if (!pVal.ActionSuccess)
+                    return;
+
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                CheckAndLoadAmendmentGrid(oForm);
+
+                Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXSLODR", "@FIL_DR_LCM1", "U_SONO");
+
+                ApplyExportLCStatusState(oForm);
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError("Export LC update state error: " + ex.Message);
+            }
         }
 
         private void Form_RightClickBefore(ref SAPbouiCOM.ContextMenuInfo eventInfo, out bool BubbleEvent)
@@ -682,15 +779,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void CBSTATCM_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            try
-            {
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                ApplyExportLCStatusState(oForm);
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Error in CM LostFocus: " + ex.Message);
-            }
+            //try
+            //{
+            //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            //    ApplyExportLCStatusState(oForm);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Global.GFunc.ShowError("Error in CM LostFocus: " + ex.Message);
+            //}
         }
 
         private void CBSTATCM_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -698,8 +795,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
 
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
                 string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
 
                 if (selectedValue == "C")
@@ -713,11 +813,16 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         return;
                     }
 
-                    int result = Application.SBO_Application.MessageBox("Are you sure want to confirm Commercial Status?", 1, "Yes", "No");
+                    int result = Application.SBO_Application.MessageBox("Are you sure you want to confirm Commercial Status?", 1, "Yes", "No");
 
                     if (result != 1)
+                    {
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                        return;
+                    }
                 }
+
+                ApplyLCNoState(oForm);
             }
             catch (Exception ex)
             {
@@ -811,17 +916,31 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             try
             {
                 SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
 
+                if (oForm.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && oForm.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE)
+                    return;
+
+                SAPbouiCOM.ComboBox oCmb = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
                 string selectedValue = oCmb.Selected == null ? "" : oCmb.Selected.Value.Trim();
 
                 if (selectedValue == "C")
                 {
-                    int result = Application.SBO_Application.MessageBox("Are you sure want to confirm Marketing Status?", 1, "Yes", "No");
+                    int result = Application.SBO_Application.MessageBox("Are you sure you want to confirm Marketing Status?", 1, "Yes", "No");
 
                     if (result != 1)
+                    {
                         oCmb.Select("D", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                        return;
+                    }
+
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", true);
                 }
+                else if (selectedValue == "D")
+                {
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", false);
+                }
+
+                ApplyLCNoState(oForm);
             }
             catch (Exception ex)
             {
@@ -831,15 +950,15 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private void CBSTATMR_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            try
-            {
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                ApplyExportLCStatusState(oForm);
-            }
-            catch (Exception ex)
-            {
-                Global.GFunc.ShowError("Error in MR LostFocus: " + ex.Message);
-            }
+            //try
+            //{
+            //    SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+            //    ApplyExportLCStatusState(oForm);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Global.GFunc.ShowError("Error in MR LostFocus: " + ex.Message);
+            //}
         }
 
         //private void CBSTATMR_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -1862,6 +1981,26 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return BubbleEvent;
         }
 
+        //private void CheckAndLoadAmendmentGrid(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+        //        int amendNo = 0;
+        //        int.TryParse(amendNoStr, out amendNo);
+
+        //        if (amendNo > 0)
+        //        {
+        //            LoadAmendmentGrid(oForm);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Amendment check error: " + ex.Message);
+        //    }
+        //}
+
         private void CheckAndLoadAmendmentGrid(SAPbouiCOM.Form oForm)
         {
             try
@@ -1874,6 +2013,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (amendNo > 0)
                 {
                     LoadAmendmentGrid(oForm);
+                }
+                else
+                {
+                    SAPbouiCOM.DataTable oDT = oForm.DataSources.DataTables.Item("DT_AMDTL");
+                    oDT.Clear();
                 }
             }
             catch (Exception ex)
@@ -2059,6 +2203,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                                     T0.""U_HBNKNAME"",
 
                                     T0.""U_LCVALUE"",
+                                    T0.""U_PIVALUE"",
                                     T0.""U_DOCDATE"",
                                     T0.""U_ISSUEDATE"",
                                     T0.""U_SHIPDATE"",
@@ -2143,6 +2288,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 // Amount
                 SetEditAmountFormat(oForm, "ETLCVAL", rs.Fields.Item("U_LCVALUE").Value);
+                SetEditAmountFormat(oForm, "ETPIVLUE", rs.Fields.Item("U_PIVALUE").Value);
                 SetEdit(oForm, "ETB2BPER", rs.Fields.Item("U_BTOBLCPER").Value);
                 SetEditAmountFormat(oForm, "ETB2BAMT", rs.Fields.Item("U_BTOBLCVALUE").Value);
 
@@ -2506,6 +2652,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 SAPbouiCOM.EditText ETLCVAL = (SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific;
                 ETLCVAL.Value = totalLCValue.ToString("0.00");
+                SAPbouiCOM.EditText ETPIVLUE = (SAPbouiCOM.EditText)oForm.Items.Item("ETPIVLUE").Specific;
+                ETPIVLUE.Value = totalLCValue.ToString("0.00");
 
                 CalculateB2BAmount(oForm);
             }
@@ -2864,56 +3012,99 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         //    oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
         //}
 
+        //private void ApplyExportLCStatusState(SAPbouiCOM.Form oForm)
+        //{
+        //    try
+        //    {
+        //        SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+        //        SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+        //        SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
+
+        //        string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+        //        string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+        //        string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+        //        int amendNo = 0;
+        //        int.TryParse(amendNoStr, out amendNo);
+
+        //        bool bothConfirmed = mrStatus == "C" && cmStatus == "C";
+
+        //        if (mrStatus == "D" && cmStatus == "D")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = true;
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+        //        else if (mrStatus == "C" && cmStatus == "D")
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = false;
+        //            oForm.Items.Item("CBSTATCM").Enabled = true;
+        //        }
+        //        else if (bothConfirmed)
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = false;
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+        //        else
+        //        {
+        //            oForm.Items.Item("CBSTATMR").Enabled = true;
+        //            oForm.Items.Item("CBSTATCM").Enabled = false;
+        //        }
+
+        //        if (amendNo > 0)
+        //        {
+        //            stLCNo.Caption = "LC No*";
+        //            oForm.Items.Item("ETLCNO").Enabled = false;
+        //        }
+        //        else
+        //        {
+        //            stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
+        //            oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
+        //        }
+
+        //        oForm.Items.Item("BTNAMND").Enabled = bothConfirmed && oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError("Export LC status control error: " + ex.Message);
+        //    }
+        //}
+
         private void ApplyExportLCStatusState(SAPbouiCOM.Form oForm)
         {
             try
             {
                 SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
                 SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
-                SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
 
                 string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
                 string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
-                string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
-
-                int amendNo = 0;
-                int.TryParse(amendNoStr, out amendNo);
 
                 bool bothConfirmed = mrStatus == "C" && cmStatus == "C";
 
                 if (mrStatus == "D" && cmStatus == "D")
                 {
-                    oForm.Items.Item("CBSTATMR").Enabled = true;
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                    SetExportLCItemEnabled(oForm, "CBSTATMR", true);
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", false);
                 }
                 else if (mrStatus == "C" && cmStatus == "D")
                 {
-                    oForm.Items.Item("CBSTATMR").Enabled = false;
-                    oForm.Items.Item("CBSTATCM").Enabled = true;
+                    SetExportLCItemEnabled(oForm, "CBSTATMR", false);
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", true);
                 }
                 else if (bothConfirmed)
                 {
-                    oForm.Items.Item("CBSTATMR").Enabled = false;
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                    SetExportLCItemEnabled(oForm, "CBSTATMR", false);
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", false);
                 }
                 else
                 {
-                    oForm.Items.Item("CBSTATMR").Enabled = true;
-                    oForm.Items.Item("CBSTATCM").Enabled = false;
+                    SetExportLCItemEnabled(oForm, "CBSTATMR", true);
+                    SetExportLCItemEnabled(oForm, "CBSTATCM", false);
                 }
 
-                if (amendNo > 0)
-                {
-                    stLCNo.Caption = "LC No*";
-                    oForm.Items.Item("ETLCNO").Enabled = false;
-                }
-                else
-                {
-                    stLCNo.Caption = bothConfirmed ? "LC No*" : "LC No";
-                    oForm.Items.Item("ETLCNO").Enabled = !bothConfirmed;
-                }
+                ApplyLCNoState(oForm);
 
-                oForm.Items.Item("BTNAMND").Enabled = bothConfirmed && oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE;
+                SetExportLCItemEnabled(oForm, "BTNAMND", bothConfirmed && oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE);
             }
             catch (Exception ex)
             {
@@ -3323,6 +3514,43 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 }
             }
         }
+        private void ApplyLCNoState(SAPbouiCOM.Form oForm)
+        {
+            SAPbouiCOM.StaticText stLCNo = (SAPbouiCOM.StaticText)oForm.Items.Item("STLCNO").Specific;
+            SAPbouiCOM.ComboBox cbStatMR = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATMR").Specific;
+            SAPbouiCOM.ComboBox cbStatCM = (SAPbouiCOM.ComboBox)oForm.Items.Item("CBSTATCM").Specific;
+
+            string mrStatus = cbStatMR.Selected == null ? "" : cbStatMR.Selected.Value.Trim();
+            string cmStatus = cbStatCM.Selected == null ? "" : cbStatCM.Selected.Value.Trim();
+            string amendNoStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETAMDNO").Specific).Value.Trim();
+
+            int amendNo = 0;
+            int.TryParse(amendNoStr, out amendNo);
+
+            bool bothConfirmed = mrStatus == "C" && cmStatus == "C";
+
+            stLCNo.Caption = bothConfirmed || amendNo > 0 ? "LC No*" : "LC No";
+
+            SetExportLCItemEnabled(oForm, "ETLCNO", amendNo == 0 && !bothConfirmed);
+        }
+
+        private void SetExportLCItemEnabled(SAPbouiCOM.Form oForm, string itemUID, bool enabled)
+        {
+            SAPbouiCOM.Item oItem = oForm.Items.Item(itemUID);
+
+            if (oItem.Enabled == enabled)
+                return;
+
+            if (!enabled && oForm.ActiveItem == itemUID)
+            {
+                if (!oForm.Items.Item("ETLCDESC").Enabled)
+                    throw new Exception("Unable to change focus before disabling " + itemUID);
+
+                oForm.ActiveItem = "ETLCDESC";
+            }
+
+            oItem.Enabled = enabled;
+        }
 
         //private bool ValidateSalesOrderCurrentValues(SAPbouiCOM.Form oForm)
         //{
@@ -3401,5 +3629,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 return false;
             }
         }
+
+        private SAPbouiCOM.EditText EditText0;
+        private SAPbouiCOM.StaticText StaticText0;
     }
 }

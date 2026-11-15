@@ -47,6 +47,58 @@ namespace Apparel_Dynamic_1._0.Helper
             }
         }
 
+        public void setMatrixComboBoxValue(SAPbouiCOM.Column oColumn, string query)
+        {
+            SAPbobsCOM.Recordset oRS = null;
+
+            try
+            {
+                if (oColumn.Type != SAPbouiCOM.BoFormItemTypes.it_COMBO_BOX)
+                    return;
+
+                oRS = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                oRS.DoQuery(query);
+
+                while (!oRS.EoF)
+                {
+                    string value = oRS.Fields.Item(0).Value.ToString();
+                    string description = oRS.Fields.Item(1).Value.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        bool exists = false;
+
+                        for (int i = 0; i < oColumn.ValidValues.Count; i++)
+                        {
+                            if (oColumn.ValidValues.Item(i).Value == value)
+                            {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (!exists)
+                            oColumn.ValidValues.Add(value, description);
+                    }
+
+                    oRS.MoveNext();
+                }
+
+                oColumn.DisplayDesc = true;
+            }
+            catch (Exception ex)
+            {
+                Global.G_UI_Application.StatusBar.SetText("Matrix ComboBox Load Error: " + ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
+            finally
+            {
+                if (oRS != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRS);
+            }
+        }
+
         public void LoadUserBranches(SAPbouiCOM.Form oForm, string comboId)
         {
             try

@@ -44,6 +44,7 @@ namespace Apparel_Dynamic_1._0
                 CreateMainMenu("APP_STP", "APP_STP_LEADTIME", "Lead Time", 16, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_PARAMSTR", "Parameter Master", 17, 1, false);
                 CreateMainMenu("APP_STP", "APP_STP_INCOTRMS", "Inco Terms", 18, 1, false);
+                CreateMainMenu("APP_STP", "APP_STP_CSTEMNT", "Cost Element", 19, 1, false);
 
 
                 //Apparel ->  Master
@@ -400,6 +401,20 @@ namespace Apparel_Dynamic_1._0
                         return;
                     }
                     IncoTerms activeForm = new IncoTerms();
+                    activeForm.Show();
+                }
+                //Cost Element
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_STP_CSTEMNT")
+                {
+                    string formUID = "FIL_FRM_CSTEMNT";
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText("Form already opened once.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                        return;
+                    }
+                    CostElement activeForm = new CostElement();
                     activeForm.Show();
                 }
 
@@ -1003,6 +1018,92 @@ namespace Apparel_Dynamic_1._0
                     }
                 }
 
+                // Procurement Costing 
+                else if (pVal.BeforeAction && pVal.MenuUID == "APP_TRN_MRD_CST")
+                {
+                    string formUID = "FIL_FRM_PRECSTING";
+
+                    if (IsFormOpen(formUID))
+                    {
+                        Global.G_UI_Application.Forms.Item(formUID).Select();
+                        Global.G_UI_Application.StatusBar.SetText(
+                            "Form is already open.",
+                            SAPbouiCOM.BoMessageTime.bmt_Short,
+                            SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
+                        return;
+                    }
+
+                    SAPbouiCOM.Form oForm = null;
+
+                    try
+                    {
+                        ProcurementCosting activeForm = new ProcurementCosting();
+                        activeForm.Show();
+
+                        oForm = Application.SBO_Application.Forms.Item(formUID);
+
+                        SAPbouiCOM.Matrix MTXFOB = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXFOB").Specific;
+                        SAPbouiCOM.Matrix MTXCOLOR = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOLOR").Specific;
+                        SAPbouiCOM.Matrix MTXTRMS = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXTRMS").Specific;
+                        SAPbouiCOM.Matrix MTXOTCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXOTCST").Specific;
+                        SAPbouiCOM.Matrix MTXPRCST = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXPRCST").Specific;
+                        SAPbouiCOM.Matrix MTXCSTEL = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCSTEL").Specific;
+                        SAPbouiCOM.Matrix MTXCOMSN = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCOMSN").Specific;
+                        SAPbouiCOM.Matrix MTXSUMRY = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXSUMRY").Specific;
+                        SAPbouiCOM.Matrix MTXATTCH = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXATTCH").Specific;
+                        SAPbouiCOM.Grid GRDFAB = (SAPbouiCOM.Grid)oForm.Items.Item("GRDFAB").Specific;
+
+                        MTXFOB.AutoResizeColumns();
+                        MTXCOLOR.AutoResizeColumns();
+                        //MTXTRMS.AutoResizeColumns();
+                        MTXOTCST.AutoResizeColumns();
+                        MTXPRCST.AutoResizeColumns();
+                        MTXCSTEL.AutoResizeColumns();
+                        MTXCOMSN.AutoResizeColumns();
+                        MTXSUMRY.AutoResizeColumns();
+                        MTXATTCH.AutoResizeColumns();
+                        
+                        GRDFAB.AutoResizeColumns();
+
+                        // Series Initialization
+                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+                        {
+                            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM");
+                            Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+
+                            string today = DateTime.Now.ToString("yyyyMMdd");
+                            SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_OPCS");
+                            oDBH.SetValue("U_DOCDATE", 0, today);
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDAT").Specific).Value = today;
+                            UpdateSeriesAndDocNumByDate(oForm, oDBH, today, "FIL_D_OPCS");
+
+                            //Version
+                            ((SAPbouiCOM.EditText)oForm.Items.Item("ETVERSON").Specific).Value = "1";
+
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXFOB", "@FIL_DR_PCSFOB", "U_FOB");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXTRMS", "@FIL_DR_PCSTA", "U_ITEMCODE");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXCOMSN", "@FIL_DR_PCSCOMSN", "U_CARDCODE");
+                            Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXATTCH", "@FIL_DR_PCSATCH", "U_ATCHMENT");
+
+
+                            // Load Price List for Trims
+                            string priceListQuery = @"SELECT ""ListNum"", ""ListName"" FROM OPLN ORDER BY ""ListNum""";
+                            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXTRMS").Specific;
+                            SAPbouiCOM.Column CLPRILST = oMatrix.Columns.Item("CLPRILST");
+                            Global.GFunc.setMatrixComboBoxValue(CLPRILST, priceListQuery);
+                            MTXTRMS.AutoResizeColumns();
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Application.SBO_Application.MessageBox("Procurement Costing Error:\n" + ex.ToString());
+                    }
+                }
+
+
                 //___________________________________________________________Standard______________________________________________
                 //ADD
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1282")
@@ -1458,6 +1559,11 @@ namespace Apparel_Dynamic_1._0
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
                             }
+                        case "FIL_FRM_CSTEMNT":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
                         case "FIL_FRM_OCSTPRM":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCUSCOD");
@@ -1700,6 +1806,11 @@ namespace Apparel_Dynamic_1._0
                                 break;
                             }
                         case "FIL_FRM_INCOTRMS":
+                            {
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
+                                break;
+                            }
+                        case "FIL_FRM_CSTEMNT":
                             {
                                 Global.GFunc.SetItemsEnabled(oForm, true, "ETCODE");
                                 break;
@@ -2390,6 +2501,7 @@ namespace Apparel_Dynamic_1._0
                                         }
 
                                         ((SAPbouiCOM.EditText)oForm.Items.Item("ETLCVAL").Specific).Value = totalLCValue.ToString("0.00");
+                                        ((SAPbouiCOM.EditText)oForm.Items.Item("ETPIVLUE").Specific).Value = totalLCValue.ToString("0.00");
 
                                         string b2bPerStr = ((SAPbouiCOM.EditText)oForm.Items.Item("ETB2BPER").Specific).Value.Trim();
                                         decimal.TryParse(b2bPerStr, out decimal b2bPercent);

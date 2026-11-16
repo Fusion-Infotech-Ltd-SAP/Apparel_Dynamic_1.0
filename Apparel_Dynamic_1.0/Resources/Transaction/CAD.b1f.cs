@@ -1108,9 +1108,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 {
                     string itemCode = selectedDt.GetValue("ItemCode", 0).ToString().Trim();
                     string itemName = selectedDt.GetValue("ItemName", 0).ToString().Trim();
+                    string inventoryUom = selectedDt.GetValue("InvntryUom", 0).ToString().Trim();
 
                     dtCAD.SetValue("ItemCode", dtRow, itemCode);
                     dtCAD.SetValue("Item Desc", dtRow, itemName);
+                    dtCAD.SetValue("UoM", dtRow, inventoryUom);
 
                     // Add new row only if current row is last row
                     if (dtRow == dtCAD.Rows.Count - 1)
@@ -1133,11 +1135,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         dtCAD.SetValue("Remarks", newRow, "");
 
                         // Keep same colour
-                        dtCAD.SetValue(
-                            "BSCLR",
-                            newRow,
-                            dtCAD.GetValue("BSCLR", dtRow).ToString()
-                        );
+                        dtCAD.SetValue("BSCLR", newRow, dtCAD.GetValue("BSCLR", dtRow).ToString());
                     }
                 }
             }
@@ -1498,6 +1496,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SetGridColumnEditable(oGrid, "BSCLR", false);
             SetGridColumnEditable(oGrid, "Total Consumption", false);
             SetGridColumnEditable(oGrid, "Item Desc", false);
+            SetGridColumnEditable(oGrid, "UoM", false);
         }
 
         private void SetGridColumnEditable(SAPbouiCOM.Grid oGrid, string colUID, bool editable)
@@ -1710,36 +1709,39 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPOS")
                         .Cells.Item(pVal.Row).Specific).Value = selectedCode;
                 }
-                else if (pVal.ColUID == "CLUOM")
-                {
-                    // From CFL_POS table
-                    selectedCode = dt.GetValue("UomCode", 0).ToString().Trim();
+                //else if (pVal.ColUID == "CLUOM")
+                //{
+                //    // From CFL_POS table
+                //    selectedCode = dt.GetValue("UomCode", 0).ToString().Trim();
 
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM")
-                        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
-                }
+                //    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM")
+                //        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
+                //}
                 else if(pVal.ColUID == "CLITMCOD")
                 {
                     string itemCode = dt.GetValue("ItemCode", 0).ToString().Trim();
                     string itemDesc = dt.GetValue("ItemName", 0).ToString().Trim();
+                    string itemUom = dt.GetValue("InvntryUom", 0).ToString().Trim();
 
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMCOD")
-                        .Cells.Item(pVal.Row).Specific).Value = itemCode;
 
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMNAM")
-                        .Cells.Item(pVal.Row).Specific).Value = itemDesc;
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMCOD").Cells.Item(pVal.Row).Specific).Value = itemCode;
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMNAM").Cells.Item(pVal.Row).Specific).Value = itemDesc;
+                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM").Cells.Item(pVal.Row).Specific).Value = itemUom;
 
                     AddLineIfLastRowHasValue(oForm, "MTXMRCON", "@FIL_DR_CADMFAB", "U_ITEMCODE");
                 }
 
             }
+            //catch (System.Runtime.InteropServices.COMException ex)
+            //{
+            //    if (ex.Message.Contains("66000-153"))
+            //        return;
+
+            //    Global.GFunc.ShowError($"CFL After Error: {ex.Message}");
+            //}
             catch (Exception ex)
             {
-                Application.SBO_Application.StatusBar.SetText(
-                    "CFL After error: " + ex.Message,
-                    SAPbouiCOM.BoMessageTime.bmt_Short,
-                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
-                );
+                Global.GFunc.ShowError($"CFL After Error: {ex.Message}");
             }
         }
 

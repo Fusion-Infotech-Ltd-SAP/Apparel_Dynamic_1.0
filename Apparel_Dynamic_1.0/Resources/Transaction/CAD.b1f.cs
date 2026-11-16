@@ -33,15 +33,17 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.Grid GRDCDCON, GRDSIZE, GRDSCLR;
 
+        private SAPbouiCOM.LinkedButton LKSTYLNO, LKDRFTOR, LKMRCHND;
 
 
-        private SAPbouiCOM.Button ADDButton, CancelButton, BTNFETCH, BTNLDCAD, BTNSAVE;
+
+        private SAPbouiCOM.Button ADDButton, CancelButton, BTNFETCH, BTNLDCAD, BTNSAVE, BTNLDCLR;
 
 
 
         public override void OnInitializeComponent()
         {
-            //                      Static text
+            //                       Static text
             this.STSTATUS = ((SAPbouiCOM.StaticText)(this.GetItem("STSTATUS").Specific));
             this.STSTYLCD = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLCD").Specific));
             this.STSTYLDS = ((SAPbouiCOM.StaticText)(this.GetItem("STSTYLDS").Specific));
@@ -51,7 +53,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.STDRFTNO = ((SAPbouiCOM.StaticText)(this.GetItem("STDRFTNO").Specific));
             this.STSLCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STSLCLR").Specific));
             this.STCDCLR = ((SAPbouiCOM.StaticText)(this.GetItem("STCDCLR").Specific));
-            //                      Edittext
+            //                       Edittext
             this.ETSLCLR = ((SAPbouiCOM.EditText)(this.GetItem("ETSLCLR").Specific));
             this.ETSTYLCD = ((SAPbouiCOM.EditText)(this.GetItem("ETSTYLCD").Specific));
             this.ETSTYLCD.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETSTYLCD_ChooseFromListAfter);
@@ -64,15 +66,19 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETDRFTNO.ChooseFromListBefore += new SAPbouiCOM._IEditTextEvents_ChooseFromListBeforeEventHandler(this.ETDRFTNO_ChooseFromListBefore);
             this.ETCDCLR = ((SAPbouiCOM.EditText)(this.GetItem("ETCDCLR").Specific));
             this.ETDOCTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCTRY").Specific));
-            //                      Combo box
+            //                       Combo box
             this.CBSERIES = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSERIES").Specific));
             this.CBSERIES.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBSERIES_ComboSelectAfter);
             this.CBSTATUS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSTATUS").Specific));
-            //                      Folder
+            //                       Folder
+            // this.FOLMERCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLMERCON").Specific));
+            // this.FOLCANCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLCANCN").Specific));
             this.FOLMERCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLMERCON").Specific));
+            this.FOLMERCON.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.CADFolder_ClickAfter);
             this.FOLCANCON = ((SAPbouiCOM.Folder)(this.GetItem("FOLCANCN").Specific));
+            this.FOLCANCON.ClickAfter += new SAPbouiCOM._IFolderEvents_ClickAfterEventHandler(this.CADFolder_ClickAfter);
             this.FOLTEMP = ((SAPbouiCOM.Folder)(this.GetItem("FOLTEMP").Specific));
-            //                      Matrix
+            //                       Matrix
             this.MTXMRCON = ((SAPbouiCOM.Matrix)(this.GetItem("MTXMRCON").Specific));
             this.MTXMRCON.LostFocusAfter += new SAPbouiCOM._IMatrixEvents_LostFocusAfterEventHandler(this.MTXMRCON_LostFocusAfter);
             this.MTXMRCON.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.MTXMRCON_ChooseFromListAfter);
@@ -80,13 +86,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.MTXCDCLR = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCDCLR").Specific));
             this.MTXCDCLR.DoubleClickAfter += new SAPbouiCOM._IMatrixEvents_DoubleClickAfterEventHandler(this.MTXCDCLR_DoubleClickAfter);
             this.MTXCDCON = ((SAPbouiCOM.Matrix)(this.GetItem("MTXCDCON").Specific));
-            //                      Grid
+            //                       Grid
             this.GRDCDCON = ((SAPbouiCOM.Grid)(this.GetItem("GRDCDCON").Specific));
             this.GRDCDCON.ValidateAfter += new SAPbouiCOM._IGridEvents_ValidateAfterEventHandler(this.GRDCDCON_ValidateAfter);
             this.GRDCDCON.ChooseFromListBefore += new SAPbouiCOM._IGridEvents_ChooseFromListBeforeEventHandler(this.GRDCDCON_ChooseFromListBefore);
             this.GRDCDCON.ChooseFromListAfter += new SAPbouiCOM._IGridEvents_ChooseFromListAfterEventHandler(this.GRDCDCON_ChooseFromListAfter);
             this.GRDSIZE = ((SAPbouiCOM.Grid)(this.GetItem("GRDSIZE").Specific));
-            //                      Button
+            //                       Button
             this.ADDButton = ((SAPbouiCOM.Button)(this.GetItem("1").Specific));
             this.ADDButton.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.ADDButton_PressedAfter);
             this.ADDButton.PressedBefore += new SAPbouiCOM._IButtonEvents_PressedBeforeEventHandler(this.ADDButton_PressedBefore);
@@ -104,9 +110,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             this.ETDONTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDONTRY").Specific));
             this.ETMERHN = ((SAPbouiCOM.EditText)(this.GetItem("ETMERHN").Specific));
             this.ETMERHN.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.ETMERHN_ChooseFromListAfter);
-            this.LinkedButton0 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLNO").Specific));
-            this.LinkedButton1 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTOR").Specific));
-            this.LinkedButton2 = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKMRCHND").Specific));
+            
+            this.LKSTYLNO = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKSTYLNO").Specific));
+            this.LKDRFTOR = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKDRFTOR").Specific));
+            this.LKMRCHND = ((SAPbouiCOM.LinkedButton)(this.GetItem("LKMRCHND").Specific));
+            this.BTNLDCLR = ((SAPbouiCOM.Button)(this.GetItem("BTNLDCLR").Specific));
             this.OnCustomInitialize();
 
         }
@@ -2113,186 +2121,8 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        //private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
-        //{
-        //    SAPbouiCOM.Form oForm = null;
-
-        //    try
-        //    {
-        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-        //        oForm.Freeze(true);
-
-        //        int formWidth = oForm.ClientWidth;
-        //        int formHeight = oForm.ClientHeight;
-
-        //        int margin = 10;
-        //        int gap = 10;
-
-        //        // =========================
-        //        // Top Grids: GRDSCLR + GRDSIZE
-        //        // =========================
-        //        SAPbouiCOM.Item grdClr = oForm.Items.Item("GRDSCLR");
-        //        SAPbouiCOM.Item grdSize = oForm.Items.Item("GRDSIZE");
-        //        SAPbouiCOM.Item etStntry = oForm.Items.Item("ETSTNTRY");
-        //        SAPbouiCOM.Item stDocDate = oForm.Items.Item("STDOCDAT");
-
-        //        grdClr.Top = 31;
-        //        grdClr.Left = etStntry.Left + etStntry.Width + 50;
-        //        grdClr.Width = 178;
-
-        //        grdSize.Top = 28;
-        //        grdSize.Left = grdClr.Left + grdClr.Width + 34;
-
-        //        // Never allow GRDSIZE to enter the document information area
-        //        int rightGap = 15;
-        //        int availableSizeGridWidth =
-        //            stDocDate.Left - grdSize.Left - rightGap;
-
-        //        grdSize.Width = Math.Max(150, availableSizeGridWidth);
-
-        //        int maxTopGridHeight = 130;
-        //        int tabTopLimit = 170;
-
-        //        grdClr.Height = Math.Min(
-        //            maxTopGridHeight,
-        //            tabTopLimit - grdClr.Top - gap);
-
-        //        grdSize.Height = Math.Min(
-        //            maxTopGridHeight,
-        //            tabTopLimit - grdSize.Top - gap);
-
-        //        // =========================
-        //        // Caption Width Fix
-        //        // =========================
-        //        oForm.Items.Item("STSLCLR").Width = 110;
-        //        oForm.Items.Item("FOLMERCON").Width = 180;
-        //        oForm.Items.Item("FOLCANCN").Width = 140;
-
-        //        // =========================
-        //        // Tab Container: Item_8
-        //        // =========================
-        //        SAPbouiCOM.Item tab = oForm.Items.Item("Item_8");
-
-        //        tab.Left = margin;
-        //        tab.Top = 170;
-        //        tab.Width = formWidth - (margin * 2);
-
-        //        int bottomButtonSpace = 55;
-        //        tab.Height = Math.Max(190, formHeight - tab.Top - bottomButtonSpace);
-
-        //        // =========================
-        //        // Common Tab Content Area
-        //        // =========================
-        //        int folderHeaderHeight = 55;
-        //        int insideMargin = 10;
-
-        //        int contentTop = tab.Top + folderHeaderHeight + insideMargin;
-        //        int contentBottom = tab.Top + tab.Height - 20;
-        //        int contentHeight = Math.Max(80, contentBottom - contentTop);
-
-        //        // =========================
-        //        // Pane 1: FOLMERCON
-        //        // Matrix: MTXMRCON
-        //        // =========================
-        //        SAPbouiCOM.Item mtxMrCon = oForm.Items.Item("MTXMRCON");
-
-        //        mtxMrCon.Top = contentTop;
-        //        mtxMrCon.Left = tab.Left + 18;
-        //        mtxMrCon.Width = tab.Width - 36;
-        //        mtxMrCon.Height = contentHeight;
-
-        //        // =========================
-        //        // Pane 2: FOLCANCN
-        //        // Matrix: MTXCDCLR
-        //        // StaticText: STCDCLR
-        //        // EditText: ETCDCLR
-        //        // Grid: GRDCDCON
-        //        // Buttons: BTNLDCAD, BTNSAVE
-        //        // =========================
-        //        SAPbouiCOM.Item mtxCdClr = oForm.Items.Item("MTXCDCLR");
-        //        SAPbouiCOM.Item stCdClr = oForm.Items.Item("STCDCLR");
-        //        SAPbouiCOM.Item etCdClr = oForm.Items.Item("ETCDCLR");
-        //        SAPbouiCOM.Item grdCdCon = oForm.Items.Item("GRDCDCON");
-        //        SAPbouiCOM.Item btnLoadCad = oForm.Items.Item("BTNLDCAD");
-        //        SAPbouiCOM.Item btnSave = oForm.Items.Item("BTNSAVE");
-
-        //        int labelTop = contentTop;
-        //        int gridTop = labelTop + 30;
-
-        //        int leftMatrixWidth = 220;
-        //        int buttonHeightSpace = 25;
-
-        //        mtxCdClr.Top = gridTop;
-        //        mtxCdClr.Left = tab.Left + 10;
-        //        mtxCdClr.Width = leftMatrixWidth;
-        //        mtxCdClr.Height = Math.Max(70, contentBottom - gridTop - buttonHeightSpace);
-
-        //        stCdClr.Top = labelTop;
-        //        stCdClr.Left = mtxCdClr.Left + mtxCdClr.Width + gap;
-        //        stCdClr.Width = 90;
-
-        //        etCdClr.Top = labelTop;
-        //        etCdClr.Left = stCdClr.Left + stCdClr.Width + 5;
-        //        etCdClr.Width = 100;
-
-        //        grdCdCon.Top = gridTop;
-        //        grdCdCon.Left = mtxCdClr.Left + mtxCdClr.Width + gap;
-        //        grdCdCon.Width = tab.Left + tab.Width - grdCdCon.Left - 20;
-        //        grdCdCon.Height = Math.Max(70, contentBottom - gridTop - buttonHeightSpace);
-
-        //        btnLoadCad.Top = contentBottom - 18;
-        //        btnLoadCad.Left = grdCdCon.Left+ 800;
-        //        btnLoadCad.Width = 65;
 
 
-        //        btnSave.Top = btnLoadCad.Top;
-        //        btnSave.Left = btnLoadCad.Left + btnLoadCad.Width + 5;
-        //        btnSave.Width = 65;
-
-        //        // =========================
-        //        // Pane 3: FOLTEMP
-        //        // Matrix: MTXCDCON
-        //        // =========================
-        //        SAPbouiCOM.Item mtxCdCon = oForm.Items.Item("MTXCDCON");
-
-        //        mtxCdCon.Top = contentTop;
-        //        mtxCdCon.Left = tab.Left + 18;
-        //        mtxCdCon.Width = tab.Width - 36;
-        //        mtxCdCon.Height = contentHeight;
-
-        //        // =========================
-        //        // Bottom Add / Cancel Buttons
-        //        // =========================
-        //        SAPbouiCOM.Item btnAdd = oForm.Items.Item("1");
-        //        SAPbouiCOM.Item btnCancel = oForm.Items.Item("2");
-
-        //        btnAdd.Top = formHeight - 35;
-        //        btnCancel.Top = formHeight - 35;
-
-        //        btnAdd.Left = 13;
-        //        btnCancel.Left = btnAdd.Left + btnAdd.Width + 3;
-
-        //        // =========================
-        //        // Auto Resize All Columns
-        //        // =========================
-        //        AutoResizeAllMatrixAndGridColumns(oForm);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Application.SBO_Application.StatusBar.SetText(
-        //            "Resize error: " + ex.Message,
-        //            SAPbouiCOM.BoMessageTime.bmt_Short,
-        //            SAPbouiCOM.BoStatusBarMessageType.smt_Error
-        //        );
-        //    }
-        //    finally
-        //    {
-        //        if (oForm != null)
-        //        {
-        //            oForm.Freeze(false);
-        //        }
-        //    }
-        //}
 
         private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
         {
@@ -2305,12 +2135,10 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 oForm.Freeze(true);
                 frozen = true;
 
-                int formWidth = oForm.ClientWidth;
                 int formHeight = oForm.ClientHeight;
-                int margin = 10;
                 int gap = 10;
 
-                // Header Colour Grid
+                // Header Colour and Size Grids
                 SAPbouiCOM.Item grdClr = oForm.Items.Item("GRDSCLR");
                 SAPbouiCOM.Item grdSize = oForm.Items.Item("GRDSIZE");
                 SAPbouiCOM.Item etStntry = oForm.Items.Item("ETSTNTRY");
@@ -2329,23 +2157,21 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 // Tab Container
                 SAPbouiCOM.Item tab = oForm.Items.Item("Item_8");
 
-                tab.Left = margin;
-                tab.Top = 170;
-                tab.Width = Math.Max(400, formWidth - (margin * 2));
-                tab.Height = Math.Max(190, formHeight - tab.Top - 55);
+                tab.Width = Math.Max(760, oForm.Width - 38);
+
+                int footerTop = formHeight - oForm.Items.Item("1").Height - 12;
+                tab.Height = Math.Max(190, footerTop - tab.Top - 6);
 
                 // Folder Captions
-                // Do not modify Folder.Top or Folder.Left.
                 SAPbouiCOM.Item folderMer = oForm.Items.Item("FOLMERCON");
                 SAPbouiCOM.Item folderCad = oForm.Items.Item("FOLCANCN");
 
-                folderMer.Width = 245;
-                folderCad.Width = 185;
+                folderMer.Width = 210;
+                folderCad.Width = 165;
 
                 // Common Content Area
-                // Keep controls beneath the SAP-rendered folder strip.
-                int contentTop = tab.Top + 68;
-                int contentBottom = tab.Top + tab.Height - 15;
+                int contentTop = tab.Top + 20;
+                int contentBottom = tab.Top + tab.Height - 12;
                 int contentHeight = Math.Max(70, contentBottom - contentTop);
 
                 // Merchandise Consumption Matrix
@@ -2363,17 +2189,18 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Item grdCdCon = oForm.Items.Item("GRDCDCON");
                 SAPbouiCOM.Item btnLoadCad = oForm.Items.Item("BTNLDCAD");
                 SAPbouiCOM.Item btnSave = oForm.Items.Item("BTNSAVE");
+                SAPbouiCOM.Item btnLoadClr = oForm.Items.Item("BTNLDCLR");
 
-                int leftMatrixWidth = 245;
+                int leftMatrixWidth = 310;
                 int labelTop = contentTop;
-                int gridTop = labelTop + 28;
+                int gridTop = labelTop + 24;
                 int gridHeight = Math.Max(65, contentBottom - gridTop - 30);
 
                 // CAD Colour Matrix
-                mtxCdClr.Top = gridTop;
+                mtxCdClr.Top = labelTop;
                 mtxCdClr.Left = tab.Left + 10;
                 mtxCdClr.Width = leftMatrixWidth;
-                mtxCdClr.Height = gridHeight;
+                mtxCdClr.Height = gridHeight +10;
 
                 // CAD Consumption Grid
                 grdCdCon.Top = gridTop;
@@ -2390,7 +2217,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 etCdClr.Left = stCdClr.Left + stCdClr.Width + 5;
                 etCdClr.Width = 110;
 
-                // LOAD CAD and SAVE Buttons
+                // Load Colour Button
+                btnLoadClr.Width = 90;
+                btnLoadClr.Height = etCdClr.Height;
+                btnLoadClr.Top = etCdClr.Top;
+                btnLoadClr.Left = etCdClr.Left + etCdClr.Width + 10;
+
+                // Load CAD and Save Buttons
                 btnLoadCad.Width = 75;
                 btnSave.Width = 65;
 
@@ -2412,8 +2245,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 SAPbouiCOM.Item btnAdd = oForm.Items.Item("1");
                 SAPbouiCOM.Item btnCancel = oForm.Items.Item("2");
 
-                btnAdd.Top = formHeight - 35;
-                btnCancel.Top = btnAdd.Top;
+                btnAdd.Top = footerTop;
+                btnCancel.Top = footerTop;
+
                 btnAdd.Left = 13;
                 btnCancel.Left = btnAdd.Left + btnAdd.Width + 3;
 
@@ -2431,10 +2265,146 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
+        //private void Form_ResizeAfter(SAPbouiCOM.SBOItemEventArg pVal)
+        //{
+        //    SAPbouiCOM.Form oForm = null;
+        //    bool frozen = false;
 
-        // =====================================================
-        // AUTO RESIZE ALL MATRIX AND GRID COLUMNS
-        // =====================================================
+        //    try
+        //    {
+        //        oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+        //        oForm.Freeze(true);
+        //        frozen = true;
+
+        //        int formHeight = oForm.ClientHeight;
+        //        int gap = 10;
+
+        //        // Header Colour and Size Grids
+        //        SAPbouiCOM.Item grdClr = oForm.Items.Item("GRDSCLR");
+        //        SAPbouiCOM.Item grdSize = oForm.Items.Item("GRDSIZE");
+        //        SAPbouiCOM.Item etStntry = oForm.Items.Item("ETSTNTRY");
+        //        SAPbouiCOM.Item stDocDate = oForm.Items.Item("STDOCDAT");
+
+        //        grdClr.Top = 31;
+        //        grdClr.Left = etStntry.Left + etStntry.Width + 35;
+        //        grdClr.Width = 235;
+        //        grdClr.Height = 122;
+
+        //        grdSize.Top = 28;
+        //        grdSize.Left = grdClr.Left + grdClr.Width + 20;
+        //        grdSize.Width = Math.Max(120, stDocDate.Left - grdSize.Left - 15);
+        //        grdSize.Height = 130;
+
+        //        // Tab Container
+        //        SAPbouiCOM.Item tab = oForm.Items.Item("Item_8");
+
+        //        tab.Width = Math.Max(760, oForm.Width - 38);
+
+        //        int footerTop = formHeight - oForm.Items.Item("1").Height - 12;
+        //        tab.Height = Math.Max(190, footerTop - tab.Top - 6);
+
+        //        // Folder Captions
+        //        SAPbouiCOM.Item folderMer = oForm.Items.Item("FOLMERCON");
+        //        SAPbouiCOM.Item folderCad = oForm.Items.Item("FOLCANCN");
+
+        //        folderMer.Width = 210;
+        //        folderCad.Width = 165;
+
+        //        // Common Content Area
+        //        int contentTop = tab.Top + 30;
+        //        int contentBottom = tab.Top + tab.Height - 12;
+        //        int contentHeight = Math.Max(70, contentBottom - contentTop);
+
+        //        // Merchandise Consumption Matrix
+        //        SAPbouiCOM.Item mtxMrCon = oForm.Items.Item("MTXMRCON");
+
+        //        mtxMrCon.Top = contentTop;
+        //        mtxMrCon.Left = tab.Left + 15;
+        //        mtxMrCon.Width = Math.Max(300, tab.Width - 30);
+        //        mtxMrCon.Height = contentHeight;
+
+        //        // CAD Consumption Controls
+        //        SAPbouiCOM.Item mtxCdClr = oForm.Items.Item("MTXCDCLR");
+        //        SAPbouiCOM.Item stCdClr = oForm.Items.Item("STCDCLR");
+        //        SAPbouiCOM.Item etCdClr = oForm.Items.Item("ETCDCLR");
+        //        SAPbouiCOM.Item grdCdCon = oForm.Items.Item("GRDCDCON");
+        //        SAPbouiCOM.Item btnLoadCad = oForm.Items.Item("BTNLDCAD");
+        //        SAPbouiCOM.Item btnSave = oForm.Items.Item("BTNSAVE");
+        //        SAPbouiCOM.Item btnLoadClr = oForm.Items.Item("BTNLDCLR");
+
+        //        int leftMatrixWidth = 310;
+        //        int labelTop = contentTop;
+        //        int gridTop = labelTop + 24;
+        //        int gridHeight = Math.Max(65, contentBottom - gridTop - 30);
+
+        //        // CAD Colour Matrix
+        //        mtxCdClr.Top = gridTop;
+        //        mtxCdClr.Left = tab.Left + 10;
+        //        mtxCdClr.Width = leftMatrixWidth;
+        //        mtxCdClr.Height = Math.Max(65, gridHeight - 30);
+
+        //        // Load Colour Button
+        //        btnLoadClr.Width = 90;
+        //        btnLoadClr.Top = mtxCdClr.Top + mtxCdClr.Height + 10;
+        //        btnLoadClr.Left = mtxCdClr.Left + mtxCdClr.Width - btnLoadClr.Width;
+
+        //        // CAD Consumption Grid
+        //        grdCdCon.Top = gridTop;
+        //        grdCdCon.Left = mtxCdClr.Left + mtxCdClr.Width + gap;
+        //        grdCdCon.Width = Math.Max(140, tab.Left + tab.Width - grdCdCon.Left - 15);
+        //        grdCdCon.Height = gridHeight;
+
+        //        // Selected Colour
+        //        stCdClr.Top = labelTop;
+        //        stCdClr.Left = grdCdCon.Left;
+        //        stCdClr.Width = 105;
+
+        //        etCdClr.Top = labelTop;
+        //        etCdClr.Left = stCdClr.Left + stCdClr.Width + 5;
+        //        etCdClr.Width = 110;
+
+        //        // Load CAD and Save Buttons
+        //        btnLoadCad.Width = 75;
+        //        btnSave.Width = 65;
+
+        //        btnSave.Top = contentBottom - 18;
+        //        btnLoadCad.Top = btnSave.Top;
+
+        //        btnSave.Left = tab.Left + tab.Width - 15 - btnSave.Width;
+        //        btnLoadCad.Left = btnSave.Left - gap - btnLoadCad.Width;
+
+        //        // Temporary Matrix
+        //        SAPbouiCOM.Item mtxCdCon = oForm.Items.Item("MTXCDCON");
+
+        //        mtxCdCon.Top = contentTop;
+        //        mtxCdCon.Left = tab.Left + 15;
+        //        mtxCdCon.Width = Math.Max(300, tab.Width - 30);
+        //        mtxCdCon.Height = contentHeight;
+
+        //        // Bottom Add / Cancel Buttons
+        //        SAPbouiCOM.Item btnAdd = oForm.Items.Item("1");
+        //        SAPbouiCOM.Item btnCancel = oForm.Items.Item("2");
+
+        //        btnAdd.Top = footerTop;
+        //        btnCancel.Top = footerTop;
+
+        //        btnAdd.Left = 13;
+        //        btnCancel.Left = btnAdd.Left + btnAdd.Width + 3;
+
+        //        // Auto Resize Matrix and Grid Columns
+        //        AutoResizeAllMatrixAndGridColumns(oForm);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Global.GFunc.ShowError($"CAD Form Resize Error: {ex.Message}");
+        //    }
+        //    finally
+        //    {
+        //        if (frozen && oForm != null)
+        //            oForm.Freeze(false);
+        //    }
+        //}
+
         private void AutoResizeAllMatrixAndGridColumns(SAPbouiCOM.Form oForm)
         {
             // Header Size Grid
@@ -2486,16 +2456,65 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
             catch { }
 
-            // CAD Colour Matrix
+            //// CAD Colour Matrix
+            //try
+            //{
+            //    SAPbouiCOM.Matrix mtxCdClr = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCLR").Specific;
+            //    mtxCdClr.Columns.Item("CLCLRCOD").Width = 90;
+            //    mtxCdClr.Columns.Item("CLCLRNAM").Width = 125;
+            //}
+            //catch { }
+
+            // CAD Colour Matrix - Dynamic Column Resize
             try
             {
                 SAPbouiCOM.Matrix mtxCdClr = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCLR").Specific;
-                mtxCdClr.Columns.Item("CLCLRCOD").Width = 90;
-                mtxCdClr.Columns.Item("CLCLRNAM").Width = 125;
+
+                int matrixWidth = mtxCdClr.Item.Width;
+                int rowNumberWidth = 25;
+                int scrollbarSpace = 20;
+                int availableWidth = Math.Max(100, matrixWidth - rowNumberWidth - scrollbarSpace);
+
+                int colourCodeWidth = (int)(availableWidth * 0.45);
+                int colourNameWidth = availableWidth - colourCodeWidth;
+
+                mtxCdClr.Columns.Item("#").Width = rowNumberWidth;
+                mtxCdClr.Columns.Item("CLCLRCOD").Width = colourCodeWidth;
+                mtxCdClr.Columns.Item("CLCLRNAM").Width = colourNameWidth;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"CAD Colour Matrix Resize Error: {ex.Message}");
+            }
         }
 
+        private void CADFolder_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            SAPbouiCOM.Form oForm = null;
+            bool frozen = false;
+
+            try
+            {
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                oForm.Freeze(true);
+                frozen = true;
+
+                SAPbouiCOM.Item folderMer = oForm.Items.Item("FOLMERCON");
+                SAPbouiCOM.Item folderCad = oForm.Items.Item("FOLCANCN");
+
+                folderMer.Width = 210;
+                folderCad.Width = 165;
+            }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"CAD Folder Resize Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen && oForm != null)
+                    oForm.Freeze(false);
+            }
+        }
 
         //private void AutoResizeAllMatrixAndGridColumns(SAPbouiCOM.Form oForm)
         //{
@@ -2517,5 +2536,6 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         private SAPbouiCOM.LinkedButton LinkedButton0;
         private SAPbouiCOM.LinkedButton LinkedButton1;
         private SAPbouiCOM.LinkedButton LinkedButton2;
+        private SAPbouiCOM.Button Button0;
     }
 }

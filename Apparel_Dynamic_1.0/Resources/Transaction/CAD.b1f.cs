@@ -971,10 +971,12 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     dtCAD.SetValue("Wastage", dtRow, "0");
                 }
 
-                double totalConsumption =
-                    consumption +
-                    (consumption * shrinkage) +
-                    (consumption * wastage);
+                //double totalConsumption =
+                //    consumption +
+                //    (consumption * shrinkage) +
+                //    (consumption * wastage);
+
+                double totalConsumption = consumption + (consumption * wastage / 100);
 
                 dtCAD.SetValue(
                     "Total Consumption",

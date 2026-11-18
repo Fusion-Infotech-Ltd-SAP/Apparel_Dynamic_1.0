@@ -967,7 +967,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 if (pVal.ColUID == "UseType")
                 {
                     string code = selectedDt.GetValue("Code", 0).ToString().Trim();
+                    string name =selectedDt.GetValue("Name", 0).ToString().Trim();
                     dtCAD.SetValue("UseType", dtRow, code);
+                    dtCAD.SetValue("UseType Desc", dtRow, name);
                 }
                 else if (pVal.ColUID == "Position")
                 {
@@ -992,6 +994,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                         int newRow = dtCAD.Rows.Count - 1;
 
                         dtCAD.SetValue("UseType", newRow, "");
+                        dtCAD.SetValue("UseType Desc", newRow, "");
                         dtCAD.SetValue("Position", newRow, "");
                         dtCAD.SetValue("ItemCode", newRow, "");
                         dtCAD.SetValue("Item Desc", newRow, "");
@@ -1226,6 +1229,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             SetGridColumnEditable(oGrid, "Total Consumption", false);
             SetGridColumnEditable(oGrid, "Item Desc", false);
             SetGridColumnEditable(oGrid, "UoM", false);
+            SetGridColumnEditable(oGrid, "UseType Desc", false);
         }
 
         private void SetGridColumnEditable(SAPbouiCOM.Grid oGrid, string colUID, bool editable)
@@ -1258,8 +1262,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                 {
                     string code = MatrixText(merch, "CLITMCOD", row);
                     if (string.IsNullOrWhiteSpace(code) || IsMerchChecked(merch, row) != wantChecked) continue;
+                    string useType = MatrixText(merch, "CLUSETYP", row);
                     string position = MatrixText(merch, "CLPOS", row);
-                    var saved = existing.FirstOrDefault(x => SameCADKey(x, group, code, position));
+                    var saved = existing.FirstOrDefault(x => SameCADKey(x, group, useType, code, position));
                     result.Add(saved != null ? new Dictionary<string, string>(saved) : NewCADFromMerch(merch, row, group));
                 }
             }
@@ -1331,77 +1336,63 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             }
         }
 
-        private void MTXMRCON_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        private void MTXMRCON_ChooseFromListAfter(object sboObject,SAPbouiCOM.SBOItemEventArg pVal)
         {
+            SAPbouiCOM.Form oForm = null;
+
             try
             {
-                SAPbouiCOM.ISBOChooseFromListEventArg cflArg =
-                    (SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
-
+                SAPbouiCOM.ISBOChooseFromListEventArg cflArg =(SAPbouiCOM.ISBOChooseFromListEventArg)pVal;
                 SAPbouiCOM.DataTable dt = cflArg.SelectedObjects;
+
                 if (dt == null || dt.Rows.Count == 0)
                     return;
 
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-                SAPbouiCOM.Matrix oMatrix =
-                    (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                int selectedRow = pVal.Row;
 
-                string selectedCode = "";
-                string selectedName = "";
+                if (selectedRow <= 0 || selectedRow > oMatrix.RowCount)
+                    return;
+
+                oForm.Freeze(true);
 
                 if (pVal.ColUID == "CLUSETYP")
                 {
-                    // From CFL_USE table
-                    selectedCode = dt.GetValue("Code", 0).ToString().Trim();
-                    selectedName = dt.GetValue("Name", 0).ToString().Trim();
-
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUSETYP")
-                        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
-
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUSDESC")
-                        .Cells.Item(pVal.Row).Specific).Value = selectedName;
+                    string selectedCode =dt.GetValue("Code", 0).ToString().Trim();
+                    string selectedName =dt.GetValue("Name", 0).ToString().Trim();
+                    SetMatrixValue(oMatrix,"CLUSETYP",selectedRow,selectedCode);
+                    SetMatrixValue(oMatrix,"CLUSDESC",selectedRow,selectedName);
                 }
                 else if (pVal.ColUID == "CLPOS")
                 {
-                    // From CFL_POS table
-                    selectedCode = dt.GetValue("Code", 0).ToString().Trim();
-
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLPOS")
-                        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
+                    string selectedCode =dt.GetValue("Code", 0).ToString().Trim();
+                    SetMatrixValue( oMatrix, "CLPOS",selectedRow,selectedCode);
                 }
-                //else if (pVal.ColUID == "CLUOM")
-                //{
-                //    // From CFL_POS table
-                //    selectedCode = dt.GetValue("UomCode", 0).ToString().Trim();
-
-                //    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM")
-                //        .Cells.Item(pVal.Row).Specific).Value = selectedCode;
-                //}
                 else if (pVal.ColUID == "CLITMCOD")
                 {
-                    string itemCode = dt.GetValue("ItemCode", 0).ToString().Trim();
-                    string itemDesc = dt.GetValue("ItemName", 0).ToString().Trim();
-                    string itemUom = dt.GetValue("InvntryUom", 0).ToString().Trim();
+                    string itemCode =dt.GetValue("ItemCode", 0).ToString().Trim();
+                    string itemDesc =dt.GetValue("ItemName", 0).ToString().Trim();
+                    string itemUom =dt.GetValue("InvntryUom", 0).ToString().Trim();
 
+                    SetMatrixValue(oMatrix, "CLITMCOD", selectedRow, itemCode);
+                    SetMatrixValue(oMatrix, "CLITMNAM", selectedRow, itemDesc);
+                    SetMatrixValue(oMatrix, "CLUOM", selectedRow, itemUom);
 
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMCOD").Cells.Item(pVal.Row).Specific).Value = itemCode;
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLITMNAM").Cells.Item(pVal.Row).Specific).Value = itemDesc;
-                    ((SAPbouiCOM.EditText)oMatrix.Columns.Item("CLUOM").Cells.Item(pVal.Row).Specific).Value = itemUom;
+                    // Preserve current matrix values before adding a new line.
+                    oMatrix.FlushToDataSource();
 
-                    AddLineIfLastRowHasValue(oForm, "MTXMRCON", "@FIL_DR_CADMFAB", "U_ITEMCODE");
+                    AddLineIfLastRowHasValue( oForm,"MTXMRCON","@FIL_DR_CADMFAB","U_ITEMCODE");
                 }
-
             }
-            //catch (System.Runtime.InteropServices.COMException ex)
-            //{
-            //    if (ex.Message.Contains("66000-153"))
-            //        return;
-
-            //    Global.GFunc.ShowError($"CFL After Error: {ex.Message}");
-            //}
             catch (Exception ex)
             {
-                Global.GFunc.ShowError($"CFL After Error: {ex.Message}");
+                Global.GFunc.ShowError($"CAD Merchandise CFL Error: {ex.Message}");
+            }
+            finally
+            {
+                if (oForm != null)
+                    oForm.Freeze(false);
             }
         }
 
@@ -2145,10 +2136,48 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             return ((SAPbouiCOM.CheckBox)matrix.Columns.Item("CLCLRAPL").Cells.Item(row).Specific).Checked;
         }
 
-        private static readonly string[] CADFields = { "UseType", "Position", "ItemCode", "Item Desc", "UoM", "Consumption", "Shrinkage", "Wastage", "Cut WD Inch", "Cut WD CM", "Total Consumption", "Remarks", "BSCLR" };
-        private static readonly string[] CADMatrixFields = { "CLUSETYP", "CLPOSTN", "CLITMCOD", "CLITMNAM", "CLUOM", "CLCNSMPN", "CLSHRKPR", "CLWSTGP", "CLCTWDIN", "CLCTWDCM", "CLTTLCON", "CLRMRKS", "CLBSCLR" };
-        private static readonly string[] CADDbFields = { "U_USETYPE", "U_POSITION", "U_ITEMCODE", "U_ITEMNAME", "U_UOM", "U_ACTCONSM", "U_SHRNLPRC", "U_CUTWSTG", "U_CBLWDIN", "U_CBLWDCM", "U_TTLCONSM", "U_REMARKS", "U_BASECLR" };
+        private static readonly string[] CADFields ={
+            "UseType","UseType Desc","Position",
+            "ItemCode","Item Desc","UoM","Consumption",
+            "Shrinkage","Wastage","Cut WD Inch","Cut WD CM",
+            "Total Consumption","Remarks","BSCLR"
+        };
 
+        private static readonly string[] CADMatrixFields =
+        {
+    "CLUSETYP",
+    "CLUSDESC",
+    "CLPOSTN",
+    "CLITMCOD",
+    "CLITMNAM",
+    "CLUOM",
+    "CLCNSMPN",
+    "CLSHRKPR",
+    "CLWSTGP",
+    "CLCTWDIN",
+    "CLCTWDCM",
+    "CLTTLCON",
+    "CLRMRKS",
+    "CLBSCLR"
+};
+
+        private static readonly string[] CADDbFields =
+        {
+    "U_USETYPE",
+    "U_USETYPENM",
+    "U_POSITION",
+    "U_ITEMCODE",
+    "U_ITEMNAME",
+    "U_UOM",
+    "U_ACTCONSM",
+    "U_SHRNLPRC",
+    "U_CUTWSTG",
+    "U_CBLWDIN",
+    "U_CBLWDCM",
+    "U_TTLCONSM",
+    "U_REMARKS",
+    "U_BASECLR"
+};
         private static List<string> ReadCADColours(SAPbouiCOM.Matrix matrix)
         {
             var result = new List<string>();
@@ -2162,35 +2191,87 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private static SAPbouiCOM.DataTable EnsureCADGridSchema(SAPbouiCOM.Form form)
         {
-            SAPbouiCOM.DataTable dt = form.DataSources.DataTables.Item("DT_CADCN");
-            // A zero-record query preserves the correct HANA column types and the same aliases for every grid operation.
-            if (dt.Columns.Count != CADFields.Length || !Enumerable.Range(0, CADFields.Length).All(i => dt.Columns.Item(i).Name == CADFields[i]))
+            SAPbouiCOM.DataTable dt =
+                form.DataSources.DataTables.Item("DT_CADCN");
+
+            if (dt.Columns.Count != CADFields.Length ||
+                !Enumerable.Range(0, CADFields.Length)
+                    .All(i => dt.Columns.Item(i).Name == CADFields[i]))
             {
-                string query = @"SELECT ""U_USETYPE"" AS ""UseType"", ""U_POSITION"" AS ""Position"", ""U_ITEMCODE"" AS ""ItemCode"", ""U_ITEMNAME"" AS ""Item Desc"", ""U_UOM"" AS ""UoM"", ""U_ACTCONSM"" AS ""Consumption"", ""U_SHRNLPRC"" AS ""Shrinkage"", ""U_CUTWSTG"" AS ""Wastage"", ""U_CBLWDIN"" AS ""Cut WD Inch"", ""U_CBLWDCM"" AS ""Cut WD CM"", ""U_TTLCONSM"" AS ""Total Consumption"", ""U_REMARKS"" AS ""Remarks"", ""U_BASECLR"" AS ""BSCLR"" FROM ""@FIL_DR_CADFABCN"" WHERE 1 = 0";
+                string query = @"
+            SELECT
+                ""U_USETYPE"" AS ""UseType"",
+                ""U_USETYPENM"" AS ""UseType Desc"",
+                ""U_POSITION"" AS ""Position"",
+                ""U_ITEMCODE"" AS ""ItemCode"",
+                ""U_ITEMNAME"" AS ""Item Desc"",
+                ""U_UOM"" AS ""UoM"",
+                ""U_ACTCONSM"" AS ""Consumption"",
+                ""U_SHRNLPRC"" AS ""Shrinkage"",
+                ""U_CUTWSTG"" AS ""Wastage"",
+                ""U_CBLWDIN"" AS ""Cut WD Inch"",
+                ""U_CBLWDCM"" AS ""Cut WD CM"",
+                ""U_TTLCONSM"" AS ""Total Consumption"",
+                ""U_REMARKS"" AS ""Remarks"",
+                ""U_BASECLR"" AS ""BSCLR""
+            FROM ""@FIL_DR_CADFABCN""
+            WHERE 1 = 0";
+
                 dt.ExecuteQuery(query);
             }
+
             return dt;
         }
 
-        private static Dictionary<string, string> NewCADFromMerch(SAPbouiCOM.Matrix matrix, int i, string colour)
+        private static Dictionary<string, string> NewCADFromMerch(
+    SAPbouiCOM.Matrix matrix,
+    int i,
+    string colour)
         {
             var row = CADFields.ToDictionary(x => x, x => "");
-            row["UseType"] = MatrixText(matrix, "CLUSETYP", i);
-            row["Position"] = MatrixText(matrix, "CLPOS", i);
-            row["ItemCode"] = MatrixText(matrix, "CLITMCOD", i);
-            row["Item Desc"] = MatrixText(matrix, "CLITMNAM", i);
-            row["UoM"] = MatrixText(matrix, "CLUOM", i);
-            row["Shrinkage"] = MatrixText(matrix, "CLSHRKPR", i);
-            row["Cut WD Inch"] = MatrixText(matrix, "CLCTWDIN", i);
-            row["Cut WD CM"] = MatrixText(matrix, "CLCTWDCM", i);
-            row["Consumption"] = "0"; row["Wastage"] = "0"; row["Total Consumption"] = "0";
+
+            row["UseType"] =
+                MatrixText(matrix, "CLUSETYP", i);
+
+            row["UseType Desc"] =
+                MatrixText(matrix, "CLUSDESC", i);
+
+            row["Position"] =
+                MatrixText(matrix, "CLPOS", i);
+
+            row["ItemCode"] =
+                MatrixText(matrix, "CLITMCOD", i);
+
+            row["Item Desc"] =
+                MatrixText(matrix, "CLITMNAM", i);
+
+            row["UoM"] =
+                MatrixText(matrix, "CLUOM", i);
+
+            row["Shrinkage"] =
+                MatrixText(matrix, "CLSHRKPR", i);
+
+            row["Cut WD Inch"] =
+                MatrixText(matrix, "CLCTWDIN", i);
+
+            row["Cut WD CM"] =
+                MatrixText(matrix, "CLCTWDCM", i);
+
+            row["Consumption"] = "0";
+            row["Wastage"] = "0";
+            row["Total Consumption"] = "0";
+
             row["BSCLR"] = colour;
+
             return row;
         }
 
-        private static bool SameCADKey(Dictionary<string, string> row, string colour, string itemCode, string position)
+        private static bool SameCADKey(Dictionary<string, string> row, string colour, string useType, string itemCode, string position)
         {
-            return row["BSCLR"].Equals(colour, StringComparison.OrdinalIgnoreCase) && row["ItemCode"].Equals(itemCode, StringComparison.OrdinalIgnoreCase) && row["Position"].Equals(position, StringComparison.OrdinalIgnoreCase);
+            return row["BSCLR"].Equals(colour, StringComparison.OrdinalIgnoreCase) &&
+                   row["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase) &&
+                   row["ItemCode"].Equals(itemCode, StringComparison.OrdinalIgnoreCase) &&
+                   row["Position"].Equals(position, StringComparison.OrdinalIgnoreCase);
         }
 
         private static List<Dictionary<string, string>> ReadStoredCAD(SAPbouiCOM.Form form)
@@ -2379,65 +2460,138 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
         // Invoked from Menu.cs MenuUID 1293 BEFORE action. Cancel the SAP default and delete synchronously.
         public static void DeleteCADSelectedRow(SAPbouiCOM.Form form)
         {
-            if (!_cadDeleteContext.TryGetValue(form.UniqueID, out var info)) { Global.GFunc.ShowError("Please right-click and select a CAD row to delete."); return; }
+            if (!_cadDeleteContext.TryGetValue(form.UniqueID, out var info))
+            {
+                Global.GFunc.ShowError("Please right-click and select a CAD row to delete.");
+                return;
+            }
+
             _cadDeleteContext.Remove(form.UniqueID);
-            if (form.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE) { Global.GFunc.ShowError("Row deletion is not allowed in this form mode."); return; }
+
+            if (form.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
+            {
+                Global.GFunc.ShowError("Row deletion is not allowed in this form mode.");
+                return;
+            }
+
             if (!CheckCADGridSaved(form)) return;
-            form.Freeze(true);
+
+            bool frozen = false;
+
             try
             {
+                form.Freeze(true);
+                frozen = true;
+
                 SAPbouiCOM.Matrix merch = (SAPbouiCOM.Matrix)form.Items.Item("MTXMRCON").Specific;
                 SAPbouiCOM.Matrix stored = (SAPbouiCOM.Matrix)form.Items.Item("MTXCDCON").Specific;
+
                 stored.FlushToDataSource();
                 var data = ReadStoredCAD(form);
+
                 if (info.Item1 == "MTXMRCON")
                 {
                     int rowIndex = info.Item2;
-                    if (rowIndex < 1 || rowIndex > merch.RowCount) { Global.GFunc.ShowError("Please select a valid merchandise row."); return; }
-                    string code = MatrixText(merch, "CLITMCOD", rowIndex), position = MatrixText(merch, "CLPOS", rowIndex);
+
+                    if (rowIndex < 1 || rowIndex > merch.RowCount)
+                    {
+                        Global.GFunc.ShowError("Please select a valid merchandise row.");
+                        return;
+                    }
+
+                    string code = MatrixText(merch, "CLITMCOD", rowIndex);
+                    string position = MatrixText(merch, "CLPOS", rowIndex);
+                    string useType = MatrixText(merch, "CLUSETYP", rowIndex);
+
                     if (string.IsNullOrWhiteSpace(code)) return;
+
                     merch.FlushToDataSource();
+
                     SAPbouiCOM.DBDataSource db = form.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
                     db.RemoveRecord(rowIndex - 1);
-                    for (int i = 0; i < db.Size; i++) db.SetValue("LineId", i, (i + 1).ToString());
+
+                    for (int i = 0; i < db.Size; i++)
+                        db.SetValue("LineId", i, (i + 1).ToString());
+
                     merch.LoadFromDataSource();
-                    data.RemoveAll(x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) && x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase));
+
+                    data.RemoveAll(x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
+                                        x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
+                                        x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
+
                     WriteStoredCAD(form, data);
-                    RemoveCADGridRows(form, x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) && x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase));
+
+                    RemoveCADGridRows(form, x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
+                                                 x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
+                                                 x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
                 }
                 else if (info.Item1 == "GRDCDCON")
                 {
                     SAPbouiCOM.Grid grid = (SAPbouiCOM.Grid)form.Items.Item("GRDCDCON").Specific;
-                    if (info.Item2 < 0 || info.Item2 >= grid.Rows.Count) { Global.GFunc.ShowError("Please select a valid CAD grid row."); return; }
+
+                    if (info.Item2 < 0 || info.Item2 >= grid.Rows.Count)
+                    {
+                        Global.GFunc.ShowError("Please select a valid CAD grid row.");
+                        return;
+                    }
+
                     int dtRow = grid.GetDataTableRowIndex(info.Item2);
                     SAPbouiCOM.DataTable dt = grid.DataTable;
+
+                    if (dtRow < 0 || dtRow >= dt.Rows.Count)
+                    {
+                        Global.GFunc.ShowError("Invalid CAD grid datasource row.");
+                        return;
+                    }
+
                     string code = dt.GetValue("ItemCode", dtRow).ToString().Trim();
                     string position = dt.GetValue("Position", dtRow).ToString().Trim();
                     string colour = dt.GetValue("BSCLR", dtRow).ToString().Trim();
+                    string useType = dt.GetValue("UseType", dtRow).ToString().Trim();
+
                     if (string.IsNullOrWhiteSpace(code)) return;
-                    data.RemoveAll(x => SameCADKey(x, colour, code, position));
+
+                    data.RemoveAll(x => SameCADKey(x, colour, useType, code, position));
+
                     WriteStoredCAD(form, data);
                     dt.Rows.Remove(dtRow);
                 }
+                else
+                {
+                    Global.GFunc.ShowError("Invalid CAD row selection.");
+                    return;
+                }
+
                 RememberCADGrid(form);
-                if (form.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE) form.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                if (form.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                    form.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
             }
-            catch (Exception ex) { Global.GFunc.ShowError($"CAD Delete Row Error: {ex.Message}"); }
-            finally { form.Freeze(false); }
+            catch (Exception ex)
+            {
+                Global.GFunc.ShowError($"CAD Delete Row Error: {ex.Message}");
+            }
+            finally
+            {
+                if (frozen) form.Freeze(false);
+            }
         }
 
         private static void RemoveCADGridRows(SAPbouiCOM.Form form, Func<Dictionary<string, string>, bool> remove)
         {
             SAPbouiCOM.DataTable dt = ((SAPbouiCOM.Grid)form.Items.Item("GRDCDCON").Specific).DataTable;
+
             for (int i = dt.Rows.Count - 1; i >= 0; i--)
             {
                 var row = new Dictionary<string, string>();
-                foreach (string f in CADFields) row[f] = dt.GetValue(f, i).ToString().Trim();
-                if (remove(row)) dt.Rows.Remove(i);
+
+                foreach (string field in CADFields)
+                    row[field] = dt.GetValue(field, i).ToString().Trim();
+
+                if (remove(row))
+                    dt.Rows.Remove(i);
             }
         }
 
-        private SAPbouiCOM.StaticText StaticText0;
-        private SAPbouiCOM.EditText EditText0;
     }
 }

@@ -2169,27 +2169,43 @@ namespace Apparel_Dynamic_1._0
 
                                 break;
                             }
+                        //case "FIL_FRM_CAD":
+                        //    {
+                        //        try
+                        //        {
+                        //            SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                        //            int selectedRow =MTXMRCON.GetNextSelectedRow(0,SAPbouiCOM.BoOrderType.ot_RowOrder);
+
+                        //            if (selectedRow <= 0)
+                        //                break;
+
+                        //            _cadDeletedItemCode =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLITMCOD").Cells.Item(selectedRow).Specific).Value.Trim();
+                        //            _cadDeletedPosition =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLPOS").Cells.Item(selectedRow).Specific).Value.Trim();
+                        //            _cadDeleteRowPending = true;
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            _cadDeleteRowPending = false;
+                        //            Global.GFunc.ShowError( "CAD Delete Row Error: " + ex.Message);
+                        //        }
+
+                        //        break;
+                        //    }
+
                         case "FIL_FRM_CAD":
                             {
+                                BubbleEvent = false;
+
                                 try
                                 {
-                                    SAPbouiCOM.Matrix MTXMRCON =(SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
-                                    int selectedRow =MTXMRCON.GetNextSelectedRow(0,SAPbouiCOM.BoOrderType.ot_RowOrder);
-
-                                    if (selectedRow <= 0)
-                                        break;
-
-                                    _cadDeletedItemCode =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLITMCOD").Cells.Item(selectedRow).Specific).Value.Trim();
-                                    _cadDeletedPosition =((SAPbouiCOM.EditText)MTXMRCON.Columns.Item("CLPOS").Cells.Item(selectedRow).Specific).Value.Trim();
-                                    _cadDeleteRowPending = true;
+                                    Apparel_Dynamic_1._0.Resources.Transaction.CAD.DeleteCADSelectedRow(oForm);
                                 }
                                 catch (Exception ex)
                                 {
-                                    _cadDeleteRowPending = false;
-                                    Global.GFunc.ShowError( "CAD Delete Row Error: " + ex.Message);
+                                    Global.GFunc.ShowError($"CAD Delete Row Error: {ex.Message}");
                                 }
 
-                                break;
+                                return;
                             }
                     }
                 }
@@ -2375,88 +2391,88 @@ namespace Apparel_Dynamic_1._0
 
                                     break;
                                 }
-                            case "FIL_FRM_CAD":
-                                {
-                                    try
-                                    {
-                                        if (!_cadDeleteRowPending)
-                                            break;
+                            //case "FIL_FRM_CAD":
+                            //    {
+                            //        //try
+                            //        //{
+                            //        //    if (!_cadDeleteRowPending)
+                            //        //        break;
 
-                                        oForm.Freeze(true);
+                            //        //    oForm.Freeze(true);
 
-                                        SAPbouiCOM.Matrix MTXMRCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
-                                        SAPbouiCOM.Matrix MTXCDCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
+                            //        //    SAPbouiCOM.Matrix MTXMRCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXMRCON").Specific;
+                            //        //    SAPbouiCOM.Matrix MTXCDCON = (SAPbouiCOM.Matrix)oForm.Items.Item("MTXCDCON").Specific;
 
-                                        SAPbouiCOM.DBDataSource dbMRCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
-                                        SAPbouiCOM.DBDataSource dbCDCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
+                            //        //    SAPbouiCOM.DBDataSource dbMRCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
+                            //        //    SAPbouiCOM.DBDataSource dbCDCON = oForm.DataSources.DBDataSources.Item("@FIL_DR_CADFABCN");
 
-                                        // ==========================================
-                                        // MTXMRCON
-                                        // SAP already deleted selected row
-                                        // ==========================================
-                                        MTXMRCON.FlushToDataSource();
+                            //        //    // ==========================================
+                            //        //    // MTXMRCON
+                            //        //    // SAP already deleted selected row
+                            //        //    // ==========================================
+                            //        //    MTXMRCON.FlushToDataSource();
 
-                                        for (int i = 0; i < dbMRCON.Size; i++)
-                                        {
-                                            dbMRCON.SetValue("LineId", i, (i + 1).ToString());
-                                        }
+                            //        //    for (int i = 0; i < dbMRCON.Size; i++)
+                            //        //    {
+                            //        //        dbMRCON.SetValue("LineId", i, (i + 1).ToString());
+                            //        //    }
 
-                                        MTXMRCON.LoadFromDataSource();
+                            //        //    MTXMRCON.LoadFromDataSource();
 
-                                        // ==========================================
-                                        // Delete matching rows from MTXCDCON
-                                        // Item Code + Position
-                                        // ==========================================
-                                        MTXCDCON.FlushToDataSource();
+                            //        //    // ==========================================
+                            //        //    // Delete matching rows from MTXCDCON
+                            //        //    // Item Code + Position
+                            //        //    // ==========================================
+                            //        //    MTXCDCON.FlushToDataSource();
 
-                                        for (int i = dbCDCON.Size - 1; i >= 0; i--)
-                                        {
-                                            string itemCode = dbCDCON.GetValue("U_ITEMCODE", i).Trim();
-                                            string position = dbCDCON.GetValue("U_POSITION", i).Trim();
+                            //        //    for (int i = dbCDCON.Size - 1; i >= 0; i--)
+                            //        //    {
+                            //        //        string itemCode = dbCDCON.GetValue("U_ITEMCODE", i).Trim();
+                            //        //        string position = dbCDCON.GetValue("U_POSITION", i).Trim();
 
-                                            if (itemCode == _cadDeletedItemCode && position == _cadDeletedPosition)
-                                            {
-                                                dbCDCON.RemoveRecord(i);
-                                            }
-                                        }
+                            //        //        if (itemCode == _cadDeletedItemCode && position == _cadDeletedPosition)
+                            //        //        {
+                            //        //            dbCDCON.RemoveRecord(i);
+                            //        //        }
+                            //        //    }
 
-                                        // ==========================================
-                                        // Re-arrange MTXCDCON LineId
-                                        // ==========================================
-                                        for (int i = 0; i < dbCDCON.Size; i++)
-                                        {
-                                            dbCDCON.SetValue("LineId", i, (i + 1).ToString());
-                                        }
+                            //        //    // ==========================================
+                            //        //    // Re-arrange MTXCDCON LineId
+                            //        //    // ==========================================
+                            //        //    for (int i = 0; i < dbCDCON.Size; i++)
+                            //        //    {
+                            //        //        dbCDCON.SetValue("LineId", i, (i + 1).ToString());
+                            //        //    }
 
-                                        MTXCDCON.LoadFromDataSource();
+                            //        //    MTXCDCON.LoadFromDataSource();
 
-                                        SAPbouiCOM.Grid GRDCDCON = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
-                                        for (int i = GRDCDCON.DataTable.Rows.Count - 1; i >= 0; i--)
-                                        {
-                                            GRDCDCON.DataTable.Rows.Remove(i);
-                                        }
+                            //        //    SAPbouiCOM.Grid GRDCDCON = (SAPbouiCOM.Grid)oForm.Items.Item("GRDCDCON").Specific;
+                            //        //    for (int i = GRDCDCON.DataTable.Rows.Count - 1; i >= 0; i--)
+                            //        //    {
+                            //        //        GRDCDCON.DataTable.Rows.Remove(i);
+                            //        //    }
 
-                                        // Form must know there are unsaved changes
-                                        if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
-                                        {
-                                            oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
-                                        }
+                            //        //    // Form must know there are unsaved changes
+                            //        //    if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
+                            //        //    {
+                            //        //        oForm.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+                            //        //    }
 
-                                        _cadDeletedItemCode = "";
-                                        _cadDeletedPosition = "";
-                                        _cadDeleteRowPending = false;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Global.GFunc.ShowError("CAD Related Consumption Delete Error: " + ex.Message);
-                                    }
-                                    finally
-                                    {
-                                        oForm.Freeze(false);
-                                    }
+                            //        //    _cadDeletedItemCode = "";
+                            //        //    _cadDeletedPosition = "";
+                            //        //    _cadDeleteRowPending = false;
+                            //        //}
+                            //        //catch (Exception ex)
+                            //        //{
+                            //        //    Global.GFunc.ShowError("CAD Related Consumption Delete Error: " + ex.Message);
+                            //        //}
+                            //        //finally
+                            //        //{
+                            //        //    oForm.Freeze(false);
+                            //        //}
 
-                                    break;
-                                }
+                            //        break;
+                            //    }
 
                             case "FIL_FRM_EXPLC":
                                 {

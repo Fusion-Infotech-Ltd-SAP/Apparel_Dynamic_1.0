@@ -20,27 +20,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
         private SAPbouiCOM.StaticText STSTATUS, STREMRKS, STSTYLCD, STSTYLDS, STMERCHN, STDOCNUM, STDOCDAT, STDRFTNO, STSLCLR, STCDCLR;
         private SAPbouiCOM.EditText ETSLCLR, ETREMRKS, ETSTYLCD, ETMERHN, ETSTYLDS, ETDOCNUM, ETMERCNM, ETDONTRY, ETDOCDAT, ETDRFTNO, ETCDCLR, ETDOCTRY, ETSTNTRY;
-
-
-
         private SAPbouiCOM.ComboBox CBSERIES, CBSTATUS;
-
-
-
         private SAPbouiCOM.Folder FOLMERCON, FOLCANCON, FOLTEMP;
-
-
-
         private SAPbouiCOM.Matrix MTXMRCON, MTXCDCLR, MTXCDCON;
-
-
-
         private SAPbouiCOM.Grid GRDCDCON, GRDSIZE, GRDSCLR;
-
         private SAPbouiCOM.LinkedButton LKSTYLNO, LKDRFTOR, LKMRCHND;
-
-
-
         private SAPbouiCOM.Button ADDButton, CancelButton, BTNFETCH, BTNLDCAD, BTNSAVE, BTNLDCLR;
 
 
@@ -2468,7 +2452,9 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
             _cadDeleteContext.Remove(form.UniqueID);
 
-            if (form.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE && form.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
+            if (form.Mode != SAPbouiCOM.BoFormMode.fm_ADD_MODE &&
+                form.Mode != SAPbouiCOM.BoFormMode.fm_UPDATE_MODE &&
+                form.Mode != SAPbouiCOM.BoFormMode.fm_OK_MODE)
             {
                 Global.GFunc.ShowError("Row deletion is not allowed in this form mode.");
                 return;
@@ -2485,6 +2471,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 SAPbouiCOM.Matrix merch = (SAPbouiCOM.Matrix)form.Items.Item("MTXMRCON").Specific;
                 SAPbouiCOM.Matrix stored = (SAPbouiCOM.Matrix)form.Items.Item("MTXCDCON").Specific;
+                SAPbouiCOM.Grid grid = (SAPbouiCOM.Grid)form.Items.Item("GRDCDCON").Specific;
 
                 stored.FlushToDataSource();
                 var data = ReadStoredCAD(form);
@@ -2508,6 +2495,13 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     merch.FlushToDataSource();
 
                     SAPbouiCOM.DBDataSource db = form.DataSources.DBDataSources.Item("@FIL_DR_CADMFAB");
+
+                    if (rowIndex - 1 >= db.Size)
+                    {
+                        Global.GFunc.ShowError("Invalid Merchandise Consumption datasource row.");
+                        return;
+                    }
+
                     db.RemoveRecord(rowIndex - 1);
 
                     for (int i = 0; i < db.Size; i++)
@@ -2515,32 +2509,34 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                     merch.LoadFromDataSource();
 
-                    data.RemoveAll(x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
-                                        x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
-                                        x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
+                    data.RemoveAll(x =>
+                        x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
+                        x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
+                        x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
 
                     WriteStoredCAD(form, data);
 
-                    RemoveCADGridRows(form, x => x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
-                                                 x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
-                                                 x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
+                    RemoveCADGridRows(form, x =>
+                        x["ItemCode"].Equals(code, StringComparison.OrdinalIgnoreCase) &&
+                        x["Position"].Equals(position, StringComparison.OrdinalIgnoreCase) &&
+                        x["UseType"].Equals(useType, StringComparison.OrdinalIgnoreCase));
                 }
                 else if (info.Item1 == "GRDCDCON")
                 {
-                    SAPbouiCOM.Grid grid = (SAPbouiCOM.Grid)form.Items.Item("GRDCDCON").Specific;
+                    int selectedRow = info.Item2;
 
-                    if (info.Item2 < 0 || info.Item2 >= grid.Rows.Count)
+                    if (selectedRow < 0 || selectedRow >= grid.Rows.Count)
                     {
-                        Global.GFunc.ShowError("Please select a valid CAD grid row.");
+                        Global.GFunc.ShowError("Please select a valid CAD Consumption grid row.");
                         return;
                     }
 
-                    int dtRow = grid.GetDataTableRowIndex(info.Item2);
+                    int dtRow = grid.GetDataTableRowIndex(selectedRow);
                     SAPbouiCOM.DataTable dt = grid.DataTable;
 
                     if (dtRow < 0 || dtRow >= dt.Rows.Count)
                     {
-                        Global.GFunc.ShowError("Invalid CAD grid datasource row.");
+                        Global.GFunc.ShowError("Invalid CAD Consumption datasource row.");
                         return;
                     }
 
@@ -2549,11 +2545,25 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
                     string colour = dt.GetValue("BSCLR", dtRow).ToString().Trim();
                     string useType = dt.GetValue("UseType", dtRow).ToString().Trim();
 
-                    if (string.IsNullOrWhiteSpace(code)) return;
+                    if (string.IsNullOrWhiteSpace(code))
+                    {
+                        Global.GFunc.ShowError("Cannot delete an empty CAD Consumption row.");
+                        return;
+                    }
 
-                    data.RemoveAll(x => SameCADKey(x, colour, useType, code, position));
+                    int removedCount = data.RemoveAll(x =>
+                        SameCADKey(x, colour, useType, code, position));
 
+                    if (removedCount == 0)
+                    {
+                        Global.GFunc.ShowError("Matching CAD Consumption record was not found in the stored datasource.");
+                        return;
+                    }
+
+                    // Update DBDataSource and refresh MTXCDCON.
                     WriteStoredCAD(form, data);
+
+                    // Remove the selected record from GRDCDCON.
                     dt.Rows.Remove(dtRow);
                 }
                 else
@@ -2566,6 +2576,11 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
 
                 if (form.Mode == SAPbouiCOM.BoFormMode.fm_OK_MODE)
                     form.Mode = SAPbouiCOM.BoFormMode.fm_UPDATE_MODE;
+
+                Application.SBO_Application.StatusBar.SetText(
+                    "CAD row deleted successfully. Click SAP Update/Add to save changes.",
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Success);
             }
             catch (Exception ex)
             {

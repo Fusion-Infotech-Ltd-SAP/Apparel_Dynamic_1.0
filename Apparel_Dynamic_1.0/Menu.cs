@@ -1522,7 +1522,7 @@ namespace Apparel_Dynamic_1._0
                                     // Series Initialization
                                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                     {
-                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM");
+                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM", "ETDRFTNO", "ETSTYLCD");
                                         Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
 
                                         string today = DateTime.Now.ToString("yyyyMMdd");
@@ -1789,7 +1789,7 @@ namespace Apparel_Dynamic_1._0
                             }
                         case "FIL_FRM_CAD":
                             {
-                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETDOCDAT", "ETMERCNM", "ETSTYLDS");
+                                Global.GFunc.SetItemsEnabled(oForm, true, "ETDOCNUM", "ETDOCDAT", "ETMERCNM", "ETSTYLDS", "ETSTYLCD", "ETDRFTNO", "ETDONTRY");
                                 Global.GFunc.SetItemsEnabled(oForm, false, "CBSERIES");
                                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETSLCLR").Specific).Value = "";
                                 ((SAPbouiCOM.EditText)oForm.Items.Item("ETCDCLR").Specific).Value = "";

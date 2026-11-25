@@ -1522,8 +1522,8 @@ namespace Apparel_Dynamic_1._0
                                     // Series Initialization
                                     if (oForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                                     {
-                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM", "ETDRFTNO", "ETSTYLCD");
-                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT");
+                                        Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "ETSTYLDS", "ETMERCNM");
+                                        Global.GFunc.SetItemsEnabled(oForm, true, "CBSERIES", "ETDOCDAT", "ETDRFTNO", "ETSTYLCD");
 
                                         string today = DateTime.Now.ToString("yyyyMMdd");
                                         SAPbouiCOM.DBDataSource oDBH = oForm.DataSources.DBDataSources.Item("@FIL_DH_CADFABCN");

@@ -132,7 +132,7 @@ namespace Apparel_Dynamic_1._0.Resources.Transaction
             LoadHeaderColourSizeInfo(pVal.FormUID);
             LoadCADConsumptionDetails(pVal.FormUID);
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "ETDOCDAT", "ETMERCNM", "ETSTYLDS");
+            Global.GFunc.SetItemsEnabled(oForm, false, "ETDOCNUM", "CBSERIES", "ETDOCDAT", "ETMERCNM", "ETSTYLDS", "ETSTYLCD", "ETDRFTNO");
             Global.GFunc.AddLineIfLastRowHasValue(oForm, "MTXMRCON", "@FIL_DR_CADMFAB", "U_ITEMCODE");
 
         }
